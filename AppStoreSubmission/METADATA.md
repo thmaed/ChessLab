@@ -1,6 +1,6 @@
 # Métadonnées App Store Connect — ChessLab
 
-**Version courante : 2.4, build 27** (fixés dans `project.pbxproj`). La 2.3 (build 24) est EN VENTE ; les builds 25 et 26 de la 2.4 sont déjà chez les testeurs internes de TestFlight (groupe « Test ChessLab »), le 27 les remplace. Voir `RELEASE_NOTES-2.4.md` pour le détail. **Préparée le 20/11/2026 : fiche à cinq langues (fr-FR, en-GB, es-ES, de-DE, it-IT), nouveautés et notes de révision posées dans App Store Connect (version 2.4) ; la version n'est PAS soumise à la révision (attendre l'accord de Thierry). Les textes es/de/it attendent une relecture par un locuteur natif.**
+**Version courante : 2.4, build 28** (fixés dans `project.pbxproj`). La 2.3 (build 24) est EN VENTE ; les builds 25, 26 et 27 de la 2.4 sont déjà chez les testeurs internes de TestFlight (groupe « Test ChessLab »), le 28 les remplace. Voir `RELEASE_NOTES-2.4.md` pour le détail. **Préparée le 20/11/2026 : fiche à cinq langues (fr-FR, en-GB, es-ES, de-DE, it-IT), nouveautés et notes de révision posées dans App Store Connect (version 2.4) ; la version n'est PAS soumise à la révision (attendre l'accord de Thierry). Les textes es/de/it attendent une relecture par un locuteur natif.**
 
 > **Variantes régionales (14/11/2026)** — en-AU, en-CA (texte de l'anglais UK), es-MX (texte de es-ES), fr-CA (texte de fr-FR) et **en-US** reprennent le texte de leur langue-source, sans rien réécrire (`VARIANTS` dans `tools/asc/asc.py`). « ChessLab » seul est PRIS en en-US, en allemand et en italien : la fiche américaine s'appelle **« ChessLab: Chess Trainer »**, l'allemande « ChessLab Schach », l'italienne « ChessLab Scacchi ». Le nom sous l'icône reste « ChessLab ». Visuels : es-MX et fr-CA ont leur jeu (celui de es-ES / fr-FR) ; les variantes anglaises reprennent ceux de la langue principale (en-GB).
 
@@ -16,7 +16,7 @@ Tout ce qui suit est à copier-coller directement dans les champs correspondants
 
 C'est le champ « What's New in This Version ». Rédigé pour l'utilisateur final : ce qu'il va sentir, pas ce qui a été refactorisé. Un texte par langue de la fiche (fr-FR, en-GB, es-ES, de-DE, it-IT) ; les trois derniers sont à faire relire par un locuteur natif.
 
-> Version 2.4, build 27. Contenu : coups à la voix (reconnaissance sur l'appareil), partie à l'aveugle, module Visualisation, « Contre la montre » dans les puzzles, écran Nouvelle partie refait, synchro iCloud revue (« Vos appareils »). Détail dans `RELEASE_NOTES-2.4.md`. Les textes de la 2.3 sont dans `RELEASE_NOTES-2.3.md`.
+> Version 2.4, build 28. Contenu : coups à la voix (reconnaissance sur l'appareil), partie à l'aveugle, module Visualisation, « Contre la montre » dans les puzzles, écran Nouvelle partie refait, synchro iCloud revue (« Vos appareils »). Détail dans `RELEASE_NOTES-2.4.md`. Les textes de la 2.3 sont dans `RELEASE_NOTES-2.3.md`.
 
 ### Français
 
@@ -492,7 +492,7 @@ Réponses déduites du code (vérifié, pas deviné) :
 
 ### Version et build
 
-**2.4, build 27** (le 25, téléversé le 19/11, ne portait ni la fin de phrase lissée, ni l'essai anticipé, ni la pastille du micro, ni la ligne orange « Sous iOS 18… » ni les nouveautés 2.4 de l'Aide ; le 26 du 20/11 portait tout cela mais encore l'ancienne phrase d'aide sur l'interrupteur « Micro » et les traductions es/de/it d'avant la relecture du 20/11 au soir) — `MARKETING_VERSION = 2.4`, `CURRENT_PROJECT_VERSION = 27` (aux quatre configurations, app et extension de partage). La 2.3 (build 24) est en vente. Nouveautés détaillées dans `RELEASE_NOTES-2.4.md`. **État au 20/11/2026 :** build 27 téléversé, traité et rattaché à la version 2.4 (PREPARE_FOR_SUBMISSION, NON soumise) ; il est aussi en TestFlight interne (groupe « Test ChessLab », distribution automatique). Captures « 04-adversaires » refaites (iPhone, iPad, Duo extérieur, cinq langues).
+**2.4, build 28** (le 27 portait encore le défaut des jauges sur écran de 320 pt, corrigé dans le 28 ; le 25, téléversé le 19/11, ne portait ni la fin de phrase lissée, ni l'essai anticipé, ni la pastille du micro, ni la ligne orange « Sous iOS 18… » ni les nouveautés 2.4 de l'Aide ; le 26 du 20/11 portait tout cela mais encore l'ancienne phrase d'aide sur l'interrupteur « Micro » et les traductions es/de/it d'avant la relecture du 20/11 au soir) — `MARKETING_VERSION = 2.4`, `CURRENT_PROJECT_VERSION = 28` (aux quatre configurations, app et extension de partage). La 2.3 (build 24) est en vente. Nouveautés détaillées dans `RELEASE_NOTES-2.4.md`. **État au 20/11/2026 :** build 28 téléversé, traité et rattaché à la version 2.4 (PREPARE_FOR_SUBMISSION, NON soumise) ; il est aussi en TestFlight interne (groupe « Test ChessLab », distribution automatique). Captures « 04-adversaires » refaites (iPhone, iPad, Duo extérieur, cinq langues).
 
 **2.3, build 24** (le 23, téléversé le 14/11, est remplacé : il affichait « 2.3 » au-dessus des nouveautés 2.2 dans l'Aide) — `MARKETING_VERSION = 2.3`, `CURRENT_PROJECT_VERSION = 24` (aux quatre configurations, app et extension de partage ; la 2.2, build 22, est en vente : à revérifier par `asc.py build` avant l'archive). Nouveautés détaillées dans `RELEASE_NOTES-2.3.md`.
 
@@ -536,7 +536,7 @@ git push origin main
 Au 19/08/2026, `main` est poussé au fil de l'eau (la nuit de travail du 18-19/08 a été poussée commit par commit). Vérifier malgré tout au moment de soumettre (`git log --oneline origin/main..HEAD | wc -l` doit rendre 0) : soumettre sans pousser publierait un binaire dont les sources annoncées ne correspondent pas.
 
 ### Historique des versions
-- **2.4** — build 27 (les 25 et 26 sont sur TestFlight, remplacés) : coups à la voix, partie à l'aveugle, Visualisation, « Contre la montre », Nouvelle partie refaite, synchro iCloud revue (`RELEASE_NOTES-2.4.md`).
+- **2.4** — build 28 (les 25, 26 et 27 sont sur TestFlight, remplacés) : coups à la voix, partie à l'aveugle, Visualisation, « Contre la montre », Nouvelle partie refaite, synchro iCloud revue (`RELEASE_NOTES-2.4.md`).
 - **2.3** — build 23, préparée (non soumise) : espagnol, allemand et italien complets (interface, aide, cours, noms d'ouvertures, notation), sélecteur de langue en pastilles, noms des joueurs par défaut traduits (`RELEASE_NOTES-2.3.md`).
 - **2.2** — build 22, en vente : scanner fiabilisé (photos d'écran, revue des cases douteuses, partage depuis Photos par l'extension ChessLabShare), export PGN et copie iCloud des collections de puzzles, réglage « Afficher le thème du puzzle », Laboratoire Chess960, Stockfish 19, jauge d'avancement de l'analyse (`RELEASE_NOTES-2.2.md`).
 - **2.1** — build 21, en vente depuis le 05/11/2026 : collections de puzzles importées, écran Puzzles repensé, réussite partielle, 130 935 puzzles (`RELEASE_NOTES-2.1.md`).

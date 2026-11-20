@@ -2,7 +2,7 @@
 
 Notes DÉTAILLÉES pour le dépôt. Les textes à coller dans App Store Connect sont dans la section « Nouveautés de cette version » de `METADATA.md` (un par langue : fr-FR, en-GB, es-ES, de-DE, it-IT).
 
-> Version `2.4`, build `27` (la 2.3, build 24, est en vente ; les builds 25 et 26 sont sur TestFlight, le 27 les remplace). iOS seulement pour cette version : Android n'a pas de version 2.4 (rien publié sur Play depuis la 2.3) ; ses écarts sont dans `android/PARITE.md`. Préparée le 20/11/2026 ; la version n'est pas soumise à la révision.
+> Version `2.4`, build `28` (la 2.3, build 24, est en vente ; les builds 25, 26 et 27 sont sur TestFlight, le 28 les remplace). iOS seulement pour cette version : Android n'a pas de version 2.4 (rien publié sur Play depuis la 2.3) ; ses écarts sont dans `android/PARITE.md`. Préparée le 20/11/2026 ; la version n'est pas soumise à la révision.
 
 ## Ce qui est nouveau
 

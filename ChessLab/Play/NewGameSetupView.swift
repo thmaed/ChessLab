@@ -457,39 +457,10 @@ struct NewGameSetupView: View {
     }
 
     /// Quatre jauges de cinq points : Attaque, Solidité, Échanges, Imprévisible — calculées des réglages du
-    /// personnage (``OpponentTraits``), donc comparables d'un personnage à l'autre.
+    /// personnage (``OpponentTraits``), donc comparables d'un personnage à l'autre. Voir ``OpponentGaugesView`` :
+    /// elles se partagent la largeur (un affichage « Zoomé » de 320 pt débordait avec la grille à largeurs fixes).
     private func traitGauges(_ traits: OpponentTraits) -> some View {
-        Grid(horizontalSpacing: 18, verticalSpacing: 6) {
-            GridRow {
-                traitGauge("Attaque", traits.attack)
-                traitGauge("Solidité", traits.solidity)
-            }
-            GridRow {
-                traitGauge("Échanges", traits.trades)
-                traitGauge("Imprévisible", traits.unpredictability)
-            }
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("opponentTraits")
-    }
-
-    private func traitGauge(_ title: LocalizedStringKey, _ value: Int) -> some View {
-        HStack(spacing: 8) {
-            Text(title)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(Theme.textSecondary)
-                .frame(width: 82, alignment: .leading)
-            HStack(spacing: 3) {
-                ForEach(1...5, id: \.self) { step in
-                    Capsule()
-                        .fill(step <= value ? heroVivid : Color.white.opacity(0.12))
-                        .frame(width: 12, height: 6)
-                }
-            }
-        }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(title))
-        .accessibilityValue(Text("\(value) sur 5"))
+        OpponentGaugesView(traits: traits, tint: heroVivid)
     }
 
     /// Le niveau, sur une ligne : le mot, le curseur, le chiffre.
