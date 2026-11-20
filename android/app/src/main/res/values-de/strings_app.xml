@@ -71,7 +71,7 @@
     <string name="help_level_title">Die angezeigte Stufe</string>
     <string name="help_offline_body">Alles. Kein Konto, kein Netz, keine Daten, die das Gerät verlassen. Engine, Puzzles, Kurse und Gegner sind eingebaut.</string>
     <string name="help_visualization_title">Visualisierung</string>
-    <string name="help_visualization_body">Das Brett im Kopf sehen, Stufe um Stufe. Hake die Stufen an, die du üben willst: Die Serie mischt die angehakten.\n\nDIE FÜNF STUFEN\n1. Die Felder: die Farbe eines Feldes, es auf einem Brett ohne Koordinaten finden, es benennen.\n2. Die Linien: gleiche Diagonale, Schnittpunkte, Springerwege.\n3. Figuren verfolgen: Züge in Notation, ohne Brett — sind sie möglich, was greift die Figur an?\n4. Die Stellung ohne Brett: Schach, hängende Figur, angegriffenes Feld.\n5. Rechnen: Ein Puzzle erscheint, etwas unter deiner Wertung gewählt; „Ich habe sie mir gemerkt“ verbirgt die Figuren, dann spielst du den Zug — oder die Fortsetzung nach zwei vorgegebenen Zügen — auf dem leeren Brett: erst das Ausgangsfeld, dann das Zielfeld antippen. Jeder Mattzug ist richtig.\n\nEINSTELLUNGEN\nDauer: 10 oder 20 Fragen, 1 oder 2 Minuten. Zeit pro Frage: Ohne, Kurz, Mittel oder Lang; sie wächst mit der Stufe (eine Stellung bekommt viermal so viel Zeit wie ein Feld). „Aus Sicht von Schwarz“ dreht das Brett.\n\nFORTSCHRITT\nDie Übungen werden endlos erzeugt. Eine verpasste Frage kommt in späteren Serien wieder, bis du sie zweimal richtig hast. Der Prozentsatz neben einer Stufe bezieht sich auf ihre letzten 50 Fragen. Der Zurück-Pfeil führt zu den Einstellungen; was du beantwortet hast, zählt weiter.</string>
+    <string name="help_visualization_body">Das Brett im Kopf sehen, Stufe um Stufe. Hake die Stufen an, die du üben willst: Die Serie mischt die angehakten.\n\nDIE FÜNF STUFEN\n1. Die Felder: die Farbe eines Feldes, es auf einem Brett ohne Koordinaten finden, es benennen.\n2. Die Linien: gleiche Diagonale, Kreuzungen, Springerwege.\n3. Figuren verfolgen: Züge in Notation, ohne Brett — sind sie möglich, was greift die Figur an?\n4. Die Stellung ohne Brett: Schach, hängende Figur, angegriffenes Feld.\n5. Rechnen: Ein Puzzle erscheint, etwas unter deiner Wertung gewählt; „Ich habe sie mir gemerkt“ verbirgt die Figuren, dann spielst du den Zug — oder die Fortsetzung nach zwei vorgegebenen Zügen — auf dem leeren Brett: erst das Ausgangsfeld, dann das Zielfeld antippen. Jeder Mattzug ist richtig.\n\nEINSTELLUNGEN\nDauer: 10 oder 20 Fragen, 1 oder 2 Minuten. Zeit pro Frage: Ohne, Kurz, Mittel oder Lang; sie wächst mit der Stufe (eine Stellung bekommt viermal so viel Zeit wie ein Feld). „Aus Sicht von Schwarz“ dreht das Brett.\n\nFORTSCHRITT\nDie Übungen werden endlos erzeugt. Eine verpasste Frage kommt in späteren Serien wieder, bis du sie zweimal richtig hast. Der Prozentsatz neben einer Stufe bezieht sich auf ihre letzten 50 Fragen. Der Zurück-Pfeil führt zu den Einstellungen; was du beantwortet hast, zählt weiter.</string>
     <string name="help_offline_title">Was offline bleibt</string>
     <string name="help_puzzles_body">Standardmäßig ein Versuch. Drei laden dazu ein, einen Zug „zum Ausprobieren“ zu spielen – genau das Gegenteil dessen, was ein Puzzle trainiert: Man berechnet die Variante bis zum Ende, BEVOR man die Figur anfasst. Das Drei-Versuche-Netz bleibt in den Einstellungen. „Verfehlt“ wiederholt nur, was du beim letzten Versuch falsch gemacht hast, und ein Zug, der Matt setzt, wird immer akzeptiert, auch wenn er nicht die gespeicherte Lösung ist. Am Ende einer Partie sucht „Verpasste Matts“ die erzwungenen Matts, die eine der beiden Seiten entwischen ließ, und bietet an, Puzzles daraus zu machen. Die Woodpecker-Methode nimmt einen festen Satz von 10, 25 oder 50 Puzzles Zyklus für Zyklus in neuer Reihenfolge wieder auf, um mehr davon schneller zu finden; die verteilte Wiederholung lässt sie unberührt. Deine eigenen Puzzles (eine PGN-Datei, in der jede Partie ein Puzzle mit FEN-Header ist; der erste Zug wird für dich gespielt, wie bei Lichess) importierst du über den Bildschirm Puzzles: Jede Datei wird zu einer separat abgelegten Sammlung, die du in Serie oder im vollständigen Woodpecker-Programm übst. Das Menü einer Sammlung exportiert sie als PGN: Das ist auch ihre Sicherung, und die Datei lässt sich unverändert wieder importieren.</string>
     <string name="help_puzzles_title">Die Puzzles</string>
@@ -1362,7 +1362,7 @@
     <string name="rush_black_to_move">Schwarz am Zug</string>
     <string name="rush_new_record">Neuer Rekord! (vorher: %1$d)</string>
     <string name="rush_first_record">Erster Rekord!</string>
-    <string name="rush_hardest">Schwerstes gelöstes: %1$d</string>
+    <string name="rush_hardest">Schwierigstes gelöstes Puzzle: %1$d</string>
     <string name="rush_done">Fertig</string>
     <string name="rush_again">Wiederholen</string>
     <string name="rush_analyze">Analysieren</string>
@@ -1509,7 +1509,7 @@
     <string name="vis_timer_medium">Mittel</string>
     <string name="vis_timer_long">Lang</string>
     <string name="vis_hero_title">Das Brett im Kopf sehen</string>
-    <string name="vis_hero_detail">Endlose Übungen, von den Feldern bis zum Rechnen. Deine Fehler kommen wieder, bis du sie kannst.</string>
+    <string name="vis_hero_detail">Endlose Übungen, von den Feldern bis zum Rechnen. Deine Fehler kommen wieder, bis du richtig antwortest.</string>
     <string name="vis_len_two_minutes">2 Minuten</string>
     <string name="vis_correct_in_two_minutes">richtig in zwei Minuten</string>
     <!-- Visualisation, lot 3 (18/11/2026) -->
@@ -1521,7 +1521,7 @@
     <string name="vis_q_memorize">Merke dir die Stellung und verdecke sie dann.</string>
     <string name="vis_q_white_to_move">Weiß am Zug: Spiele den besten Zug aus dem Gedächtnis.</string>
     <string name="vis_q_black_to_move">Schwarz am Zug: Spiele den besten Zug aus dem Gedächtnis.</string>
-    <string name="vis_q_after">Nach %1$s spiele den nächsten Zug aus dem Gedächtnis.</string>
+    <string name="vis_q_after">Nach %1$s: Spiele den nächsten Zug aus dem Gedächtnis.</string>
 
     <!-- Coups à la voix (19/11/2026) — pendant des clés iOS de la voix. -->
     <string name="voice_row">Züge per Sprache</string>
@@ -1541,5 +1541,5 @@
     <string name="voice_ambiguous">Mehrere Figuren können das: sag auch das Ausgangsfeld</string>
     <string name="voice_not_understood">Ich habe dich nicht verstanden</string>
     <string name="help_voice_title">Mit der Stimme spielen</string>
-    <string name="help_voice_body">Schalte unter Neue Partie, Karte „Partie“, „Züge per Sprache“ ein. Während der Partie hört das Mikrofon von selbst zu, wenn du am Zug bist: Sag deinen Zug — „Springer f3“, „Läufer schlägt c6“, „e4“, „kurze Rochade“, „e8 Dame“ für eine Umwandlung.\n\nDer verstandene Zug wird sofort gespielt und oben am Brett angezeigt; sag „zurück“, um ihn zurückzunehmen. Ein unmöglicher Zug oder ein nicht verstandener Satz wird laut gesagt. Können zwei Figuren auf dasselbe Feld, nenne auch die Ausgangslinie: „Springer b d2“. Der Schalter „Mikrofon“ über dem Brett schaltet das Mikrofon während eines Gesprächs aus; auf dem Brett kannst du immer spielen, ob das Mikrofon an ist oder nicht.\n\nDeine Stimme wird auf dem Gerät erkannt, ohne Netzwerk, und nie gespeichert.</string>
+    <string name="help_voice_body">Schalte unter Neue Partie, Karte „Partie“, „Züge per Sprache“ ein. Während der Partie hört das Mikrofon von selbst zu, wenn du am Zug bist: Sag deinen Zug — „Springer f3“, „Läufer schlägt c6“, „e4“, „kurze Rochade“, „e8 Dame“ für eine Umwandlung.\n\nDer verstandene Zug wird sofort gespielt und oben am Brett angezeigt; sag „zurück“, um ihn zurückzunehmen. Ein unmöglicher Zug oder ein nicht verstandener Satz wird dir laut gesagt. Können zwei Figuren auf dasselbe Feld ziehen, nenne auch die Ausgangslinie: „Springer b d2“. Die Mikrofon-Schaltfläche unter dem Brett, neben deinem Namen, schaltet das Mikrofon während eines Gesprächs aus; tippe erneut darauf, um es wieder einzuschalten. Auf dem Brett kannst du immer spielen, ob das Mikrofon an ist oder nicht.\n\nDeine Stimme wird auf dem Gerät erkannt, ohne Netzwerk, und nie gespeichert.</string>
 </resources>

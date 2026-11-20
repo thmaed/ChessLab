@@ -1479,7 +1479,7 @@
     <string name="vis_from_black">Dal lato del Nero</string>
     <string name="vis_timer">Tempo per domanda</string>
     <string name="vis_timer_none">Senza</string>
-    <string name="vis_review_waiting">%1$d domanda/e sbagliata/e tornerà/anno nelle tue serie.</string>
+    <string name="vis_review_waiting">Domande sbagliate che torneranno nelle tue serie: %1$d.</string>
     <string name="vis_step_squares">Le case</string>
     <string name="vis_step_lines">Le linee</string>
     <string name="vis_step_squares_detail">Colore di una casa, trovarla, nominarla</string>
@@ -1548,7 +1548,7 @@
     <string name="vis_timer_medium">Medio</string>
     <string name="vis_timer_long">Lungo</string>
     <string name="vis_hero_title">Vedere la scacchiera nella testa</string>
-    <string name="vis_hero_detail">Esercizi infiniti, dalle case al calcolo. I tuoi errori tornano finché non li sai.</string>
+    <string name="vis_hero_detail">Esercizi infiniti, dalle case al calcolo. I tuoi errori tornano finché non rispondi bene.</string>
     <string name="vis_len_two_minutes">2 minuti</string>
     <string name="vis_correct_in_two_minutes">giuste in due minuti</string>
     <!-- Visualisation, lot 3 (18/11/2026) -->
@@ -1574,11 +1574,11 @@
     <string name="voice_mic_off">Microfono spento: gioca sulla scacchiera</string>
     <string name="voice_note_denied">Microfono o riconoscimento vocale negati: consentili in Impostazioni.</string>
     <string name="voice_note_unavailable">Non disponibile su questo dispositivo in questa lingua: il riconoscimento deve avvenire sul dispositivo, senza rete.</string>
-    <string name="voice_note_on">Di\' la tua mossa quando tocca a te: viene giocata appena capita; «annulla» la ritira.</string>
+    <string name="voice_note_on">Di\' la tua mossa quando tocca a te: viene giocata non appena è riconosciuta; «annulla» la ritira.</string>
     <string name="voice_undone">Mossa ritirata</string>
     <string name="voice_cannot_undo">Impossibile ritirare questa mossa</string>
     <string name="voice_ambiguous">Più pezzi possono farlo: di\' anche la casa di partenza</string>
     <string name="voice_not_understood">Non ho capito</string>
     <string name="help_voice_title">Giocare a voce</string>
-    <string name="help_voice_body">In Nuova partita, scheda «Partita», attiva «Mosse a voce». Durante la partita il microfono ascolta da solo quando tocca a te: di\' la tua mossa — «cavallo f3», «alfiere prende c6», «e4», «arrocco corto», «e8 donna» per una promozione.\n\nLa mossa capita viene giocata subito e appare sopra la scacchiera; di\' «annulla» per ritirarla. Una mossa impossibile o una frase non capita ti viene detta ad alta voce. Se due pezzi possono andare sulla stessa casa, aggiungi la colonna di partenza: «cavallo b d2». L\'interruttore «Microfono», sopra la scacchiera, spegne il microfono durante una conversazione; puoi sempre giocare sulla scacchiera, con il microfono acceso o spento.\n\nLa tua voce è riconosciuta sul dispositivo, senza rete, e non viene mai registrata.</string>
+    <string name="help_voice_body">In Nuova partita, scheda «Partita», attiva «Mosse a voce». Durante la partita il microfono ascolta da solo quando tocca a te: di\' la tua mossa — «cavallo f3», «alfiere prende c6», «e4», «arrocco corto», «e8 donna» per una promozione.\n\nLa mossa riconosciuta viene giocata subito e appare sopra la scacchiera; di\' «annulla» per ritirarla. Una mossa impossibile o una frase non compresa ti viene detta ad alta voce. Se due pezzi possono andare sulla stessa casa, aggiungi la colonna di partenza: «cavallo b d2». Il pulsante del microfono, sotto la scacchiera, accanto al tuo nome, spegne il microfono durante una conversazione; toccalo di nuovo per riaccenderlo. Puoi sempre giocare sulla scacchiera, con il microfono acceso o spento.\n\nLa tua voce è riconosciuta sul dispositivo, senza rete, e non viene mai registrata.</string>
 </resources>

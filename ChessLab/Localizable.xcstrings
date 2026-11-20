@@ -3600,7 +3600,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aktiviere die Synchronisierung in den Einstellungen, damit deine Partien dir über dein privates iCloud auf allen Geräten folgen – kein Konto nötig, keine Server von Drittanbietern. Standardmäßig deaktiviert: Die App funktioniert vollständig offline. Die Änderung wird beim nächsten Start wirksam."
+            "value": "Aktiviere die Synchronisierung in den Einstellungen, damit deine Partien dir über deine private iCloud auf allen Geräten folgen – kein Konto nötig, keine Server von Drittanbietern. Standardmäßig deaktiviert: Die App funktioniert vollständig offline. Die Änderung wird beim nächsten Start wirksam."
           }
         },
         "it": {
@@ -3634,7 +3634,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aktiviere die Synchronisierung in den Einstellungen, damit deine Partien dir über dein privates iCloud auf allen Geräten folgen – kein Konto nötig, keine Server von Drittanbietern. Standardmäßig deaktiviert: Die App funktioniert vollständig offline. Die Änderung wird beim nächsten Start wirksam.\n\nWAS SYNCHRONISIERT WIRD\nDeine beendeten Partien, dein Fortschritt bei Eröffnungen und Endspielen, deine persönlichen Repertoires, deine importierten Puzzle-Sammlungen (die Puzzles, nicht dein Fortschritt darin) und deine Einstellungen – Brettdesign, Figurensatz, Notation, Versuche pro Puzzle, Partieeinstellungen.\n\nWAS AUF JEDEM GERÄT BLEIBT\nSprache und Töne, damit jedes Gerät seine eigenen behält. Und deine LAUFENDE Partie: Sie bleibt dort, wo du sie spielst. Zwei Geräte, zwei begonnene Partien – eine müsste geopfert werden; besser, jede wartet dort auf dich, wo du sie verlassen hast."
+            "value": "Aktiviere die Synchronisierung in den Einstellungen, damit deine Partien dir über deine private iCloud auf allen Geräten folgen – kein Konto nötig, keine Server von Drittanbietern. Standardmäßig deaktiviert: Die App funktioniert vollständig offline. Die Änderung wird beim nächsten Start wirksam.\n\nWAS SYNCHRONISIERT WIRD\nDeine beendeten Partien, dein Fortschritt bei Eröffnungen und Endspielen, deine persönlichen Repertoires, deine importierten Puzzle-Sammlungen (die Puzzles, nicht dein Fortschritt darin) und deine Einstellungen – Brettdesign, Figurensatz, Notation, Versuche pro Puzzle, Partieeinstellungen.\n\nWAS AUF JEDEM GERÄT BLEIBT\nSprache und Töne, damit jedes Gerät seine eigenen behält. Und deine LAUFENDE Partie: Sie bleibt dort, wo du sie spielst. Zwei Geräte, zwei begonnene Partien – eine müsste geopfert werden; besser, jede wartet dort auf dich, wo du sie verlassen hast."
           }
         },
         "it": {
@@ -43885,7 +43885,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Deine Partien folgen dir über dein privates iCloud auf alle Geräte. Standardmäßig deaktiviert; die App funktioniert vollständig offline. Die Änderung wird beim nächsten Start wirksam."
+            "value": "Deine Partien folgen dir über deine private iCloud auf alle Geräte. Standardmäßig deaktiviert; die App funktioniert vollständig offline. Die Änderung wird beim nächsten Start wirksam."
           }
         },
         "it": {
@@ -53838,7 +53838,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Deine Partien, dein Trainingsfortschritt und die laufende Partie folgen dir über dein privates iCloud auf alle Geräte. Standardmäßig deaktiviert; die App funktioniert vollständig offline."
+            "value": "Deine Partien, dein Trainingsfortschritt und die laufende Partie folgen dir über deine private iCloud auf alle Geräte. Standardmäßig deaktiviert; die App funktioniert vollständig offline."
           }
         },
         "it": {
@@ -54314,7 +54314,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Einstellungen und die laufende Partie werden nicht mehr geteilt. Um auch den Rest zu beenden, beende ChessLab vollständig und öffne es erneut."
+            "value": "Einstellungen und die laufende Partie werden nicht mehr geteilt. Um auch den Rest zu stoppen, beende ChessLab vollständig und öffne es erneut."
           }
         },
         "it": {
@@ -55544,7 +55544,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Iniziare una nuova partita la cancellerà su tutti i tuoi dispositivi (%lld mosse giocate)."
+            "value": "Iniziare una nuova partita la cancellerà su tutti i tuoi dispositivi (mosse giocate: %lld)."
           }
         }
       }
@@ -55974,19 +55974,19 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Para encontrar tus partidas y tu progreso en tu iPhone, tu iPad y tu Mac. Todo pasa por tu iCloud privado: sin cuenta de ChessLab, sin servidores de terceros. Desactivada por defecto; la app funciona totalmente sin conexión.\n\nACTIVARLA\nAjustes › Sincronización › «Sincronizar con iCloud», en cada uno de tus dispositivos. Todo se sincroniza al momento: ChessLab se reinicia solo en un instante. Si una tarea en curso lo impide (una importación, por ejemplo), la app te pide cerrarlo y volver a abrirlo, y te muestra cómo. Si otro de tus dispositivos ya sincroniza, la pantalla de inicio te propone unirte.\n\nCOMPROBARLA\nLa tarjeta Sincronización dice en una palabra cómo va el intercambio («Todo al día», «Sincronizando…» o lo que lo bloquea), y «Tus dispositivos» muestra los que están conectados. ¿Falta uno? Misma cuenta de Apple, ChessLab actualizado y sincronización activada también en él.\n\nQUÉ SE SINCRONIZA\nTus partidas terminadas, la partida EN CURSO (contra el ordenador o a dos: la pantalla de inicio del otro dispositivo te la ofrece para reanudarla), tu progreso en aperturas y finales, tus repertorios personales, tus programas Woodpecker, tus ejercicios de Visualización (aciertos y preguntas por repasar), tus colecciones de puzles importadas (los puzles, no tu progreso en ellos) y tus preferencias: tema del tablero, juego de piezas, notación, intentos por puzle, ajustes de partida. El idioma y los sonidos se quedan en cada dispositivo.\n\nBUENO SABERLO\niOS elige el momento del intercambio: puede tardar desde unos segundos hasta unos minutos; «Sincronizar ahora» relanza lo que se puede relanzar. Si hay dos partidas distintas en curso en dos dispositivos, la jugada más recientemente pasa a ser la partida en curso; la otra no se pierde: queda apartada en su dispositivo y la pantalla de inicio la propone. Y si el otro dispositivo juega mientras el tablero está abierto aquí, un aviso propone ponerse al día con sus jugadas."
+            "value": "Para encontrar tus partidas y tu progreso en tu iPhone, tu iPad y tu Mac. Todo pasa por tu iCloud privado: sin cuenta de ChessLab, sin servidores de terceros. Desactivada por defecto; la app funciona totalmente sin conexión.\n\nACTIVARLA\nAjustes › Sincronización › «Sincronizar con iCloud», en cada uno de tus dispositivos. Todo se sincroniza al momento: ChessLab se reinicia solo en un instante. Si una tarea en curso lo impide (una importación, por ejemplo), la app te pide cerrarlo y volver a abrirlo, y te muestra cómo. Si otro de tus dispositivos ya sincroniza, la pantalla de inicio te propone unirte.\n\nCOMPROBARLA\nLa tarjeta Sincronización dice en una palabra cómo va el intercambio («Todo al día», «Sincronizando…» o lo que lo bloquea), y «Tus dispositivos» muestra los que están conectados. ¿Falta uno? Misma cuenta de Apple, ChessLab actualizado y sincronización activada también en él.\n\nQUÉ SE SINCRONIZA\nTus partidas terminadas, la partida EN CURSO (contra el ordenador o a dos: la pantalla de inicio del otro dispositivo te la ofrece para reanudarla), tu progreso en aperturas y finales, tus repertorios personales, tus programas Woodpecker, tus ejercicios de Visualización (aciertos y preguntas por repasar), tus colecciones de puzles importadas (los puzles, no tu progreso en ellos) y tus preferencias: tema del tablero, juego de piezas, notación, intentos por puzle, ajustes de partida. El idioma y los sonidos se quedan en cada dispositivo.\n\nCONVIENE SABER\niOS elige el momento del intercambio: puede tardar desde unos segundos hasta unos minutos; «Sincronizar ahora» relanza lo que se puede relanzar. Si hay dos partidas distintas en curso en dos dispositivos, la partida jugada más recientemente pasa a ser la partida en curso; la otra no se pierde: queda apartada en su dispositivo y la pantalla de inicio la propone. Y si el otro dispositivo juega mientras el tablero está abierto aquí, un aviso propone ponerse al día con sus jugadas."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Damit du deine Partien und deinen Fortschritt auf iPhone, iPad und Mac wiederfindest. Alles läuft über dein privates iCloud: kein ChessLab-Konto, keine Server von Drittanbietern. Standardmäßig deaktiviert; die App funktioniert vollständig offline.\n\nEINSCHALTEN\nEinstellungen › Sync › „Über iCloud synchronisieren“, auf jedem deiner Geräte. Alles folgt sofort: ChessLab startet sich im Nu selbst neu. Verhindert das eine laufende Aufgabe (etwa ein Import), bittet dich die App, sie zu beenden und erneut zu öffnen, und zeigt dir, wie. Synchronisiert schon ein anderes deiner Geräte, schlägt dir der Startbildschirm vor, dich anzuschließen.\n\nPRÜFEN\nDie Sync-Karte sagt in einem Wort, wo der Austausch steht („Alles aktuell“, „Synchronisierung läuft …“ oder was ihn blockiert), und „Deine Geräte“ zeigt, welche verbunden sind. Fehlt ein Gerät? Derselbe Apple Account, ChessLab aktuell, Synchronisierung auch dort aktiviert.\n\nWAS SYNCHRONISIERT WIRD\nDeine beendeten Partien, die LAUFENDE Partie (gegen den Computer oder zu zweit: Der Startbildschirm des anderen Geräts bietet sie zum Fortsetzen an), dein Fortschritt bei Eröffnungen und Endspielen, deine eigenen Repertoires, deine Woodpecker-Programme, deine Visualisierungsübungen (Trefferquote und zu wiederholende Fragen), deine importierten Puzzle-Sammlungen (die Puzzles, nicht dein Fortschritt darin) und deine Vorlieben – Brettdesign, Figurensatz, Notation, Versuche pro Puzzle, Partieeinstellungen. Sprache und Töne bleiben auf jedem Gerät für sich.\n\nGUT ZU WISSEN\niOS bestimmt den Zeitpunkt des Austauschs: Rechne mit wenigen Sekunden bis einigen Minuten; „Jetzt synchronisieren“ stößt an, was sich anstoßen lässt. Laufen auf zwei Geräten zwei verschiedene Partien, wird die zuletzt gespielte zur laufenden Partie; die andere geht nicht verloren: Sie wird auf ihrem Gerät zurückgelegt, und der Startbildschirm bietet sie an. Und spielt das andere Gerät, während das Brett hier offen ist, bietet ein Hinweis an, seine Züge zu übernehmen."
+            "value": "Damit du deine Partien und deinen Fortschritt auf iPhone, iPad und Mac wiederfindest. Alles läuft über deine private iCloud: kein ChessLab-Konto, keine Server von Drittanbietern. Standardmäßig deaktiviert; die App funktioniert vollständig offline.\n\nEINSCHALTEN\nEinstellungen › Sync › „Über iCloud synchronisieren“, auf jedem deiner Geräte. Alles folgt sofort: ChessLab startet sich im Nu selbst neu. Verhindert das eine laufende Aufgabe (etwa ein Import), bittet dich die App, sie zu beenden und erneut zu öffnen, und zeigt dir, wie. Synchronisiert schon ein anderes deiner Geräte, schlägt dir der Startbildschirm vor, dich anzuschließen.\n\nPRÜFEN\nDie Sync-Karte sagt in einem Wort, wo der Austausch steht („Alles aktuell“, „Synchronisierung läuft …“ oder was ihn blockiert), und „Deine Geräte“ zeigt, welche verbunden sind. Fehlt ein Gerät? Derselbe Apple Account, ChessLab aktuell, Synchronisierung auch dort aktiviert.\n\nWAS SYNCHRONISIERT WIRD\nDeine beendeten Partien, die LAUFENDE Partie (gegen den Computer oder zu zweit: Der Startbildschirm des anderen Geräts bietet sie zum Fortsetzen an), dein Fortschritt bei Eröffnungen und Endspielen, deine eigenen Repertoires, deine Woodpecker-Programme, deine Visualisierungsübungen (Trefferquote und zu wiederholende Fragen), deine importierten Puzzle-Sammlungen (die Puzzles, nicht dein Fortschritt darin) und deine Vorlieben – Brettdesign, Figurensatz, Notation, Versuche pro Puzzle, Partieeinstellungen. Sprache und Töne bleiben auf jedem Gerät für sich.\n\nGUT ZU WISSEN\niOS bestimmt den Zeitpunkt des Austauschs: Rechne mit wenigen Sekunden bis einigen Minuten; „Jetzt synchronisieren“ stößt an, was sich anstoßen lässt. Laufen auf zwei Geräten zwei verschiedene Partien, wird die zuletzt gespielte zur laufenden Partie; die andere geht nicht verloren: Sie wird auf ihrem Gerät zurückgelegt, und der Startbildschirm bietet sie an. Und spielt das andere Gerät, während das Brett hier offen ist, schlägt ein Banner vor, seine Züge zu übernehmen."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Per ritrovare le tue partite e i tuoi progressi su iPhone, iPad e Mac. Tutto passa dal tuo iCloud privato: nessun account ChessLab, nessun server di terzi. Disattivata per impostazione predefinita; l'app funziona interamente offline.\n\nATTIVARLA\nImpostazioni › Sincronizzazione › «Sincronizza tramite iCloud», su ciascuno dei tuoi dispositivi. Tutto si sincronizza subito: ChessLab si riavvia da solo in un istante. Se un'attività in corso lo impedisce (un'importazione, ad esempio), l'app ti chiede di chiuderlo e riaprirlo, e ti mostra come. Se un altro tuo dispositivo sincronizza già, la schermata iniziale ti propone di unirti.\n\nVERIFICARLA\nLa scheda Sincronizzazione dice in una parola a che punto è lo scambio («Tutto aggiornato», «Sincronizzazione in corso…» o cosa lo blocca), e «I tuoi dispositivi» elenca quelli collegati. Manca un dispositivo? Stesso Account Apple, ChessLab aggiornato, sincronizzazione attiva anche lì.\n\nCOSA SI SINCRONIZZA\nLe partite concluse, la partita IN CORSO (contro il computer o a due: la schermata iniziale dell'altro dispositivo te la propone per riprenderla), i progressi su aperture e finali, i tuoi repertori personali, i programmi Woodpecker, gli esercizi di Visualizzazione (riuscita e domande da ripassare), le raccolte di puzzle importate (i puzzle, non i tuoi progressi) e le preferenze: tema della scacchiera, set di pezzi, notazione, tentativi per puzzle, impostazioni di partita. Lingua e suoni restano propri di ogni dispositivo.\n\nBUONO A SAPERSI\niOS sceglie il momento dello scambio: da pochi secondi a qualche minuto; «Sincronizza ora» rilancia ciò che si può rilanciare. Se su due dispositivi ci sono due partite diverse in corso, quella giocata più di recente diventa la partita in corso; l'altra non va persa: viene messa da parte sul suo dispositivo e la schermata iniziale la propone. E se l'altro dispositivo gioca mentre la scacchiera è aperta qui, un avviso propone di aggiornare le sue mosse."
+            "value": "Per ritrovare le tue partite e i tuoi progressi su iPhone, iPad e Mac. Tutto passa dal tuo iCloud privato: nessun account ChessLab, nessun server di terzi. Disattivata per impostazione predefinita; l'app funziona interamente offline.\n\nATTIVARLA\nImpostazioni › Sincronizzazione › «Sincronizza tramite iCloud», su ciascuno dei tuoi dispositivi. Tutto si sincronizza subito: ChessLab si riavvia da solo in un istante. Se un'attività in corso lo impedisce (un'importazione, ad esempio), l'app ti chiede di chiuderlo e riaprirlo, e ti mostra come. Se un altro tuo dispositivo sincronizza già, la schermata iniziale ti propone di unirti.\n\nVERIFICARLA\nLa scheda Sincronizzazione dice in una parola a che punto è lo scambio («Tutto aggiornato», «Sincronizzazione in corso…» o cosa lo blocca), e «I tuoi dispositivi» elenca quelli collegati. Manca un dispositivo? Stesso Account Apple, ChessLab aggiornato, sincronizzazione attiva anche lì.\n\nCOSA SI SINCRONIZZA\nLe partite concluse, la partita IN CORSO (contro il computer o a due: la schermata iniziale dell'altro dispositivo te la propone per riprenderla), i progressi su aperture e finali, i tuoi repertori personali, i programmi Woodpecker, gli esercizi di Visualizzazione (riuscita e domande da ripassare), le raccolte di puzzle importate (i puzzle, non i tuoi progressi) e le preferenze: tema della scacchiera, set di pezzi, notazione, tentativi per puzzle, impostazioni di partita. Lingua e suoni restano specifici di ogni dispositivo.\n\nDA SAPERE\niOS sceglie il momento dello scambio: da pochi secondi a qualche minuto; «Sincronizza ora» rilancia ciò che si può rilanciare. Se su due dispositivi ci sono due partite diverse in corso, quella giocata più di recente diventa la partita in corso; l'altra non va persa: viene messa da parte sul suo dispositivo e la schermata iniziale la propone. E se l'altro dispositivo gioca mentre la scacchiera è aperta qui, un avviso propone di aggiornare le sue mosse."
           }
         }
       }
@@ -56592,7 +56592,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schwerstes gelöstes: %lld"
+            "value": "Schwierigstes gelöstes Puzzle: %lld"
           }
         },
         "it": {
@@ -58774,7 +58774,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Di' la tua mossa quando tocca a te: viene giocata appena capita; «annulla» la ritira."
+            "value": "Di' la tua mossa quando tocca a te: viene giocata non appena è riconosciuta; «annulla» la ritira."
           }
         }
       }
@@ -58949,36 +58949,36 @@
         }
       }
     },
-    "Dans Nouvelle partie, carte « Partie », allumez « Coups à la voix ». Pendant la partie, le micro écoute seul quand c'est à vous de jouer : dites votre coup — « cavalier f3 », « fou prend c6 », « e4 », « petit roque », « e8 dame » pour une promotion.\n\nLe coup compris est joué tout de suite et s'affiche en haut de l'échiquier ; dites « annule » pour le reprendre. Un coup impossible ou une phrase mal comprise vous est dit à voix haute. Si deux pièces peuvent aller sur la même case, ajoutez la colonne de départ : « cavalier b d2 ». L'interrupteur « Micro », au-dessus de l'échiquier, coupe le micro le temps d'une conversation ; vous pouvez toujours jouer sur l'échiquier, que le micro soit allumé ou non.\n\nVotre voix est reconnue sur l'appareil, sans réseau, et n'est jamais enregistrée. La reconnaissance est plus précise à partir d'iOS 26 ; avant, dites des coups courts, « e quatre » plutôt que « pion en e quatre ».": {
+    "Dans Nouvelle partie, carte « Partie », allumez « Coups à la voix ». Pendant la partie, le micro écoute seul quand c'est à vous de jouer : dites votre coup — « cavalier f3 », « fou prend c6 », « e4 », « petit roque », « e8 dame » pour une promotion.\n\nLe coup compris est joué tout de suite et s'affiche en haut de l'échiquier ; dites « annule » pour le reprendre. Un coup impossible ou une phrase mal comprise vous est dit à voix haute. Si deux pièces peuvent aller sur la même case, ajoutez la colonne de départ : « cavalier b d2 ». La pastille du micro, sous l'échiquier, à côté de votre nom, coupe le micro le temps d'une conversation ; touchez-la de nouveau pour le rallumer. Vous pouvez toujours jouer sur l'échiquier, que le micro soit allumé ou non.\n\nVotre voix est reconnue sur l'appareil, sans réseau, et n'est jamais enregistrée. La reconnaissance est plus précise à partir d'iOS 26 ; avant, dites des coups courts, « e quatre » plutôt que « pion en e quatre ».": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "In New game, “Game” card, turn on “Voice moves”. During the game, the microphone listens by itself when it is your turn: say your move — “knight f3”, “bishop takes c6”, “e4”, “castles kingside”, “e8 queen” for a promotion.\n\nThe understood move is played at once and shown at the top of the board; say “undo” to take it back. An impossible move or a misunderstood phrase is said out loud. If two pieces can reach the same square, add the starting file: “knight b d2”. The “Microphone” switch above the board turns the microphone off during a conversation; you can always play on the board, microphone on or off.\n\nYour voice is recognised on the device, without the network, and is never recorded. Recognition is more accurate from iOS 26; before that, say short moves, “e four” rather than “pawn to e four”."
+            "value": "In New game, “Game” card, turn on “Voice moves”. During the game, the microphone listens by itself when it is your turn: say your move — “knight f3”, “bishop takes c6”, “e4”, “castles kingside”, “e8 queen” for a promotion.\n\nThe understood move is played at once and shown at the top of the board; say “undo” to take it back. An impossible move or a misunderstood phrase is said out loud. If two pieces can reach the same square, add the starting file: “knight b d2”. The microphone button below the board, next to your name, turns the microphone off during a conversation; tap it again to turn it back on. You can always play on the board, microphone on or off.\n\nYour voice is recognised on the device, without the network, and is never recorded. Recognition is more accurate from iOS 26; before that, say short moves, “e four” rather than “pawn to e four”."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dans Nouvelle partie, carte « Partie », allumez « Coups à la voix ». Pendant la partie, le micro écoute seul quand c'est à vous de jouer : dites votre coup — « cavalier f3 », « fou prend c6 », « e4 », « petit roque », « e8 dame » pour une promotion.\n\nLe coup compris est joué tout de suite et s'affiche en haut de l'échiquier ; dites « annule » pour le reprendre. Un coup impossible ou une phrase mal comprise vous est dit à voix haute. Si deux pièces peuvent aller sur la même case, ajoutez la colonne de départ : « cavalier b d2 ». L'interrupteur « Micro », au-dessus de l'échiquier, coupe le micro le temps d'une conversation ; vous pouvez toujours jouer sur l'échiquier, que le micro soit allumé ou non.\n\nVotre voix est reconnue sur l'appareil, sans réseau, et n'est jamais enregistrée. La reconnaissance est plus précise à partir d'iOS 26 ; avant, dites des coups courts, « e quatre » plutôt que « pion en e quatre »."
+            "value": "Dans Nouvelle partie, carte « Partie », allumez « Coups à la voix ». Pendant la partie, le micro écoute seul quand c'est à vous de jouer : dites votre coup — « cavalier f3 », « fou prend c6 », « e4 », « petit roque », « e8 dame » pour une promotion.\n\nLe coup compris est joué tout de suite et s'affiche en haut de l'échiquier ; dites « annule » pour le reprendre. Un coup impossible ou une phrase mal comprise vous est dit à voix haute. Si deux pièces peuvent aller sur la même case, ajoutez la colonne de départ : « cavalier b d2 ». La pastille du micro, sous l'échiquier, à côté de votre nom, coupe le micro le temps d'une conversation ; touchez-la de nouveau pour le rallumer. Vous pouvez toujours jouer sur l'échiquier, que le micro soit allumé ou non.\n\nVotre voix est reconnue sur l'appareil, sans réseau, et n'est jamais enregistrée. La reconnaissance est plus précise à partir d'iOS 26 ; avant, dites des coups courts, « e quatre » plutôt que « pion en e quatre »."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "En Nueva partida, tarjeta «Partida», activa «Jugadas por voz». Durante la partida, el micrófono escucha solo cuando te toca jugar: di tu jugada — «caballo f3», «alfil come c6», «e4», «enroque corto», «e8 dama» para una coronación.\n\nLa jugada entendida se juega enseguida y aparece encima del tablero; di «deshacer» para anularla. Una jugada imposible o una frase mal entendida se dice en voz alta. Si dos piezas pueden ir a la misma casilla, añade la columna de salida: «caballo b d2». El interruptor «Micrófono», encima del tablero, apaga el micrófono durante una conversación; siempre puedes jugar en el tablero, con el micrófono encendido o no.\n\nTu voz se reconoce en el dispositivo, sin red, y nunca se graba. El reconocimiento es más preciso a partir de iOS 26; antes, di jugadas cortas: «e cuatro» mejor que «peón a e cuatro»."
+            "value": "En Nueva partida, tarjeta «Partida», activa «Jugadas por voz». Durante la partida, el micrófono escucha solo cuando te toca jugar: di tu jugada — «caballo f3», «alfil come c6», «e4», «enroque corto», «e8 dama» para una coronación.\n\nLa jugada entendida se juega enseguida y aparece encima del tablero; di «deshacer» para anularla. Una jugada imposible o una frase mal entendida se dice en voz alta. Si dos piezas pueden ir a la misma casilla, añade la columna de salida: «caballo b d2». El botón del micrófono, bajo el tablero, junto a tu nombre, apaga el micrófono durante una conversación; tócalo de nuevo para volver a encenderlo. Siempre puedes jugar en el tablero, con el micrófono encendido o no.\n\nTu voz se reconoce en el dispositivo, sin red, y nunca se graba. El reconocimiento es más preciso a partir de iOS 26; antes, di jugadas cortas: «e cuatro» mejor que «peón a e cuatro»."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schalte unter Neue Partie, Karte „Partie“, „Züge per Sprache“ ein. Während der Partie hört das Mikrofon von selbst zu, wenn du am Zug bist: Sag deinen Zug — „Springer f3“, „Läufer schlägt c6“, „e4“, „kurze Rochade“, „e8 Dame“ für eine Umwandlung.\n\nDer verstandene Zug wird sofort gespielt und oben am Brett angezeigt; sag „zurück“, um ihn zurückzunehmen. Ein unmöglicher Zug oder ein nicht verstandener Satz wird laut gesagt. Können zwei Figuren auf dasselbe Feld, nenne auch die Ausgangslinie: „Springer b d2“. Der Schalter „Mikrofon“ über dem Brett schaltet das Mikrofon während eines Gesprächs aus; auf dem Brett kannst du immer spielen, ob das Mikrofon an ist oder nicht.\n\nDeine Stimme wird auf dem Gerät erkannt, ohne Netzwerk, und nie gespeichert. Ab iOS 26 ist die Erkennung genauer; davor sag kurze Züge: „e vier“ statt „Bauer nach e vier“."
+            "value": "Schalte unter Neue Partie, Karte „Partie“, „Züge per Sprache“ ein. Während der Partie hört das Mikrofon von selbst zu, wenn du am Zug bist: Sag deinen Zug — „Springer f3“, „Läufer schlägt c6“, „e4“, „kurze Rochade“, „e8 Dame“ für eine Umwandlung.\n\nDer verstandene Zug wird sofort gespielt und oben am Brett angezeigt; sag „zurück“, um ihn zurückzunehmen. Ein unmöglicher Zug oder ein nicht verstandener Satz wird dir laut gesagt. Können zwei Figuren auf dasselbe Feld ziehen, nenne auch die Ausgangslinie: „Springer b d2“. Die Mikrofon-Schaltfläche unter dem Brett, neben deinem Namen, schaltet das Mikrofon während eines Gesprächs aus; tippe erneut darauf, um es wieder einzuschalten. Auf dem Brett kannst du immer spielen, ob das Mikrofon an ist oder nicht.\n\nDeine Stimme wird auf dem Gerät erkannt, ohne Netzwerk, und nie gespeichert. Ab iOS 26 ist die Erkennung genauer; davor sag kurze Züge: „e vier“ statt „Bauer nach e vier“."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "In Nuova partita, scheda «Partita», attiva «Mosse a voce». Durante la partita il microfono ascolta da solo quando tocca a te: di' la tua mossa — «cavallo f3», «alfiere prende c6», «e4», «arrocco corto», «e8 donna» per una promozione.\n\nLa mossa capita viene giocata subito e appare sopra la scacchiera; di' «annulla» per ritirarla. Una mossa impossibile o una frase non capita ti viene detta ad alta voce. Se due pezzi possono andare sulla stessa casa, aggiungi la colonna di partenza: «cavallo b d2». L'interruttore «Microfono», sopra la scacchiera, spegne il microfono durante una conversazione; puoi sempre giocare sulla scacchiera, con il microfono acceso o spento.\n\nLa tua voce è riconosciuta sul dispositivo, senza rete, e non viene mai registrata. Il riconoscimento è più preciso da iOS 26; prima, di' mosse brevi: «e quattro» meglio di «pedone in e quattro»."
+            "value": "In Nuova partita, scheda «Partita», attiva «Mosse a voce». Durante la partita il microfono ascolta da solo quando tocca a te: di' la tua mossa — «cavallo f3», «alfiere prende c6», «e4», «arrocco corto», «e8 donna» per una promozione.\n\nLa mossa riconosciuta viene giocata subito e appare sopra la scacchiera; di' «annulla» per ritirarla. Una mossa impossibile o una frase non compresa ti viene detta ad alta voce. Se due pezzi possono andare sulla stessa casa, aggiungi la colonna di partenza: «cavallo b d2». Il pulsante del microfono, sotto la scacchiera, accanto al tuo nome, spegne il microfono durante una conversazione; toccalo di nuovo per riaccenderlo. Puoi sempre giocare sulla scacchiera, con il microfono acceso o spento.\n\nLa tua voce è riconosciuta sul dispositivo, senza rete, e non viene mai registrata. Il riconoscimento è più preciso da iOS 26; prima, di' mosse brevi: «e quattro» meglio di «pedone in e quattro»."
           }
         }
       }
@@ -59352,7 +59352,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld domanda/e sbagliata/e tornerà/anno nelle tue serie."
+            "value": "Domande sbagliate che torneranno nelle tue serie: %lld."
           }
         }
       }
@@ -61380,7 +61380,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ver el tablero en tu cabeza"
+            "value": "Ver el tablero en la cabeza"
           }
         },
         "de": {
@@ -61414,19 +61414,19 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ejercicios sin fin, de las casillas al cálculo. Tus errores vuelven hasta que los domines."
+            "value": "Ejercicios sin fin, de las casillas al cálculo. Tus errores vuelven hasta que aciertes."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Endlose Übungen, von den Feldern bis zum Rechnen. Deine Fehler kommen wieder, bis du sie kannst."
+            "value": "Endlose Übungen, von den Feldern bis zum Rechnen. Deine Fehler kommen wieder, bis du richtig antwortest."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Esercizi infiniti, dalle case al calcolo. I tuoi errori tornano finché non li sai."
+            "value": "Esercizi infiniti, dalle case al calcolo. I tuoi errori tornano finché non rispondi bene."
           }
         }
       }
@@ -61828,7 +61828,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nach %@ spiele den nächsten Zug aus dem Gedächtnis."
+            "value": "Nach %@: Spiele den nächsten Zug aus dem Gedächtnis."
           }
         },
         "it": {
@@ -61850,13 +61850,13 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ver el tablero en la cabeza, peldaño a peldaño. Marca los peldaños que quieres trabajar: la serie mezcla los marcados.\n\nLOS CINCO PELDAÑOS\n1. Las casillas: el color de una casilla, encontrarla en un tablero sin coordenadas, nombrarla.\n2. Las líneas: misma diagonal, cruces, recorridos del caballo.\n3. Seguir las piezas: jugadas anunciadas en notación, sin tablero — ¿son posibles?, ¿qué ataca la pieza?\n4. La posición sin tablero: jaque, pieza colgada, casilla atacada.\n5. Calcular: aparece un puzle, elegido un poco por debajo de tu puntuación; «Ya la memoricé» oculta las piezas y luego juegas la jugada — o la continuación tras dos jugadas dadas — en el tablero vacío, tocando la casilla de salida y luego la de llegada. Toda jugada que da mate es correcta.\n\nAJUSTES\nDuración: 10 o 20 preguntas, 1 o 2 minutos. Reloj por pregunta: Sin, Corto, Medio o Largo; crece con el peldaño (una posición da cuatro veces más tiempo que una casilla). «Desde las negras» gira el tablero.\n\nPROGRESO\nLos ejercicios se generan sin fin. Una pregunta fallada vuelve en las series siguientes hasta acertarla dos veces. El porcentaje junto a un peldaño cubre sus 50 últimas preguntas. La flecha de volver lleva a los ajustes; lo respondido sigue contando."
+            "value": "Ver el tablero en la cabeza, peldaño a peldaño. Marca los peldaños que quieres trabajar: la serie mezcla los marcados.\n\nLOS CINCO PELDAÑOS\n1. Las casillas: el color de una casilla, encontrarla en un tablero sin coordenadas, nombrarla.\n2. Las líneas: misma diagonal, cruces, trayectos del caballo.\n3. Seguir las piezas: jugadas anunciadas en notación, sin tablero — ¿son posibles?, ¿qué ataca la pieza?\n4. La posición sin tablero: jaque, pieza colgada, casilla atacada.\n5. Calcular: aparece un puzle, elegido un poco por debajo de tu puntuación; «Ya la memoricé» oculta las piezas y luego juegas la jugada — o la continuación tras dos jugadas dadas — en el tablero vacío, tocando la casilla de salida y luego la de llegada. Toda jugada que da mate es correcta.\n\nAJUSTES\nDuración: 10 o 20 preguntas, 1 o 2 minutos. Reloj por pregunta: Sin, Corto, Medio o Largo; crece con el peldaño (una posición da cuatro veces más tiempo que una casilla). «Desde las negras» gira el tablero.\n\nPROGRESO\nLos ejercicios se generan sin fin. Una pregunta fallada vuelve en las series siguientes hasta acertarla dos veces. El porcentaje junto a un peldaño cubre sus 50 últimas preguntas. La flecha de volver lleva a los ajustes; lo respondido sigue contando."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Das Brett im Kopf sehen, Stufe um Stufe. Hake die Stufen an, die du üben willst: Die Serie mischt die angehakten.\n\nDIE FÜNF STUFEN\n1. Die Felder: die Farbe eines Feldes, es auf einem Brett ohne Koordinaten finden, es benennen.\n2. Die Linien: gleiche Diagonale, Schnittpunkte, Springerwege.\n3. Figuren verfolgen: Züge in Notation, ohne Brett — sind sie möglich, was greift die Figur an?\n4. Die Stellung ohne Brett: Schach, hängende Figur, angegriffenes Feld.\n5. Rechnen: Ein Puzzle erscheint, etwas unter deiner Wertung gewählt; „Ich habe sie mir gemerkt“ verbirgt die Figuren, dann spielst du den Zug — oder die Fortsetzung nach zwei vorgegebenen Zügen — auf dem leeren Brett: erst das Ausgangsfeld, dann das Zielfeld antippen. Jeder Mattzug ist richtig.\n\nEINSTELLUNGEN\nDauer: 10 oder 20 Fragen, 1 oder 2 Minuten. Zeit pro Frage: Ohne, Kurz, Mittel oder Lang; sie wächst mit der Stufe (eine Stellung bekommt viermal so viel Zeit wie ein Feld). „Aus Sicht von Schwarz“ dreht das Brett.\n\nFORTSCHRITT\nDie Übungen werden endlos erzeugt. Eine verpasste Frage kommt in späteren Serien wieder, bis du sie zweimal richtig hast. Der Prozentsatz neben einer Stufe bezieht sich auf ihre letzten 50 Fragen. Der Zurück-Pfeil führt zu den Einstellungen; was du beantwortet hast, zählt weiter."
+            "value": "Das Brett im Kopf sehen, Stufe um Stufe. Hake die Stufen an, die du üben willst: Die Serie mischt die angehakten.\n\nDIE FÜNF STUFEN\n1. Die Felder: die Farbe eines Feldes, es auf einem Brett ohne Koordinaten finden, es benennen.\n2. Die Linien: gleiche Diagonale, Kreuzungen, Springerwege.\n3. Figuren verfolgen: Züge in Notation, ohne Brett — sind sie möglich, was greift die Figur an?\n4. Die Stellung ohne Brett: Schach, hängende Figur, angegriffenes Feld.\n5. Rechnen: Ein Puzzle erscheint, etwas unter deiner Wertung gewählt; „Ich habe sie mir gemerkt“ verbirgt die Figuren, dann spielst du den Zug — oder die Fortsetzung nach zwei vorgegebenen Zügen — auf dem leeren Brett: erst das Ausgangsfeld, dann das Zielfeld antippen. Jeder Mattzug ist richtig.\n\nEINSTELLUNGEN\nDauer: 10 oder 20 Fragen, 1 oder 2 Minuten. Zeit pro Frage: Ohne, Kurz, Mittel oder Lang; sie wächst mit der Stufe (eine Stellung bekommt viermal so viel Zeit wie ein Feld). „Aus Sicht von Schwarz“ dreht das Brett.\n\nFORTSCHRITT\nDie Übungen werden endlos erzeugt. Eine verpasste Frage kommt in späteren Serien wieder, bis du sie zweimal richtig hast. Der Prozentsatz neben einer Stufe bezieht sich auf ihre letzten 50 Fragen. Der Zurück-Pfeil führt zu den Einstellungen; was du beantwortet hast, zählt weiter."
           }
         },
         "it": {

@@ -84,7 +84,7 @@ CONTRARRELOJ
 En los puzles: tres minutos, tantos problemas como puedas, tres errores y se acabó. Supera tu récord.
 
 NUEVA PARTIDA RENOVADA
-El rival en primer plano, con su estilo en cuatro medidores (ataque, solidez, cambios, impredecible), menús para el color, el ritmo y la salida, y las ayudas en pastillas.
+El rival en primer plano, con su estilo en cuatro indicadores (ataque, solidez, cambios, impredecible), menús para el color, el ritmo y la salida, y las ayudas en pastillas.
 
 ICLOUD
 Una lista «Tus dispositivos» en Ajustes, y los cambios hechos en un dispositivo llegan antes al otro.
@@ -108,7 +108,7 @@ GEGEN DIE UHR
 Bei den Puzzles: drei Minuten, so viele Aufgaben wie möglich, drei Fehler und es ist vorbei. Schlage deinen Rekord.
 
 NEUE PARTIE, ÜBERARBEITET
-Der Gegner im Vordergrund, mit seinem Stil in vier Anzeigen (Angriff, Solidität, Abtausch, unberechenbar), Menüs für Farbe, Bedenkzeit und Start und die Hilfen als kleine Kapseln.
+Der Gegner im Vordergrund, mit seinem Stil in vier Balken (Angriff, Solidität, Abtausch, unberechenbar), Menüs für Farbe, Bedenkzeit und Start und die Hilfen als kleine Kapseln.
 
 ICLOUD
 Eine Liste „Deine Geräte“ in den Einstellungen, und Änderungen auf einem Gerät kommen schneller auf dem anderen an.
@@ -120,7 +120,7 @@ Eine Liste „Deine Geräte“ in den Einstellungen, und Änderungen auf einem G
 CHESSLAB 2.4
 
 MOSSE A VOCE
-Di' la tua mossa: «cavallo f3», «arrocco corto», «annulla». Il microfono ascolta da solo quando tocca a te; la tua voce viene riconosciuta sul dispositivo, senza rete, e non viene mai registrata. Una mossa impossibile o capita male ti viene detta a voce alta. Si attiva in Nuova partita. Con iOS 18 il riconoscimento è meno preciso: di' mosse brevi («e quattro»); da iOS 26 è migliore.
+Di' la tua mossa: «cavallo f3», «arrocco corto», «annulla». Il microfono ascolta da solo quando tocca a te; la tua voce viene riconosciuta sul dispositivo, senza rete, e non viene mai registrata. Una mossa impossibile o compresa male ti viene detta a voce alta. Si attiva in Nuova partita. Con iOS 18 il riconoscimento è meno preciso: di' mosse brevi («e quattro»); da iOS 26 è migliore.
 
 GIOCARE ALLA CIECA
 Cinque livelli, dalle sole case occupate fino alla scacchiera completamente nascosta. Tieni premuto «Sbirciata» per controllare una posizione (ogni sbirciata viene contata); l'app può ripetere le tue mosse a voce alta, con la voce che scegli.
