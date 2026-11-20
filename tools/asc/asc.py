@@ -551,7 +551,18 @@ def cmd_duo(c, args):
                 for placement in c.get_all(f"/{kind}/{item['id']}/placements"):
                     c.delete(f"/appAssetLibraryPlacements/{placement['id']}")
                 c.delete(f"/{kind}/{item['id']}")
-    videos = [SUBMISSION / "videos" / n for n in DUO_PREVIEWS if (SUBMISSION / "videos" / n).exists()][:3]
+    # Une version neuve HÉRITE du jeu de captures Duo de la précédente (10 au plus par groupe) : sans les retirer,
+    # le premier placement échoue en 409 « at most 10 APP_SCREENSHOT placements » (constaté le 20/11/2026, 2.4).
+    if not resume:
+        for locale, loc in locs.items():
+            if not locale_has_own_visuals(locale):
+                continue
+            for s in c.get_all(f"/appStoreVersionLocalizations/{loc['id']}/appScreenshotSets"):
+                if s["attributes"]["screenshotDisplayType"] == "APP_IPHONE_DUO":
+                    for shot in c.get_all(f"/appScreenshotSets/{s['id']}/appScreenshots"):
+                        c.delete(f"/appScreenshots/{shot['id']}")
+    images_only = getattr(args, "images_only", False)   # --images-only : les aperçus vidéo (hérités) restent tels quels
+    videos = [] if images_only else [SUBMISSION / "videos" / n for n in DUO_PREVIEWS if (SUBMISSION / "videos" / n).exists()][:3]
     video_ids = [library_upload(c, "appAssetLibraryVideos", library_id, f, prefix + f.stem) for f in videos]
     # Un jeu de captures par langue (dossier `fr` / `en`, repli sur `en`) : chaque
     # jeu est déposé une fois, puis placé sur la ou les localisations de sa langue.
@@ -807,6 +818,7 @@ def main():
     p.add_argument("--build", default=None, help="numéro de build (défaut : CURRENT_PROJECT_VERSION du projet)")
     p.add_argument("--resume", action="store_true", help="duo : reprendre les fichiers déjà déposés (traitement Apple trop lent)")
     p.add_argument("--langs", default=None, help="captures/aperçus/Duo : ne traiter que ces langues (codes courts, ex. es,de,it)")
+    p.add_argument("--images-only", action="store_true", dest="images_only", help="duo : ne traiter que les captures, pas les aperçus vidéo")
     p.add_argument("--wait", action="store_true", help="build : attendre le traitement par Apple (1 h max)")
     args = p.parse_args()
     global ONLY_LANGS
