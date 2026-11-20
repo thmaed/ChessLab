@@ -46,6 +46,15 @@ struct VoiceMovesGameTests {
             .identifier(.bcp47) == "it-IT", "variante inconnue d'iOS : celle par défaut")
     }
 
+    /// La ligne orange de Nouvelle partie (20/11/2026) : seulement avec la reconnaissance classique d'avant iOS 26.
+    @Test func theAccuracyWarningIsForTheClassicRecognitionOnly() {
+        #expect(NewGameSetupView.warnsAboutAccuracy(.available(precise: false)))
+        #expect(!NewGameSetupView.warnsAboutAccuracy(.available(precise: true)))
+        #expect(!NewGameSetupView.warnsAboutAccuracy(.unavailable), "indisponible : une autre note le dit")
+        #expect(!NewGameSetupView.warnsAboutAccuracy(.dictationOff))
+        #expect(!NewGameSetupView.warnsAboutAccuracy(nil))
+    }
+
     @Test func theUnderstoodMoveIsPlayedAtOnce() throws {
         let model = try Self.game()
         #expect(model.isVoiceTurn)

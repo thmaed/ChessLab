@@ -58677,36 +58677,36 @@
         }
       }
     },
-    "Dites votre coup quand c'est à vous : il est joué dès qu'il est compris ; « annule » le reprend. Reconnaissance plus précise à partir d'iOS 26.": {
+    "Sous iOS 18, la reconnaissance n'est peut-être pas optimale (surtout les colonnes e, c et a). Dites des coups courts : « e quatre ».": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Say your move when it’s your turn: it is played as soon as it is understood; “undo” takes it back. More accurate recognition from iOS 26."
+            "value": "On iOS 18, recognition may not be optimal (especially files e, c and a). Say short moves: “e four”."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dites votre coup quand c'est à vous : il est joué dès qu'il est compris ; « annule » le reprend. Reconnaissance plus précise à partir d'iOS 26."
+            "value": "Sous iOS 18, la reconnaissance n'est peut-être pas optimale (surtout les colonnes e, c et a). Dites des coups courts : « e quatre »."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Di tu jugada cuando te toque: se juega en cuanto se entiende; «deshacer» la anula. Reconocimiento más preciso a partir de iOS 26."
+            "value": "En iOS 18, el reconocimiento puede no ser óptimo (sobre todo las columnas e, c y a). Di jugadas cortas: «e cuatro»."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sag deinen Zug, wenn du dran bist: Er wird gespielt, sobald er verstanden ist; „zurück“ nimmt ihn zurück. Genauere Erkennung ab iOS 26."
+            "value": "Unter iOS 18 ist die Erkennung möglicherweise nicht optimal (vor allem die Linien e, c und a). Sag kurze Züge: „e vier“."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Di' la tua mossa quando tocca a te: viene giocata appena capita; «annulla» la ritira. Riconoscimento più preciso da iOS 26."
+            "value": "Con iOS 18 il riconoscimento potrebbe non essere ottimale (soprattutto le colonne e, c e a). Di' mosse brevi: «e quattro»."
           }
         }
       }
@@ -58915,36 +58915,36 @@
         }
       }
     },
-    "Dans Nouvelle partie, carte « Partie », allumez « Coups à la voix ». Pendant la partie, le micro écoute seul quand c'est à vous de jouer : dites votre coup — « cavalier f3 », « fou prend c6 », « e4 », « petit roque », « e8 dame » pour une promotion.\n\nLe coup compris est joué tout de suite et s'affiche en haut de l'échiquier ; dites « annule » pour le reprendre. Un coup impossible ou une phrase mal comprise vous est dit à voix haute. Si deux pièces peuvent aller sur la même case, ajoutez la colonne de départ : « cavalier b d2 ». L'interrupteur « Micro », au-dessus de l'échiquier, coupe le micro le temps d'une conversation ; vous pouvez toujours jouer sur l'échiquier, que le micro soit allumé ou non.\n\nVotre voix est reconnue sur l'appareil, sans réseau, et n'est jamais enregistrée. La reconnaissance est plus précise à partir d'iOS 26.": {
+    "Dans Nouvelle partie, carte « Partie », allumez « Coups à la voix ». Pendant la partie, le micro écoute seul quand c'est à vous de jouer : dites votre coup — « cavalier f3 », « fou prend c6 », « e4 », « petit roque », « e8 dame » pour une promotion.\n\nLe coup compris est joué tout de suite et s'affiche en haut de l'échiquier ; dites « annule » pour le reprendre. Un coup impossible ou une phrase mal comprise vous est dit à voix haute. Si deux pièces peuvent aller sur la même case, ajoutez la colonne de départ : « cavalier b d2 ». L'interrupteur « Micro », au-dessus de l'échiquier, coupe le micro le temps d'une conversation ; vous pouvez toujours jouer sur l'échiquier, que le micro soit allumé ou non.\n\nVotre voix est reconnue sur l'appareil, sans réseau, et n'est jamais enregistrée. La reconnaissance est plus précise à partir d'iOS 26 ; avant, dites des coups courts, « e quatre » plutôt que « pion en e quatre ».": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "In New game, “Game” card, turn on “Voice moves”. During the game, the microphone listens by itself when it is your turn: say your move — “knight f3”, “bishop takes c6”, “e4”, “castles kingside”, “e8 queen” for a promotion.\n\nThe understood move is played at once and shown at the top of the board; say “undo” to take it back. An impossible move or a misunderstood phrase is said out loud. If two pieces can reach the same square, add the starting file: “knight b d2”. The “Microphone” switch above the board turns the microphone off during a conversation; you can always play on the board, microphone on or off.\n\nYour voice is recognised on the device, without the network, and is never recorded. Recognition is more accurate from iOS 26."
+            "value": "In New game, “Game” card, turn on “Voice moves”. During the game, the microphone listens by itself when it is your turn: say your move — “knight f3”, “bishop takes c6”, “e4”, “castles kingside”, “e8 queen” for a promotion.\n\nThe understood move is played at once and shown at the top of the board; say “undo” to take it back. An impossible move or a misunderstood phrase is said out loud. If two pieces can reach the same square, add the starting file: “knight b d2”. The “Microphone” switch above the board turns the microphone off during a conversation; you can always play on the board, microphone on or off.\n\nYour voice is recognised on the device, without the network, and is never recorded. Recognition is more accurate from iOS 26; before that, say short moves, “e four” rather than “pawn to e four”."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dans Nouvelle partie, carte « Partie », allumez « Coups à la voix ». Pendant la partie, le micro écoute seul quand c'est à vous de jouer : dites votre coup — « cavalier f3 », « fou prend c6 », « e4 », « petit roque », « e8 dame » pour une promotion.\n\nLe coup compris est joué tout de suite et s'affiche en haut de l'échiquier ; dites « annule » pour le reprendre. Un coup impossible ou une phrase mal comprise vous est dit à voix haute. Si deux pièces peuvent aller sur la même case, ajoutez la colonne de départ : « cavalier b d2 ». L'interrupteur « Micro », au-dessus de l'échiquier, coupe le micro le temps d'une conversation ; vous pouvez toujours jouer sur l'échiquier, que le micro soit allumé ou non.\n\nVotre voix est reconnue sur l'appareil, sans réseau, et n'est jamais enregistrée. La reconnaissance est plus précise à partir d'iOS 26."
+            "value": "Dans Nouvelle partie, carte « Partie », allumez « Coups à la voix ». Pendant la partie, le micro écoute seul quand c'est à vous de jouer : dites votre coup — « cavalier f3 », « fou prend c6 », « e4 », « petit roque », « e8 dame » pour une promotion.\n\nLe coup compris est joué tout de suite et s'affiche en haut de l'échiquier ; dites « annule » pour le reprendre. Un coup impossible ou une phrase mal comprise vous est dit à voix haute. Si deux pièces peuvent aller sur la même case, ajoutez la colonne de départ : « cavalier b d2 ». L'interrupteur « Micro », au-dessus de l'échiquier, coupe le micro le temps d'une conversation ; vous pouvez toujours jouer sur l'échiquier, que le micro soit allumé ou non.\n\nVotre voix est reconnue sur l'appareil, sans réseau, et n'est jamais enregistrée. La reconnaissance est plus précise à partir d'iOS 26 ; avant, dites des coups courts, « e quatre » plutôt que « pion en e quatre »."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "En Nueva partida, tarjeta «Partida», activa «Jugadas por voz». Durante la partida, el micrófono escucha solo cuando te toca jugar: di tu jugada — «caballo f3», «alfil come c6», «e4», «enroque corto», «e8 dama» para una coronación.\n\nLa jugada entendida se juega enseguida y aparece encima del tablero; di «deshacer» para anularla. Una jugada imposible o una frase mal entendida se dice en voz alta. Si dos piezas pueden ir a la misma casilla, añade la columna de salida: «caballo b d2». El interruptor «Micrófono», encima del tablero, apaga el micrófono durante una conversación; siempre puedes jugar en el tablero, con el micrófono encendido o no.\n\nTu voz se reconoce en el dispositivo, sin red, y nunca se graba. El reconocimiento es más preciso a partir de iOS 26."
+            "value": "En Nueva partida, tarjeta «Partida», activa «Jugadas por voz». Durante la partida, el micrófono escucha solo cuando te toca jugar: di tu jugada — «caballo f3», «alfil come c6», «e4», «enroque corto», «e8 dama» para una coronación.\n\nLa jugada entendida se juega enseguida y aparece encima del tablero; di «deshacer» para anularla. Una jugada imposible o una frase mal entendida se dice en voz alta. Si dos piezas pueden ir a la misma casilla, añade la columna de salida: «caballo b d2». El interruptor «Micrófono», encima del tablero, apaga el micrófono durante una conversación; siempre puedes jugar en el tablero, con el micrófono encendido o no.\n\nTu voz se reconoce en el dispositivo, sin red, y nunca se graba. El reconocimiento es más preciso a partir de iOS 26; antes, di jugadas cortas: «e cuatro» mejor que «peón a e cuatro»."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schalte unter Neue Partie, Karte „Partie“, „Züge per Sprache“ ein. Während der Partie hört das Mikrofon von selbst zu, wenn du am Zug bist: Sag deinen Zug — „Springer f3“, „Läufer schlägt c6“, „e4“, „kurze Rochade“, „e8 Dame“ für eine Umwandlung.\n\nDer verstandene Zug wird sofort gespielt und oben am Brett angezeigt; sag „zurück“, um ihn zurückzunehmen. Ein unmöglicher Zug oder ein nicht verstandener Satz wird laut gesagt. Können zwei Figuren auf dasselbe Feld, nenne auch die Ausgangslinie: „Springer b d2“. Der Schalter „Mikrofon“ über dem Brett schaltet das Mikrofon während eines Gesprächs aus; auf dem Brett kannst du immer spielen, ob das Mikrofon an ist oder nicht.\n\nDeine Stimme wird auf dem Gerät erkannt, ohne Netzwerk, und nie gespeichert. Ab iOS 26 ist die Erkennung genauer."
+            "value": "Schalte unter Neue Partie, Karte „Partie“, „Züge per Sprache“ ein. Während der Partie hört das Mikrofon von selbst zu, wenn du am Zug bist: Sag deinen Zug — „Springer f3“, „Läufer schlägt c6“, „e4“, „kurze Rochade“, „e8 Dame“ für eine Umwandlung.\n\nDer verstandene Zug wird sofort gespielt und oben am Brett angezeigt; sag „zurück“, um ihn zurückzunehmen. Ein unmöglicher Zug oder ein nicht verstandener Satz wird laut gesagt. Können zwei Figuren auf dasselbe Feld, nenne auch die Ausgangslinie: „Springer b d2“. Der Schalter „Mikrofon“ über dem Brett schaltet das Mikrofon während eines Gesprächs aus; auf dem Brett kannst du immer spielen, ob das Mikrofon an ist oder nicht.\n\nDeine Stimme wird auf dem Gerät erkannt, ohne Netzwerk, und nie gespeichert. Ab iOS 26 ist die Erkennung genauer; davor sag kurze Züge: „e vier“ statt „Bauer nach e vier“."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "In Nuova partita, scheda «Partita», attiva «Mosse a voce». Durante la partita il microfono ascolta da solo quando tocca a te: di' la tua mossa — «cavallo f3», «alfiere prende c6», «e4», «arrocco corto», «e8 donna» per una promozione.\n\nLa mossa capita viene giocata subito e appare sopra la scacchiera; di' «annulla» per ritirarla. Una mossa impossibile o una frase non capita ti viene detta ad alta voce. Se due pezzi possono andare sulla stessa casa, aggiungi la colonna di partenza: «cavallo b d2». L'interruttore «Microfono», sopra la scacchiera, spegne il microfono durante una conversazione; puoi sempre giocare sulla scacchiera, con il microfono acceso o spento.\n\nLa tua voce è riconosciuta sul dispositivo, senza rete, e non viene mai registrata. Il riconoscimento è più preciso da iOS 26."
+            "value": "In Nuova partita, scheda «Partita», attiva «Mosse a voce». Durante la partita il microfono ascolta da solo quando tocca a te: di' la tua mossa — «cavallo f3», «alfiere prende c6», «e4», «arrocco corto», «e8 donna» per una promozione.\n\nLa mossa capita viene giocata subito e appare sopra la scacchiera; di' «annulla» per ritirarla. Una mossa impossibile o una frase non capita ti viene detta ad alta voce. Se due pezzi possono andare sulla stessa casa, aggiungi la colonna di partenza: «cavallo b d2». L'interruttore «Microfono», sopra la scacchiera, spegne il microfono durante una conversazione; puoi sempre giocare sulla scacchiera, con il microfono acceso o spento.\n\nLa tua voce è riconosciuta sul dispositivo, senza rete, e non viene mai registrata. Il riconoscimento è più preciso da iOS 26; prima, di' mosse brevi: «e quattro» meglio di «pedone in e quattro»."
           }
         }
       }

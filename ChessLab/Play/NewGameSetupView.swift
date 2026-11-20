@@ -553,6 +553,18 @@ struct NewGameSetupView: View {
                     .padding(.bottom, 10)
                     .accessibilityIdentifier("voiceMovesNote")
             }
+            // Sans le transcripteur d'iOS 26 — l'app exige iOS 18, donc c'est iOS 18 (iPhone XS : la colonne e se confond avec c ou a), le dire EN
+            // ORANGE au moment d'allumer, avec le geste qui aide : des coups courts (demande du 20/11/2026).
+            if voiceMoves, Self.warnsAboutAccuracy(voiceAvailability) {
+                Text("Sous iOS 18, la reconnaissance n'est peut-être pas optimale (surtout les colonnes e, c et a). Dites des coups courts : « e quatre ».")
+                    .font(.caption)
+                    .foregroundStyle(Theme.warning)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, 52)
+                    .padding(.trailing, 14)
+                    .padding(.bottom, 10)
+                    .accessibilityIdentifier("voiceMovesAccuracyWarning")
+            }
             rowDivider
             settingRow("flag", "Départ") { startMenu }
             if useCustomFEN { fenField.padding(.horizontal, 14).padding(.bottom, 12) }
@@ -591,6 +603,11 @@ struct NewGameSetupView: View {
         .animation(Theme.gentle, value: opponentMode)
     }
 
+    /// Vrai quand la reconnaissance est la classique d'avant iOS 26 : moins fiable sur les lettres (voir la ligne orange).
+    static func warnsAboutAccuracy(_ availability: VoiceRecognizers.Availability?) -> Bool {
+        availability == .available(precise: false)
+    }
+
     /// Sous « Coups à la voix » : comment ça marche, et ce que l'appareil permet (décision du 19/11/2026 : sous
     /// iOS 18 à 25, la même fonction, avec cette note).
     private var voiceMovesNote: LocalizedStringKey? {
@@ -604,9 +621,6 @@ struct NewGameSetupView: View {
             return "La dictée est désactivée sur cet iPhone : activez-la dans Réglages › Général › Clavier (« Activer la dictée »), puis rallumez « Coups à la voix »."
         }
         guard voiceMoves else { return nil }
-        if voiceAvailability == .available(precise: false) {
-            return "Dites votre coup quand c'est à vous : il est joué dès qu'il est compris ; « annule » le reprend. Reconnaissance plus précise à partir d'iOS 26."
-        }
         return "Dites votre coup quand c'est à vous : il est joué dès qu'il est compris ; « annule » le reprend."
     }
 
