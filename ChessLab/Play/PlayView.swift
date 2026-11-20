@@ -584,6 +584,7 @@ struct PlayView: View {
         }
         let listener = VoiceMoveListener()
         listener.onTranscripts = { transcripts in viewModel.handleVoice(transcripts) }
+        listener.isDecisive = { transcripts in viewModel.voiceIsDecisive(transcripts) }
         voiceListener = listener
         Task {
             await listener.start()
@@ -602,11 +603,62 @@ struct PlayView: View {
         voiceListener.setTurn(isMine: mine, hints: mine ? viewModel.voiceHints : [])
     }
 
-    /// Au-dessus du plateau : ce que fait le micro, et l'interrupteur « Micro » pour le couper (une conversation
-    /// à table, envie de jouer au doigt) — le plateau joue dans tous les cas.
+    /// Le micro a un PROBLÈME à dire (non autorisé, indisponible, dictée coupée) : seul cas où il prend une rangée
+    /// au-dessus du plateau. Sinon tout tient dans la pastille de ma ligne (``voicePill``) — sur l'écran replié de
+    /// l'iPhone Duo, la rangée prenait sa hauteur au plateau, qui rapetissait (20/11/2026).
+    private var voiceHasProblem: Bool {
+        guard viewModel.voiceMicOn else { return false }
+        let status = voiceListener?.status ?? .starting
+        return status == .denied || status == .unavailable || status == .dictationOff
+    }
+
+    /// Sur MA ligne, sous le plateau : ce que fait le micro, d'un symbole (et « Dites votre coup » quand il écoute) ;
+    /// la toucher coupe ou rallume le micro (une conversation à table, envie de jouer au doigt) — le plateau joue
+    /// dans tous les cas.
+    private var voicePill: some View {
+        let micOn = viewModel.voiceMicOn
+        let status = voiceListener?.status ?? .starting
+        let tint = micOn ? voiceTint(status) : Theme.textSecondary
+        let listening = micOn && status == .listening
+        return Button {
+            viewModel.setVoiceMic(!micOn)
+        } label: {
+            ViewThatFits(in: .horizontal) {
+                pillLabel(micOn: micOn, status: status, showsText: listening)
+                pillLabel(micOn: micOn, status: status, showsText: false)
+            }
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(tint)
+            .padding(.horizontal, 9)
+            .padding(.vertical, 4)
+            .background(listening ? Theme.accent.opacity(0.15) : Theme.surface, in: Capsule())
+            .overlay(Capsule().strokeBorder(listening ? Theme.accent.opacity(0.45) : Theme.stroke, lineWidth: 1))
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text("Micro"))
+        .accessibilityValue(Text(LocalizedStringKey(micOn ? voiceStatusKey(status) : "Micro coupé : jouez sur le plateau")))
+        .accessibilityAddTraits(.isToggle)
+        .accessibilityIdentifier("voiceMic")
+    }
+
+    private func pillLabel(micOn: Bool, status: VoiceMoveListener.Status, showsText: Bool) -> some View {
+        HStack(spacing: 5) {
+            Image(systemName: micOn ? voiceSymbol(status) : "mic.slash")
+                .symbolEffect(.pulse, isActive: micOn && status == .listening)
+            if showsText {
+                Text("Dites votre coup")
+                    .lineLimit(1)
+                    .fixedSize()
+            }
+        }
+    }
+
+    /// Au-dessus du plateau, SEULEMENT quand le micro a un problème à dire (voir ``voiceHasProblem``) : le message
+    /// en entier, et l'interrupteur (le recouper puis le rallumer revérifie, une fois la dictée activée).
     @ViewBuilder
     private var voiceBar: some View {
-        if viewModel.settings.voiceMoves, viewModel.outcome == nil {
+        if viewModel.settings.voiceMoves, viewModel.outcome == nil, voiceHasProblem {
             let micOn = viewModel.voiceMicOn
             let status = voiceListener?.status ?? .starting
             HStack(spacing: 10) {
@@ -745,7 +797,10 @@ struct PlayView: View {
             isActive: viewModel.outcome == nil && viewModel.board.position.sideToMove == me,
             captured: captured.captures(by: me),
             advantage: captured.advantage(for: me),
-            remaining: viewModel.clock?.displayRemaining(for: me)
+            remaining: viewModel.clock?.displayRemaining(for: me),
+            // Un problème à dire : la barre au-dessus du plateau a son propre interrupteur, pas de pastille en double.
+            accessory: viewModel.settings.voiceMoves && viewModel.outcome == nil && !voiceHasProblem
+                ? AnyView(voicePill) : nil
         )
     }
 
@@ -988,6 +1043,8 @@ private struct PlayerRowView: View {
     /// indicateur à la place du badge « réfléchit » séparé (qui prenait de la
     /// hauteur au-dessus du plateau et le faisait rétrécir).
     var isThinking: Bool = false
+    /// À droite, avant la pendule : la pastille du micro sur MA ligne (coups à la voix, 20/11/2026).
+    var accessory: AnyView?
 
     var body: some View {
         HStack(spacing: 7) {
@@ -1007,6 +1064,7 @@ private struct PlayerRowView: View {
             }
             CapturedTrayView(kinds: captured, glyphColor: color.opposite, advantage: advantage)
             Spacer(minLength: 0)
+            if let accessory { accessory }
             if let remaining {
                 Text(formatted(remaining))
                     .font(.title3.weight(.semibold).monospacedDigit())

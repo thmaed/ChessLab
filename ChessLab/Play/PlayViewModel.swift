@@ -328,6 +328,20 @@ final class PlayViewModel {
         }
     }
 
+    /// Pour l'essai anticipé de l'écoute (20/11/2026) : ces transcriptions donnent-elles un coup sûr, à jouer sans
+    /// attendre la fin de la phrase ? Rien n'est joué ni dit ici. Une promotion attend toujours : « e8… cavalier »,
+    /// coupé après « e8 », deviendrait une dame.
+    func voiceIsDecisive(_ transcripts: [String], language: String = LocalizationController.activeLanguageCode) -> Bool {
+        guard settings.voiceMoves, voiceMicOn, outcome == nil, canUserAct, !isReviewing else { return false }
+        let vocabulary = VoiceMoveParser.vocabulary(for: language)
+        guard !transcripts.contains(where: { VoiceMoveParser.isUndo($0, vocabulary: vocabulary) }),
+              VoiceMoveParser.soundsLikeChess(transcripts, vocabulary: vocabulary) else { return false }
+        let candidates = VoiceMoveParser.candidates(in: board)
+        guard case let .move(candidate) = VoiceMoveParser.resolve(transcripts: transcripts, among: candidates,
+                                                                   vocabulary: vocabulary) else { return false }
+        return candidate.promotion == nil
+    }
+
     private func playVoiceMove(_ candidate: VoiceMoveParser.Candidate) {
         attemptUserMove(from: Square(candidate.from), to: Square(candidate.to))
         guard pendingPromotion != nil else { return }

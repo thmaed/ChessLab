@@ -30,6 +30,22 @@ struct VoiceMovesGameTests {
         #expect(!VoiceRecognizers.isDictationOff(NSError(domain: "kLSRErrorDomain", code: 301)))
     }
 
+    /// iPhone XS en français de Suisse (19/11/2026) : la reconnaissance classique doit demander fr-CH, la variante de
+    /// la dictée, et non fr-FR (refusé avec la même erreur que la dictée coupée).
+    @Test func theClassicRecognitionAsksForThePhonesOwnVariant() {
+        let known: Set<String> = ["fr-FR", "fr-CH", "fr-CA", "de-DE", "de-CH", "en-US", "en-GB"]
+        #expect(VoiceRecognizers.classicLocale(for: "fr", device: Locale(identifier: "fr_CH"), supported: known)
+            .identifier(.bcp47) == "fr-CH")
+        #expect(VoiceRecognizers.classicLocale(for: "fr", device: Locale(identifier: "fr_FR"), supported: known)
+            .identifier(.bcp47) == "fr-FR")
+        #expect(VoiceRecognizers.classicLocale(for: "en", device: Locale(identifier: "en_GB"), supported: known)
+            .identifier(.bcp47) == "en-GB")
+        #expect(VoiceRecognizers.classicLocale(for: "de", device: Locale(identifier: "fr_CH"), supported: known)
+            .identifier(.bcp47) == "de-DE", "téléphone dans une autre langue que l'app : la variante par défaut")
+        #expect(VoiceRecognizers.classicLocale(for: "it", device: Locale(identifier: "it_CH"), supported: known)
+            .identifier(.bcp47) == "it-IT", "variante inconnue d'iOS : celle par défaut")
+    }
+
     @Test func theUnderstoodMoveIsPlayedAtOnce() throws {
         let model = try Self.game()
         #expect(model.isVoiceTurn)
@@ -59,6 +75,23 @@ struct VoiceMovesGameTests {
         #expect(model.handleVoice(["cavalier f3"], language: "fr", speaks: false) == .played("Nf3"))
         #expect(model.lastSpokenVoiceText == nil, "retour À L'ÉCRAN seulement (décision du 19/11/2026)")
         #expect(model.voiceNotice?.text == MoveNarration.describe(san: "Nf3"))
+    }
+
+    /// L'essai anticipé (20/11/2026) ne joue que ce qui est déjà un coup sûr ; le reste attend la fin de la phrase.
+    @Test func onlyADecisiveMoveIsPlayedEarly() throws {
+        let model = try Self.game()
+        #expect(model.voiceIsDecisive(["cavalier f3"], language: "fr"))
+        #expect(!model.voiceIsDecisive(["cavalier"], language: "fr"), "une moitié de phrase attend la suite")
+        #expect(!model.voiceIsDecisive(["fou c4"], language: "fr"), "un coup impossible se dit, à la fin")
+        #expect(!model.voiceIsDecisive(["tu veux un café ?"], language: "fr"))
+        #expect(!model.voiceIsDecisive(["annule"], language: "fr"))
+        #expect(model.moveLog.isEmpty, "la question ne joue rien")
+        let twins = try Self.game(fen: "4k3/8/8/8/8/5N2/8/1N2K3 w - - 0 1")
+        #expect(!twins.voiceIsDecisive(["cavalier d2"], language: "fr"))
+        let promotion = try Self.game(fen: "8/P7/8/8/8/8/8/k6K w - - 0 1")
+        #expect(!promotion.voiceIsDecisive(["a8"], language: "fr"), "« a8… cavalier » coupé deviendrait une dame")
+        #expect(!promotion.voiceIsDecisive(["a8 cavalier"], language: "fr"))
+        #expect(!(try Self.game(voice: false)).voiceIsDecisive(["cavalier f3"], language: "fr"))
     }
 
     @Test func anImpossibleMoveIsSaidAndNotPlayed() throws {

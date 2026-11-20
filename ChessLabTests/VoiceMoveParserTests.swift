@@ -37,11 +37,23 @@ struct VoiceMoveParserTests {
         #expect(VoiceMoveParser.resolve(transcripts: ["bonjour"], among: candidates()) == .notUnderstood)
     }
 
+    @Test func eFourHeardAsAuQuatre() {
+        // iPhone3 et iPhone XS, 20/11/2026 : « e4 » écrit « Au quatre » ou « O quatre ».
+        #expect(uci("Au quatre", candidates()) == "e2e4")
+        #expect(uci("O quatre", candidates()) == "e2e4")
+        #expect(VoiceMoveParser.resolve(transcripts: ["au revoir"], among: candidates()) == .notUnderstood)
+    }
+
     @Test func castling() {
         let italian = candidates(after: ["e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "f8c5"])
         #expect(uci("petit roque", italian) == "e1g1")
         #expect(VoiceMoveParser.resolve(transcripts: ["grand roque"], among: italian) == .illegal)
         #expect(uci("roque", italian) == "e1g1")
+        // Ce que la reconnaissance a écrit en partie sur iPhone3 (20/11/2026).
+        for heard in ["Petit rock", "Roi, Petit roc", "P rock", "Roi Petitoc", "Rock"] {
+            #expect(uci(heard, italian) == "e1g1", "« \(heard) »")
+        }
+        #expect(VoiceMoveParser.resolve(transcripts: ["Grand rock"], among: italian) == .illegal)
     }
 
     @Test func twoKnightsForOneSquareAskWhichOne() {

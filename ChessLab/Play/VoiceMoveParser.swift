@@ -119,6 +119,8 @@ enum VoiceMoveParser {
             "à": "a", "ah": "a", "ha": "a", "bey": "b", "baie": "b", "bée": "b",
             "ces": "c", "ses": "c", "c'est": "c", "s'est": "c", "sait": "c", "des": "d", "dès": "d", "dais": "d",
             "euh": "e", "eux": "e", "eu": "e", "et": "e", "est": "e", "ef": "f", "effet": "f",
+            // « e4 » entendu « Au quatre » / « O quatre », sur iPhone3 et sur l'iPhone XS (20/11/2026).
+            "au": "e", "o": "e",
             "j'ai": "g", "geai": "g", "jet": "g", "j": "g", "hash": "h", "hach": "h",
         ],
         ranks: [
@@ -126,9 +128,10 @@ enum VoiceMoveParser {
             "sept": "7", "set": "7", "cette": "7", "huit": "8",
         ],
         writtenInitials: ["c": "N", "f": "B", "t": "R", "d": "Q", "r": "K"],
-        shortCastle: ["petit roque", "petit-roque"],
-        longCastle: ["grand roque", "grand-roque"],
-        anyCastle: ["roque"],
+        // Entendus le 20/11 en partie sur iPhone3 : « Petit rock », « Roi, Petit roc », « P rock », « Petitoc ».
+        shortCastle: ["petit roque", "petit-roque", "petit roc", "petit rock", "p rock", "petitoc"],
+        longCastle: ["grand roque", "grand-roque", "grand roc", "grand rock"],
+        anyCastle: ["roque", "roc", "rock"],
         undo: ["annule", "annuler", "annulé", "reprends", "reprendre", "reprend le coup", "retour"],
         pieceNames: ["K": "roi", "Q": "dame", "R": "tour", "B": "fou", "N": "cavalier", "P": "pion"],
         to: "en", takes: "prend", shortCastleName: "petit roque", longCastleName: "grand roque"

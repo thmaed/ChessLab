@@ -27,5 +27,31 @@ Small : le calcul s'arrête sans message sur le Mac (mémoire ?) ; ~480 Mo, trop
 Pièges : `mps` (Metal) se bloque pour de bon dans waitUntilCompleted → processeur ; le téléchargement Xet de
 Hugging Face se bloque → `HF_HUB_DISABLE_XET=1`, puis `HF_HUB_OFFLINE=1`.
 
-Reste : vitesse sur l'iPhone XS (Core ML) et le Galaxy A16 (ONNX), taille, rejet des conversations (le choix
-désigne toujours un coup), d'autres voix et d'autres micros.
+## Sur le téléphone (20/11/2026) : CONCLUSION, Whisper mis de côté
+
+`convertir.py` fait deux modèles Core ML (46 + 42 Mo, poids en demi-précision) : l'ÉCOUTE (log-mel gardé en
+32 bits — en 16 bits, les sons faibles du XS tombaient à zéro — puis l'encodeur, qui rend les clés et valeurs de
+l'attention croisée) et la NOTATION (le décodeur, par lots de 32 phrases de 16 jetons, la probabilité normalisée sur
+le seul VOCABULAIRE des phrases d'échecs, ~100 jetons au lieu de 51 865 : sinon la demi-précision déborde, et c'est
+400 fois moins de calcul). Le découpage en jetons tient dans `whisper-pretokens.json` (98 morceaux) : pas de
+tokeniseur dans l'app. `verifier_coreml.py` rejoue les modèles convertis sur le Mac ; `variantes.py` compare
+vocabulaire complet/réduit et nombre de graphies. Le code Swift de l'essai (`ios/`, retiré de l'app) chargeait les
+modèles copiés dans Documents/whisper et les rejouait sur les essais enregistrés du labo.
+
+21 essais de l'iPhone XS (A12, iOS 18.7), même voix :
+
+| | justes | temps par coup |
+| --- | --- | --- |
+| Core ML sur le Mac | 20/21 | 0,14-0,16 s |
+| XS, `.all` (moteur neuronal) | **0/21** : notes invalides ou absurdes | 4-8 s |
+| XS, processeur seul | 18/21 | **1,5-6,4 s** (écoute 1,1 s, notes 0,4-5 s) |
+| Apple « B » (classique + indices), mêmes essais | 18/21 | 0,3-1,2 s |
+
+Le moteur neuronal de l'A12 fausse le calcul ; sur le processeur, Whisper est JUSTE mais n'apporte rien sur le XS
+(autant de coups qu'Apple) pour un temps 3 à 5 fois plus long. Décision de l'utilisateur (20/11/2026) : Whisper
+reste une étude, rien dans l'app ; on livre la reconnaissance d'Apple, améliorée le même jour (essai anticipé, fin
+de phrase lissée, « petit rock », « au quatre »).
+
+À rouvrir seulement si un téléphone visé n'a PAS de reconnaissance sur l'appareil (Android sans pack de langue,
+par exemple) : alors le choix parmi les coups légaux reste la meilleure piste mesurée. Non essayés : la carte
+graphique du XS (`-whisperUnits cpuAndGPU`), ONNX sur le Galaxy.

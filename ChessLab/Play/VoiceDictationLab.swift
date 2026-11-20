@@ -337,6 +337,12 @@ final class VoiceDictationLab {
 
     /// Le vocabulaire d'échecs : des gabarits de phrases (« cavalier en f 3 »…) compilés en modèle SUR l'iPhone.
     private func prepareVocabulary() async {
+        // Sous iOS 18, cette préparation n'existe pas dans le système (plantage « unrecognized selector » sur
+        // l'iPhone XS, 19/11/2026) ; le vocabulaire n'apportait rien de toute façon (mesure du matin).
+        guard #available(iOS 26, *) else {
+            vocabularyStatus = "vocabulaire : réservé à iOS 26"
+            return
+        }
         let dir = Self.directory
         let asset = dir.appending(path: "chess-fr.bin")
         let configuration = SFSpeechLanguageModel.Configuration(

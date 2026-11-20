@@ -6,8 +6,25 @@ import Speech
 /// le transcripteur d'iOS 26 (le meilleur, « D »), sinon la reconnaissance classique avec les coups légaux en indices
 /// (« B »). Le vocabulaire appris (« C », « E ») n'apportait rien : écarté.
 enum VoiceRecognizers {
+    /// La variante pour la reconnaissance CLASSIQUE (iOS 18 à 25) : celle du téléphone si iOS la connaît (fr-CH en
+    /// Suisse), sinon celle par défaut. Sur l'iPhone XS réglé en français de Suisse (19/11/2026), la dictée active,
+    /// « fr-FR » répondait quand même « Siri and Dictation are disabled » (kLSRErrorDomain 201) : la classique ne
+    /// reconnaît que dans la variante de la dictée. Le transcripteur d'iOS 26, lui, prend les équivalentes
+    /// (`supportedLocale(equivalentTo:)`) et garde `locale(for:)`. Pendant de `VoiceRecognizers.locale` (Android).
+    nonisolated static func classicLocale(
+        for language: String, device: Locale = .current,
+        supported: Set<String> = Set(SFSpeechRecognizer.supportedLocales().map { $0.identifier(.bcp47) })
+    ) -> Locale {
+        let fallback = locale(for: language)
+        guard let code = device.language.languageCode?.identifier,
+              code == fallback.language.languageCode?.identifier,
+              let region = device.region?.identifier else { return fallback }
+        let tag = "\(code)-\(region)"
+        return supported.contains(tag) ? Locale(identifier: tag) : fallback
+    }
+
     /// La langue de reconnaissance d'une langue de l'app.
-    static func locale(for language: String) -> Locale {
+    nonisolated static func locale(for language: String) -> Locale {
         switch language.prefix(2) {
         case "en": Locale(identifier: "en-US")
         case "es": Locale(identifier: "es-ES")
@@ -33,8 +50,19 @@ enum VoiceRecognizers {
         if #available(iOS 26, *), await SpeechTranscriber.supportedLocale(equivalentTo: locale) != nil {
             return .available(precise: true)
         }
-        if SFSpeechRecognizer(locale: locale)?.supportsOnDeviceRecognition == true {
-            return await classicIsBlockedByDictationSetting(locale: locale) ? .dictationOff : .available(precise: false)
+        let classic = classicLocale(for: language)
+        #if DEBUG
+        if classic != locale {
+            let blocked = await classicIsBlockedByDictationSetting(locale: locale)
+            print("[voix] essai en \(locale.identifier) : \(blocked ? "dictée refusée" : "accepté")")
+        }
+        #endif
+        if SFSpeechRecognizer(locale: classic)?.supportsOnDeviceRecognition == true {
+            let blocked = await classicIsBlockedByDictationSetting(locale: classic)
+            #if DEBUG
+            print("[voix] essai en \(classic.identifier) : \(blocked ? "dictée refusée" : "accepté")")
+            #endif
+            return blocked ? .dictationOff : .available(precise: false)
         }
         return .unavailable
     }
@@ -82,7 +110,7 @@ enum VoiceRecognizers {
             let heard = await transcriber(url: url, locale: locale, hints: hints)
             if !heard.isEmpty { return (heard, false) }
         }
-        return await classicOutcome(url: url, locale: locale, hints: hints, model: nil)
+        return await classicOutcome(url: url, locale: classicLocale(for: language), hints: hints, model: nil)
     }
 
     private final class Once: @unchecked Sendable {
@@ -168,9 +196,16 @@ enum VoiceRecognizers {
 
 /// Découpe le flux du micro en PHRASES : un début quand le son monte nettement au-dessus du bruit de fond, une fin
 /// après 0,7 s de silence. Tourne sur le fil audio (le rappel du micro) : tout est protégé par un verrou.
+///
+/// Le SILENCE se juge sur le niveau LISSÉ (la médiane du dernier dixième de seconde) et par rapport à la voix de la
+/// phrase (20 dB sous elle, c'est qu'on ne parle plus) : iPhone3, 20/11/2026, chaque phrase durait les 6 s du
+/// maximum — jugé tampon par tampon (21 ms), le moindre pic du bruit de fond relançait le compte du silence.
 /// Une phrase entendue : des copies de tampons que plus personne ne modifie — on peut la confier à un autre fil.
 struct Utterance: @unchecked Sendable {
     let buffers: [AVAudioPCMBuffer]
+    /// Une phrase finie SANS reprise de la parole depuis sa pause : le jeton de cette pause. Sa reconnaissance
+    /// anticipée vaut pour elle (le même son, plus du silence) — on la reprend au lieu d'en lancer une seconde.
+    var pauseToken: Int?
 }
 
 final class UtteranceDetector: @unchecked Sendable {
@@ -184,18 +219,33 @@ final class UtteranceDetector: @unchecked Sendable {
     private var silenceSeconds: Double = 0
     private var totalSeconds: Double = 0
     private var enabled = false
+    /// L'essai ANTICIPÉ (20/11/2026) : la phrase a déjà été rendue après une courte pause ; le jeton change dès que
+    /// la parole reprend ou que la phrase se termine, ce qui périme l'essai.
+    private var pauseSent = false
+    private var pauseToken = 0
+    /// Les niveaux des derniers tampons (un dixième de seconde) et la voix la plus forte de la phrase.
+    private var recent: [Float] = []
+    private var peak: Float = -120
 
     /// Une phrase complète, rendue sur le fil audio : à l'appelant de la confier au fil principal.
     var onUtterance: (@Sendable (Utterance) -> Void)?
+    /// La phrase telle qu'elle est après `pauseSilence` de silence, avec son jeton : si elle donne déjà un coup,
+    /// `claim(_:)` la prend et le coup se joue sans attendre la fin (`endSilence`).
+    var onPause: (@Sendable (Utterance, Int) -> Void)?
 
     static let endSilence: Double = 0.7
+    static let pauseSilence: Double = 0.3
     static let minimumSpeech: Double = 0.35
     static let maximumLength: Double = 6
     static let preRollSeconds: Double = 0.3
+    static let smoothingSeconds: Double = 0.1
+    /// Sous la voix de la phrase d'autant, c'est du silence, même si le bruit de fond a été mal estimé.
+    static let belowVoice: Float = 20
 
     func setEnabled(_ on: Bool) {
         lock.withLock {
             enabled = on
+            recent = []
             reset()
         }
     }
@@ -208,6 +258,19 @@ final class UtteranceDetector: @unchecked Sendable {
         speechSeconds = 0
         silenceSeconds = 0
         totalSeconds = 0
+        pauseSent = false
+        pauseToken += 1
+        peak = -120
+    }
+
+    /// Prend la phrase rendue à la pause `token` si rien n'a bougé depuis (pas de reprise de la parole, phrase pas
+    /// encore finie) : elle est alors close, et ne reviendra pas par `onUtterance`.
+    func claim(_ token: Int) -> Bool {
+        lock.withLock {
+            guard enabled, inSpeech, pauseSent, token == pauseToken else { return false }
+            reset()
+            return true
+        }
     }
 
     static func level(of buffer: AVAudioPCMBuffer) -> Float {
@@ -222,11 +285,17 @@ final class UtteranceDetector: @unchecked Sendable {
         let seconds = Double(buffer.frameLength) / buffer.format.sampleRate
         let level = Self.level(of: buffer)
         var finished: [AVAudioPCMBuffer]?
+        var finishedToken: Int?
+        var paused: (buffers: [AVAudioPCMBuffer], token: Int)?
         lock.withLock {
             guard enabled, let copy = Self.copy(buffer) else { return }
+            recent.append(level)
+            let window = max(1, Int((Self.smoothingSeconds / seconds).rounded()))
+            if recent.count > window { recent.removeFirst(recent.count - window) }
+            let steady = recent.sorted()[recent.count / 2]
             if !inSpeech {
                 // Le bruit de fond suit lentement ce qu'on entend hors parole.
-                noiseFloor = noiseFloor * 0.95 + min(level, noiseFloor + 6) * 0.05
+                noiseFloor = noiseFloor * 0.95 + min(steady, noiseFloor + 6) * 0.05
                 preRoll.append(copy)
                 let maxPreRoll = Int((Self.preRollSeconds / seconds).rounded(.up))
                 if preRoll.count > maxPreRoll { preRoll.removeFirst(preRoll.count - maxPreRoll) }
@@ -243,7 +312,13 @@ final class UtteranceDetector: @unchecked Sendable {
             }
             buffers.append(copy)
             totalSeconds += seconds
-            if level > noiseFloor + 6 {
+            peak = max(peak, steady)
+            if steady > max(noiseFloor + 6, peak - Self.belowVoice) {
+                if pauseSent {
+                    // La parole reprend (« cavalier… f3 ») : l'essai anticipé ne vaut plus.
+                    pauseSent = false
+                    pauseToken += 1
+                }
                 speechSeconds += seconds
                 silenceSeconds = 0
             } else {
@@ -251,11 +326,25 @@ final class UtteranceDetector: @unchecked Sendable {
             }
             if silenceSeconds >= Self.endSilence || totalSeconds >= Self.maximumLength {
                 // Un bruit bref (le son d'un coup, une porte) n'est pas une phrase.
-                if speechSeconds >= Self.minimumSpeech { finished = buffers }
+                if speechSeconds >= Self.minimumSpeech {
+                    finished = buffers
+                    if pauseSent { finishedToken = pauseToken }
+                }
+                #if DEBUG
+                if speechSeconds >= Self.minimumSpeech {
+                    print("[voix] fin de phrase par \(silenceSeconds >= Self.endSilence ? "silence" : "DURÉE MAXIMALE") : "
+                          + "fond \(Int(noiseFloor)) dB, voix \(Int(peak)) dB, parole \(String(format: "%.1f", speechSeconds)) s")
+                }
+                #endif
                 reset()
+            } else if !pauseSent, silenceSeconds >= Self.pauseSilence, speechSeconds >= Self.minimumSpeech {
+                pauseSent = true
+                pauseToken += 1
+                paused = (buffers, pauseToken)
             }
         }
-        if let finished { onUtterance?(Utterance(buffers: finished)) }
+        if let paused { onPause?(Utterance(buffers: paused.buffers), paused.token) }
+        if let finished { onUtterance?(Utterance(buffers: finished, pauseToken: finishedToken)) }
     }
 
     private static func copy(_ buffer: AVAudioPCMBuffer) -> AVAudioPCMBuffer? {
@@ -311,6 +400,9 @@ final class VoiceMoveListener {
     private var watchVoice: Task<Void, Never>?
     /// Les transcriptions d'une phrase, à confronter à la position.
     var onTranscripts: (([String]) -> Void)?
+    /// Ces transcriptions donnent-elles déjà un coup sûr ? Si oui, l'essai anticipé (après `pauseSilence`) le joue
+    /// sans attendre la fin de la phrase ; sinon (rien, une moitié de phrase, une promotion sans pièce), on attend.
+    var isDecisive: (([String]) -> Bool)?
 
     init(language: String = LocalizationController.activeLanguageCode) {
         self.language = language
@@ -350,6 +442,9 @@ final class VoiceMoveListener {
         detector.onUtterance = { [weak self] utterance in
             Task { @MainActor in await self?.recognize(utterance) }
         }
+        detector.onPause = { [weak self] utterance, token in
+            Task { @MainActor in await self?.recognizeEarly(utterance, token: token) }
+        }
         Self.installTap(on: input, format: format, feeding: detector)
         do {
             try engine.start()
@@ -385,6 +480,7 @@ final class VoiceMoveListener {
     }
 
     func stop() {
+        early = nil
         watchVoice?.cancel()
         detector.setEnabled(false)
         if running {
@@ -410,27 +506,106 @@ final class VoiceMoveListener {
         status = isPaused ? .paused : recognizing ? .recognizing : listening ? .listening : .waiting
     }
 
-    private func recognize(_ utterance: Utterance) async {
-        let buffers = utterance.buffers
-        guard let format = buffers.first?.format else { return }
-        guard running, wantsToListen, !isPaused else { return }
-        recognizing = true
-        refresh()
+    /// La phrase dans un fichier temporaire (à effacer par l'appelant), nil si elle est vide ou illisible.
+    private static func write(_ buffers: [AVAudioPCMBuffer]) -> URL? {
+        guard let format = buffers.first?.format else { return nil }
         let url = FileManager.default.temporaryDirectory.appending(path: "voice-move-\(UUID().uuidString).caf")
-        defer { try? FileManager.default.removeItem(at: url) }
         do {
             let file = try AVAudioFile(forWriting: url, settings: format.settings)
             for buffer in buffers { try file.write(from: buffer) }
+            return url
         } catch {
-            recognizing = false
-            refresh()
+            try? FileManager.default.removeItem(at: url)
+            return nil
+        }
+    }
+
+    #if DEBUG
+    private static func trace(_ what: String, _ buffers: [AVAudioPCMBuffer], since clock: ContinuousClock.Instant,
+                              _ transcripts: [String]) {
+        let frames = buffers.reduce(0) { $0 + Int($1.frameLength) }
+        let seconds = Double(frames) / (buffers.first?.format.sampleRate ?? 48_000)
+        let millis = (ContinuousClock.now - clock) / .milliseconds(1)
+        print("[voix] \(what) \(String(format: "%.2f", seconds)) s, reconnue en \(Int(millis)) ms → \(transcripts)")
+    }
+    #endif
+
+    /// L'essai ANTICIPÉ (20/11/2026) : le labo reconnaît en ~0,1 s, mais en partie on attendait encore 0,7 s de
+    /// silence pour être sûr que la phrase était finie — c'était l'essentiel de l'attente sur iPhone3. Après
+    /// `pauseSilence`, la phrase est reconnue ; si elle donne déjà un coup sûr et que personne n'a repris la parole
+    /// entre-temps, le coup se joue. Sinon rien ne change : la phrase complète arrivera par `recognize`.
+    ///
+    /// UNE SEULE reconnaissance à la fois (iPhone XS, iOS 18, 20/11/2026) : la classique y prend 0,3 à 1,2 s, l'essai
+    /// anticipé n'avait pas fini quand la phrase se terminait, et les deux reconnaissances lancées ensemble
+    /// s'empêchaient (« No speech detected »). Désormais la fin de phrase REPREND l'essai en cours.
+    private func recognizeEarly(_ utterance: Utterance, token: Int) async {
+        // Un essai plus ancien tourne encore (la parole avait repris) : pas de second en parallèle.
+        guard running, wantsToListen, !isPaused, !recognizing, !earlyInFlight, let isDecisive,
+              let task = startHearing(utterance.buffers) else { return }
+        early = (token, task)
+        earlyInFlight = true
+        #if DEBUG
+        let clock = ContinuousClock.now
+        #endif
+        let (transcripts, _) = await task.value
+        earlyInFlight = false
+        guard running, wantsToListen, !isPaused, !recognizing, !transcripts.isEmpty, isDecisive(transcripts),
+              detector.claim(token) else {
+            #if DEBUG
+            Self.trace("essai anticipé écarté,", utterance.buffers, since: clock, transcripts)
+            #endif
             return
         }
-        let (transcripts, dictationOff) = await VoiceRecognizers.transcripts(of: url, language: language, hints: hints)
         #if DEBUG
-        let frames = buffers.reduce(0) { $0 + Int($1.frameLength) }
-        print("[voix] phrase \(String(format: "%.2f", Double(frames) / format.sampleRate)) s → \(transcripts)")
+        Self.trace("essai anticipé JOUÉ,", utterance.buffers, since: clock, transcripts)
         #endif
+        onTranscripts?(transcripts)
+    }
+
+    private typealias Heard = (transcripts: [String], dictationOff: Bool)
+    /// Le dernier essai anticipé (en cours ou fini : son résultat reste lisible), et le jeton de sa pause.
+    private var early: (token: Int, task: Task<Heard, Never>)?
+    private var earlyInFlight = false
+
+    /// Reconnaît la phrase dans une tâche (son fichier temporaire vit et meurt avec elle).
+    private func startHearing(_ buffers: [AVAudioPCMBuffer]) -> Task<Heard, Never>? {
+        guard let url = Self.write(buffers) else { return nil }
+        let language = language
+        let hints = hints
+        return Task {
+            defer { try? FileManager.default.removeItem(at: url) }
+            return await VoiceRecognizers.transcripts(of: url, language: language, hints: hints)
+        }
+    }
+
+    private func recognize(_ utterance: Utterance) async {
+        let buffers = utterance.buffers
+        guard running, wantsToListen, !isPaused else { return }
+        recognizing = true
+        refresh()
+        #if DEBUG
+        let clock = ContinuousClock.now
+        #endif
+        let heard: Heard
+        if let early, let token = utterance.pauseToken, early.token == token {
+            // Rien dit depuis la pause : l'essai anticipé reconnaît déjà ce son-là.
+            heard = await early.task.value
+            #if DEBUG
+            Self.trace("phrase (essai anticipé repris)", buffers, since: clock, heard.transcripts)
+            #endif
+        } else {
+            if let early, earlyInFlight { _ = await early.task.value }
+            guard let task = startHearing(buffers) else {
+                recognizing = false
+                refresh()
+                return
+            }
+            heard = await task.value
+            #if DEBUG
+            Self.trace("phrase", buffers, since: clock, heard.transcripts)
+            #endif
+        }
+        let (transcripts, dictationOff) = heard
         recognizing = false
         if dictationOff {
             // La dictée a été coupée en cours de partie : on le DIT au lieu d'écouter pour rien.

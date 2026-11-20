@@ -369,6 +369,10 @@ struct HomeView: View {
         switch name {
         case "newGame": return .newGame
         case "game": return .activeGame(PlayGameSettings())
+        case "voiceGame":
+            var settings = PlayGameSettings()
+            settings.voiceMoves = true
+            return .activeGame(settings)
         // Une partie ENTAMÉE (Italienne, 14 demi-coups, aux Blancs de jouer) :
         // les captures App Store veulent une liste de coups et une évaluation.
         case "gameInProgress":
