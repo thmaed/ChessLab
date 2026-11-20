@@ -492,7 +492,7 @@ Réponses déduites du code (vérifié, pas deviné) :
 
 ### Version et build
 
-**2.4, build 26** (le 25, téléversé le 19/11 sur TestFlight, est remplacé : il ne portait ni la fin de phrase lissée, ni l'essai anticipé, ni la pastille du micro, ni la ligne orange « Sous iOS 18… » ni les nouveautés 2.4 de l'Aide) — `MARKETING_VERSION = 2.4`, `CURRENT_PROJECT_VERSION = 26` (aux quatre configurations, app et extension de partage). La 2.3 (build 24) est en vente. Nouveautés détaillées dans `RELEASE_NOTES-2.4.md`.
+**2.4, build 26** (le 25, téléversé le 19/11 sur TestFlight, est remplacé : il ne portait ni la fin de phrase lissée, ni l'essai anticipé, ni la pastille du micro, ni la ligne orange « Sous iOS 18… » ni les nouveautés 2.4 de l'Aide) — `MARKETING_VERSION = 2.4`, `CURRENT_PROJECT_VERSION = 26` (aux quatre configurations, app et extension de partage). La 2.3 (build 24) est en vente. Nouveautés détaillées dans `RELEASE_NOTES-2.4.md`. **État au 20/11/2026 :** build 26 téléversé, traité et rattaché à la version 2.4 (PREPARE_FOR_SUBMISSION, NON soumise) ; il est aussi en TestFlight interne (groupe « Test ChessLab », distribution automatique). Captures « 04-adversaires » refaites (iPhone, iPad, Duo extérieur, cinq langues).
 
 **2.3, build 24** (le 23, téléversé le 14/11, est remplacé : il affichait « 2.3 » au-dessus des nouveautés 2.2 dans l'Aide) — `MARKETING_VERSION = 2.3`, `CURRENT_PROJECT_VERSION = 24` (aux quatre configurations, app et extension de partage ; la 2.2, build 22, est en vente : à revérifier par `asc.py build` avant l'archive). Nouveautés détaillées dans `RELEASE_NOTES-2.3.md`.
 

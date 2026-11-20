@@ -19,7 +19,7 @@ Notes DÉTAILLÉES pour le dépôt. Les textes à coller dans App Store Connect 
 
 - Les textes es/de/it (fiche, aide, ligne orange) n'ont PAS été relus par un locuteur natif.
 - **Nouvelle autorisation** (micro, reconnaissance vocale) : décrite dans les notes de révision de `METADATA.md` ; la politique de confidentialité a une section « Le micro » (19/11).
-- Captures : seule « 04-adversaires » (écran Nouvelle partie) montrait un écran refait ; voir l'état dans `METADATA.md`.
+- Captures : seule « 04-adversaires » (écran Nouvelle partie, refondu) était périmée ; refaite le 20/11 pour l'iPhone, l'iPad et l'écran EXTÉRIEUR du Duo, dans les cinq langues (`tools/captures-fiche.sh`, `habiller-captures.py`). L'écran INTÉRIEUR du Duo (non pilotable) et les aperçus vidéo sont inchangés. Le simulateur Duo n'ayant pas de reconnaissance vocale en fr/it (ligne « Coups à la voix » grisée avec « Indisponible »), ces deux captures ont été prises avec une construction de capture forçant « disponible » (réglage de débogage, JAMAIS commité).
 - Pas vu à l'écran : la pastille du micro sur l'iPhone Duo replié (le plateau garde sa taille), la ligne orange.
 - Whisper a été étudié et laissé de côté (`tools/whisper-spike/README.md`) : rien dans l'app.
 
