@@ -1,6 +1,6 @@
 # Métadonnées App Store Connect — ChessLab
 
-**Version courante : 2.3, build 24** (fixés dans `project.pbxproj`). La 2.2 (build 22) est EN VENTE (READY_FOR_SALE, vérifié par `asc.py status` le 14/11/2026). Voir `RELEASE_NOTES-2.3.md` pour le détail. **Préparée le 14/11/2026 : fiche à cinq langues (fr-FR, en-GB, es-ES, de-DE, it-IT), nouveautés et notes de révision posées dans App Store Connect (version 2.3) ; le build n'est PAS archivé ni téléversé, la version n'est PAS soumise (attendre l'accord de Thierry). Les textes es/de/it attendent une relecture par un locuteur natif ; leurs captures et aperçus ne sont pas faits.**
+**Version courante : 2.4, build 26** (fixés dans `project.pbxproj`). La 2.3 (build 24) est EN VENTE ; le build 25 de la 2.4 est déjà chez les testeurs internes de TestFlight (groupe « Test ChessLab »), le 26 le remplace. Voir `RELEASE_NOTES-2.4.md` pour le détail. **Préparée le 20/11/2026 : fiche à cinq langues (fr-FR, en-GB, es-ES, de-DE, it-IT), nouveautés et notes de révision posées dans App Store Connect (version 2.4) ; la version n'est PAS soumise à la révision (attendre l'accord de Thierry). Les textes es/de/it attendent une relecture par un locuteur natif.**
 
 > **Variantes régionales (14/11/2026)** — en-AU, en-CA (texte de l'anglais UK), es-MX (texte de es-ES), fr-CA (texte de fr-FR) et **en-US** reprennent le texte de leur langue-source, sans rien réécrire (`VARIANTS` dans `tools/asc/asc.py`). « ChessLab » seul est PRIS en en-US, en allemand et en italien : la fiche américaine s'appelle **« ChessLab: Chess Trainer »**, l'allemande « ChessLab Schach », l'italienne « ChessLab Scacchi ». Le nom sous l'icône reste « ChessLab ». Visuels : es-MX et fr-CA ont leur jeu (celui de es-ES / fr-FR) ; les variantes anglaises reprennent ceux de la langue principale (en-GB).
 
@@ -12,95 +12,130 @@ Tout ce qui suit est à copier-coller directement dans les champs correspondants
 
 ---
 
-## Nouveautés de cette version — 2.3 (4000 car. max)
+## Nouveautés de cette version — 2.4 (4000 car. max)
 
 C'est le champ « What's New in This Version ». Rédigé pour l'utilisateur final : ce qu'il va sentir, pas ce qui a été refactorisé. Un texte par langue de la fiche (fr-FR, en-GB, es-ES, de-DE, it-IT) ; les trois derniers sont à faire relire par un locuteur natif.
 
-> Version 2.3, build 23. Contenu : espagnol, allemand et italien complets (interface, aide, cours d'ouvertures et de finales, noms d'ouvertures), sélecteur de langue en pastilles (option « Automatique »), noms des joueurs par défaut traduits en mode Deux joueurs. Détail dans `RELEASE_NOTES-2.3.md`.
+> Version 2.4, build 26. Contenu : coups à la voix (reconnaissance sur l'appareil), partie à l'aveugle, module Visualisation, « Contre la montre » dans les puzzles, écran Nouvelle partie refait, synchro iCloud revue (« Vos appareils »). Détail dans `RELEASE_NOTES-2.4.md`. Les textes de la 2.3 sont dans `RELEASE_NOTES-2.3.md`.
 
 ### Français
 
 ```
-CHESSLAB 2.3
+CHESSLAB 2.4
 
-CINQ LANGUES, COMPLÈTES
-ChessLab parle maintenant français, anglais, espagnol, allemand et italien : toute l'interface, l'aide, tous les cours d'ouvertures et de finales expliqués coup par coup, et les noms des ouvertures. Choisissez la langue dans Réglages, ou laissez « Automatique » suivre celle de l'appareil.
+COUPS À LA VOIX
+Dictez votre coup : « cavalier f3 », « petit roque », « annule ». Le micro écoute seul quand c'est à vous de jouer ; votre voix est reconnue sur votre appareil, sans réseau, et n'est jamais enregistrée. Un coup impossible ou mal compris vous est dit à voix haute. Le réglage est dans Nouvelle partie. Sous iOS 18, la reconnaissance est moins précise : dites des coups courts (« e quatre ») ; elle est meilleure à partir d'iOS 26.
 
-La notation des coups suit la langue (R D T F C en français, K Q R B N en anglais, R D T A C en espagnol et en italien, K D T L S en allemand) et se règle à part si vous préférez.
+JOUER À L'AVEUGLE
+Cinq niveaux, des cases occupées seules jusqu'au plateau entièrement caché. Maintenez « Coup d'œil » pour vérifier une position (chaque coup d'œil est compté) ; l'app peut répéter vos coups à voix haute, avec la voix de votre choix.
 
-UN CHOIX DE LANGUE PLUS SIMPLE
-Les langues se choisissent d'un toucher sur de petites pastilles, toutes visibles d'un coup d'œil.
+VISUALISATION
+Un nouveau module pour voir l'échiquier dans sa tête, en cinq marches, des cases du plateau jusqu'au calcul de tête. Vos progrès se synchronisent par iCloud si vous l'activez.
 
-DEUX JOUEURS
-Les noms par défaut des joueurs (Blancs, Noirs) s'affichent maintenant dans la langue choisie.
+CONTRE LA MONTRE
+Dans les puzzles : trois minutes, autant de problèmes que possible, trois erreurs et c'est fini. Battez votre record.
+
+NOUVELLE PARTIE REFAITE
+L'adversaire en vedette, avec son style en quatre jauges (attaque, solidité, échanges, imprévisible), des menus pour la couleur, la cadence et le départ, et les aides en pastilles.
+
+ICLOUD
+Une liste « Vos appareils » dans les Réglages, et les changements faits sur un appareil arrivent plus vite sur l'autre.
 ```
 
 ### English
 
 ```
-CHESSLAB 2.3
+CHESSLAB 2.4
 
-FIVE LANGUAGES, COMPLETE
-ChessLab now speaks French, English, Spanish, German and Italian: the whole interface, the help, every opening and endgame course explained move by move, and the opening names. Pick your language in Settings, or leave it on “Automatic” to follow your device.
+VOICE MOVES
+Say your move: “knight f3”, “castles kingside”, “undo”. The microphone listens by itself when it's your turn; your voice is recognised on your device, without the network, and is never recorded. An impossible or misheard move is spoken back to you. Turn it on in New game. On iOS 18, recognition is less accurate: say short moves (“e four”); it is better from iOS 26.
 
-Move notation follows the language (K Q R B N in English, R D T F C in French, R D T A C in Spanish and Italian, K D T L S in German) and can be set separately if you prefer.
+PLAY BLINDFOLD
+Five levels, from showing only which squares are occupied to a fully hidden board. Hold “Peek” to check a position (every peek is counted); the app can repeat your moves aloud, in the voice of your choice.
 
-A SIMPLER LANGUAGE PICKER
-Languages are chosen with a tap on small chips, all visible at a glance.
+VISUALIZATION
+A new module for seeing the board in your head, in five steps, from the squares of the board to calculating in your head. Your progress syncs through iCloud if you turn it on.
 
-TWO PLAYERS
-The default player names (White, Black) now appear in the language you chose.
+AGAINST THE CLOCK
+In puzzles: three minutes, as many problems as you can, three mistakes and it's over. Beat your record.
+
+A REDESIGNED NEW GAME SCREEN
+The opponent up front, with their style in four gauges (attack, solidity, trades, unpredictable), menus for colour, time control and starting position, and the assists as pills.
+
+ICLOUD
+A “Your devices” list in Settings, and changes made on one device reach the other sooner.
 ```
 
 ### Español
 
 ```
-CHESSLAB 2.3
+CHESSLAB 2.4
 
-CINCO IDIOMAS, COMPLETOS
-ChessLab ahora habla francés, inglés, español, alemán e italiano: toda la interfaz, la ayuda, todos los cursos de aperturas y finales explicados jugada a jugada y los nombres de las aperturas. Elige el idioma en Ajustes, o deja «Automático» para seguir el del dispositivo.
+JUGADAS POR VOZ
+Di tu jugada: «caballo f3», «enroque corto», «deshacer». El micrófono escucha solo cuando te toca jugar; tu voz se reconoce en tu dispositivo, sin red, y nunca se graba. Una jugada imposible o mal entendida se te dice en voz alta. Se activa en Nueva partida. En iOS 18 el reconocimiento es menos preciso: di jugadas cortas («e cuatro»); mejora a partir de iOS 26.
 
-La notación de las jugadas sigue el idioma (R D T A C en español y en italiano, K Q R B N en inglés, R D T F C en francés, K D T L S en alemán) y se puede ajustar por separado si lo prefieres.
+JUGAR A CIEGAS
+Cinco niveles, desde ver solo las casillas ocupadas hasta un tablero totalmente oculto. Mantén pulsado «Vistazo» para comprobar una posición (cada vistazo se cuenta); la app puede repetir tus jugadas en voz alta, con la voz que elijas.
 
-UN SELECTOR DE IDIOMA MÁS SENCILLO
-Los idiomas se eligen con un toque en pequeñas pastillas, todas visibles de un vistazo.
+VISUALIZACIÓN
+Un módulo nuevo para ver el tablero en la cabeza, en cinco peldaños, desde las casillas del tablero hasta calcular de cabeza. Tus progresos se sincronizan por iCloud si lo activas.
 
-DOS JUGADORES
-Los nombres por defecto de los jugadores (Blancas, Negras) aparecen ahora en el idioma elegido.
+CONTRARRELOJ
+En los puzles: tres minutos, tantos problemas como puedas, tres errores y se acabó. Supera tu récord.
+
+NUEVA PARTIDA RENOVADA
+El rival en primer plano, con su estilo en cuatro medidores (ataque, solidez, cambios, impredecible), menús para el color, el ritmo y la salida, y las ayudas en pastillas.
+
+ICLOUD
+Una lista «Tus dispositivos» en Ajustes, y los cambios hechos en un dispositivo llegan antes al otro.
 ```
 
 ### Deutsch
 
 ```
-CHESSLAB 2.3
+CHESSLAB 2.4
 
-FÜNF SPRACHEN, VOLLSTÄNDIG
-ChessLab spricht jetzt Französisch, Englisch, Spanisch, Deutsch und Italienisch: die gesamte Oberfläche, die Hilfe, alle Eröffnungs- und Endspielkurse Zug für Zug erklärt und die Namen der Eröffnungen. Wähle die Sprache in den Einstellungen oder lass „Automatisch“ der Sprache deines Geräts folgen.
+ZÜGE PER SPRACHE
+Sag deinen Zug: „Springer f3“, „kurze Rochade“, „zurück“. Das Mikrofon hört von selbst zu, wenn du am Zug bist; deine Stimme wird auf deinem Gerät erkannt, ohne Netzwerk, und nie gespeichert. Ein unmöglicher oder missverstandener Zug wird dir laut gesagt. Einschalten unter Neue Partie. Unter iOS 18 ist die Erkennung weniger genau: sag kurze Züge („e vier“); ab iOS 26 ist sie besser.
 
-Die Zugnotation folgt der Sprache (K D T L S auf Deutsch, K Q R B N auf Englisch, R D T F C auf Französisch, R D T A C auf Spanisch und Italienisch) und lässt sich bei Bedarf getrennt einstellen.
+BLIND SPIELEN
+Fünf Stufen, von „nur die besetzten Felder sehen“ bis zum ganz verdeckten Brett. Halte „Blick“ gedrückt, um eine Stellung zu prüfen (jeder Blick wird gezählt); die App kann deine Züge laut wiederholen, mit der Stimme deiner Wahl.
 
-EINFACHERE SPRACHAUSWAHL
-Die Sprachen wählst du mit einem Tipp auf kleine Chips, alle auf einen Blick sichtbar.
+VISUALISIERUNG
+Ein neues Modul, um das Brett im Kopf zu sehen, in fünf Stufen, von den Feldern des Brettes bis zum Rechnen im Kopf. Dein Fortschritt wird über iCloud synchronisiert, wenn du es einschaltest.
 
-ZWEI SPIELER
-Die Standardnamen der Spieler (Weiß, Schwarz) erscheinen jetzt in der gewählten Sprache.
+GEGEN DIE UHR
+Bei den Puzzles: drei Minuten, so viele Aufgaben wie möglich, drei Fehler und es ist vorbei. Schlage deinen Rekord.
+
+NEUE PARTIE, ÜBERARBEITET
+Der Gegner im Vordergrund, mit seinem Stil in vier Anzeigen (Angriff, Solidität, Abtausch, unberechenbar), Menüs für Farbe, Bedenkzeit und Start und die Hilfen als kleine Kapseln.
+
+ICLOUD
+Eine Liste „Deine Geräte“ in den Einstellungen, und Änderungen auf einem Gerät kommen schneller auf dem anderen an.
 ```
 
 ### Italiano
 
 ```
-CHESSLAB 2.3
+CHESSLAB 2.4
 
-CINQUE LINGUE, COMPLETE
-ChessLab ora parla francese, inglese, spagnolo, tedesco e italiano: tutta l'interfaccia, la guida, tutti i corsi di aperture e di finali spiegati mossa per mossa e i nomi delle aperture. Scegli la lingua in Impostazioni, oppure lascia «Automatico» per seguire quella del dispositivo.
+MOSSE A VOCE
+Di' la tua mossa: «cavallo f3», «arrocco corto», «annulla». Il microfono ascolta da solo quando tocca a te; la tua voce viene riconosciuta sul dispositivo, senza rete, e non viene mai registrata. Una mossa impossibile o capita male ti viene detta a voce alta. Si attiva in Nuova partita. Con iOS 18 il riconoscimento è meno preciso: di' mosse brevi («e quattro»); da iOS 26 è migliore.
 
-La notazione delle mosse segue la lingua (R D T A C in italiano e in spagnolo, K Q R B N in inglese, R D T F C in francese, K D T L S in tedesco) e si può impostare a parte se preferisci.
+GIOCARE ALLA CIECA
+Cinque livelli, dalle sole case occupate fino alla scacchiera completamente nascosta. Tieni premuto «Sbirciata» per controllare una posizione (ogni sbirciata viene contata); l'app può ripetere le tue mosse a voce alta, con la voce che scegli.
 
-UN SELETTORE DI LINGUA PIÙ SEMPLICE
-Le lingue si scelgono con un tocco su piccoli chip, tutti visibili a colpo d'occhio.
+VISUALIZZAZIONE
+Un nuovo modulo per vedere la scacchiera nella testa, in cinque gradini, dalle case della scacchiera al calcolo a mente. I tuoi progressi si sincronizzano con iCloud se lo attivi.
 
-DUE GIOCATORI
-I nomi predefiniti dei giocatori (Bianco, Nero) compaiono ora nella lingua scelta.
+CONTRO IL TEMPO
+Nei puzzle: tre minuti, più problemi che puoi, tre errori e il gioco finisce. Batti il tuo record.
+
+NUOVA PARTITA RINNOVATA
+L'avversario in primo piano, con il suo stile in quattro indicatori (attacco, solidità, scambi, imprevedibile), menu per colore, cadenza e partenza, e gli aiuti in pillole.
+
+ICLOUD
+Un elenco «I tuoi dispositivi» nelle Impostazioni, e le modifiche fatte su un dispositivo arrivano prima sull'altro.
 ```
 
 ---
@@ -154,10 +189,13 @@ FINALES
 78 cours prouvés par table de finales : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Et l'entraînement libre, où tout coup qui préserve le verdict est accepté.
 
 PUZZLES
-Plus de 130 000 problèmes de la base Lichess, filtrables par niveau et par thème, plus les vôtres : tirés de vos erreurs, ou importés de vos propres fichiers PGN. Cote personnelle et « À mon niveau ».
+Plus de 130 000 problèmes de la base Lichess, filtrables par niveau et par thème, plus les vôtres : tirés de vos erreurs, ou importés de vos propres fichiers PGN. Cote personnelle et « À mon niveau ». Et « Contre la montre » : trois minutes, autant de problèmes que possible.
 
 VARIANTES ET PLUS
 Chess960 et onze variantes contre l'ordinateur (Roi de la colline, Trois échecs, Horde, Atomique, Crazyhouse, Duck Chess, Barricades…), chacune avec sa propre analyse. Mode deux joueurs, et Laboratoire pour comparer deux réglages de Stockfish.
+
+VOIX, À L'AVEUGLE ET VISUALISATION
+Dictez vos coups (« cavalier f3 », « petit roque », « annule ») : la voix est reconnue sur l'appareil, sans réseau, et n'est jamais enregistrée. Jouez à l'aveugle, pièces cachées en tout ou partie, avec un « Coup d'œil » compté. Et entraînez-vous à voir l'échiquier dans votre tête avec le module Visualisation, en cinq marches.
 
 IPHONE ET IPAD
 Grand échiquier et panneaux côte à côte sur iPad, clavier et trackpad, portrait et paysage. En français, anglais, espagnol, allemand et italien. Synchronisation iCloud optionnelle, désactivée par défaut.
@@ -214,10 +252,13 @@ ENDGAMES
 78 courses proven by endgame tablebases: no move taught gives up a win, no defence offered loses a draw. Plus free training, where any move that keeps the verdict is accepted.
 
 PUZZLES
-Over 130,000 problems from the Lichess database, filtered by level and theme, plus your own: drawn from your mistakes, or imported from your own PGN files. Personal rating and “At my level”.
+Over 130,000 problems from the Lichess database, filtered by level and theme, plus your own: drawn from your mistakes, or imported from your own PGN files. Personal rating and “At my level”. Plus “Against the clock”: three minutes, as many problems as you can.
 
 VARIANTS AND MORE
 Chess960 and eleven variants against the computer (King of the Hill, Three-Check, Horde, Atomic, Crazyhouse, Duck Chess, Barricades…), each with its own analysis. Two-player mode, and a Laboratory to compare two Stockfish settings.
+
+VOICE, BLINDFOLD AND VISUALIZATION
+Say your moves (“knight f3”, “castles kingside”, “undo”): your voice is recognised on the device, without the network, and is never recorded. Play blindfold, with pieces hidden in whole or in part and a counted “Peek”. And train yourself to see the board in your head with the Visualization module, in five steps.
 
 IPHONE AND IPAD
 A large board with side-by-side panels on iPad, keyboard and trackpad, portrait and landscape. In French, English, Spanish, German and Italian. Optional iCloud sync, off by default.
@@ -274,10 +315,13 @@ FINALES
 78 cursos demostrados con tablas de finales: ninguna jugada enseñada deja escapar la victoria, ninguna defensa propuesta pierde las tablas. Y el entrenamiento libre, donde se acepta toda jugada que conserve el veredicto.
 
 PUZLES
-Más de 130 000 problemas de la base de Lichess, filtrables por nivel y por tema, más los tuyos: sacados de tus errores o importados de tus propios archivos PGN. Puntuación personal y «A mi nivel».
+Más de 130 000 problemas de la base de Lichess, filtrables por nivel y por tema, más los tuyos: sacados de tus errores o importados de tus propios archivos PGN. Puntuación personal y «A mi nivel». Y «Contrarreloj»: tres minutos, tantos problemas como puedas.
 
 VARIANTES Y MÁS
 Chess960 y once variantes contra el ordenador (Rey de la colina, Tres jaques, Horda, Atómico, Crazyhouse, Duck Chess, Barricadas…), cada una con su propio análisis. Modo de dos jugadores y Laboratorio para comparar dos ajustes de Stockfish.
+
+VOZ, A CIEGAS Y VISUALIZACIÓN
+Di tus jugadas («caballo f3», «enroque corto», «deshacer»): tu voz se reconoce en el dispositivo, sin red, y nunca se graba. Juega a ciegas, con las piezas ocultas en todo o en parte y un «Vistazo» contado. Y entrénate para ver el tablero en la cabeza con el módulo Visualización, en cinco peldaños.
 
 IPHONE Y IPAD
 Tablero grande y paneles lado a lado en iPad, teclado y trackpad, vertical y horizontal. En francés, inglés, español, alemán e italiano. Sincronización iCloud opcional, desactivada por defecto.
@@ -334,10 +378,13 @@ ENDSPIELE
 78 mit Endspieltabellen bewiesene Kurse: Kein gelehrter Zug gibt den Gewinn aus der Hand, keine empfohlene Verteidigung verliert das Remis. Dazu das freie Training, in dem jeder Zug zählt, der das Urteil bewahrt.
 
 PUZZLES
-Mehr als 130 000 Aufgaben aus der Lichess-Datenbank, filterbar nach Stufe und Thema, plus deine eigenen: aus deinen Fehlern erzeugt oder aus eigenen PGN-Dateien importiert. Persönliche Wertung und „Auf meiner Stufe“.
+Mehr als 130 000 Aufgaben aus der Lichess-Datenbank, filterbar nach Stufe und Thema, plus deine eigenen: aus deinen Fehlern erzeugt oder aus eigenen PGN-Dateien importiert. Persönliche Wertung und „Auf meiner Stufe“. Dazu „Gegen die Uhr“: drei Minuten, so viele Aufgaben wie möglich.
 
 VARIANTEN UND MEHR
 Chess960 und elf Varianten gegen den Computer (King of the Hill, Drei-Schach, Horde, Atomschach, Crazyhouse, Duck Chess, Barrikaden …), jede mit eigener Analyse. Zwei-Spieler-Modus und Labor, um zwei Stockfish-Einstellungen zu vergleichen.
+
+SPRACHE, BLIND SPIELEN UND VISUALISIERUNG
+Sag deine Züge („Springer f3“, „kurze Rochade“, „zurück“): Deine Stimme wird auf dem Gerät erkannt, ohne Netzwerk, und nie gespeichert. Spiele blind, mit ganz oder teilweise verdeckten Figuren und einem gezählten „Blick“. Und übe, das Brett im Kopf zu sehen, mit dem Modul Visualisierung, in fünf Stufen.
 
 IPHONE UND IPAD
 Großes Brett und Bedienfelder nebeneinander auf dem iPad, Tastatur und Trackpad, Hoch- und Querformat. Auf Französisch, Englisch, Spanisch, Deutsch und Italienisch. Optionale iCloud-Synchronisierung, standardmäßig aus.
@@ -394,10 +441,13 @@ FINALI
 78 corsi dimostrati con le tablebase dei finali: nessuna mossa insegnata lascia sfuggire la vittoria, nessuna difesa proposta perde la patta. E l'allenamento libero, dove si accetta ogni mossa che conserva il verdetto.
 
 PUZZLE
-Oltre 130 000 problemi dal database di Lichess, filtrabili per livello e per tema, più i tuoi: tratti dai tuoi errori o importati dai tuoi file PGN. Punteggio personale e «Al mio livello».
+Oltre 130 000 problemi dal database di Lichess, filtrabili per livello e per tema, più i tuoi: tratti dai tuoi errori o importati dai tuoi file PGN. Punteggio personale e «Al mio livello». E «Contro il tempo»: tre minuti, più problemi che puoi.
 
 VARIANTI E ALTRO
 Chess960 e undici varianti contro il computer (Re della collina, Tre scacchi, Orda, Atomico, Crazyhouse, Duck Chess, Barricate…), ognuna con la propria analisi. Modalità a due giocatori e Laboratorio per confrontare due impostazioni di Stockfish.
+
+VOCE, ALLA CIECA E VISUALIZZAZIONE
+Di' le tue mosse («cavallo f3», «arrocco corto», «annulla»): la voce viene riconosciuta sul dispositivo, senza rete, e non viene mai registrata. Gioca alla cieca, con i pezzi nascosti in tutto o in parte e una «Sbirciata» contata. E allenati a vedere la scacchiera nella testa con il modulo Visualizzazione, in cinque gradini.
 
 IPHONE E IPAD
 Scacchiera grande e pannelli affiancati su iPad, tastiera e trackpad, verticale e orizzontale. In francese, inglese, spagnolo, tedesco e italiano. Sincronizzazione iCloud facoltativa, disattivata per impostazione predefinita.
@@ -425,7 +475,7 @@ ChessLab integra il motore Stockfish (licenza GPLv3), la rete Maia-3 dell'Univer
 `INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO` est déjà réglé dans le projet. L'app n'implémente aucune cryptographie propre. La seule activité réseau possible, la synchronisation iCloud (optionnelle, désactivée par défaut), passe par CloudKit — chiffrement standard fourni par le système Apple, donc **exempté** au sens de l'export compliance. Si App Store Connect pose la question : aucune cryptographie propriétaire, exempté.
 
 ### App Privacy (étiquette de confidentialité)
-Réponse à la question « Collectez-vous des données ? » : **Non**. Aucun SDK tiers d'analytics, de publicité ou de suivi n'est intégré (les seules dépendances tierces sont ChessKit et le moteur Stockfish vendorisé, qui tournent entièrement localement). Le champ « scan de l'appareil photo » sert uniquement à la reconnaissance locale d'une position, jamais à un envoi réseau. La synchronisation iCloud (optionnelle) stocke les données dans l'iCloud **privé** de l'utilisateur (base CloudKit privée), à laquelle le développeur n'a aucun accès : Apple ne considère pas cela comme une collecte de données par le développeur. Résultat attendu dans le questionnaire App Store Connect : « Data Not Collected » pour toutes les catégories.
+Réponse à la question « Collectez-vous des données ? » : **Non**. Aucun SDK tiers d'analytics, de publicité ou de suivi n'est intégré (les seules dépendances tierces sont ChessKit et le moteur Stockfish vendorisé, qui tournent entièrement localement). Le champ « scan de l'appareil photo » sert uniquement à la reconnaissance locale d'une position, jamais à un envoi réseau. **Micro et reconnaissance vocale (2.4, « Coups à la voix »)** : la parole est reconnue SUR L'APPAREIL (`requiresOnDeviceRecognition`, ou le transcripteur d'iOS 26), jamais envoyée ni gardée ; le fichier temporaire de chaque phrase est effacé dès qu'elle est reconnue — pas une « collecte » au sens d'Apple. La synchronisation iCloud (optionnelle) stocke les données dans l'iCloud **privé** de l'utilisateur (base CloudKit privée), à laquelle le développeur n'a aucun accès : Apple ne considère pas cela comme une collecte de données par le développeur. Résultat attendu dans le questionnaire App Store Connect : « Data Not Collected » pour toutes les catégories.
 
 ### Classification par âge
 Le nouveau questionnaire d'âge (contenu, pas de violence, pas de contenu généré par les utilisateurs partagé publiquement, pas de jeu d'argent, pas d'accès web non restreint) doit répondre « aucun » partout → note **4+**.
@@ -441,6 +491,8 @@ Réponses déduites du code (vérifié, pas deviné) :
 - **Captions** : non applicable, pas de contenu audio/vidéo narratif.
 
 ### Version et build
+
+**2.4, build 26** (le 25, téléversé le 19/11 sur TestFlight, est remplacé : il ne portait ni la fin de phrase lissée, ni l'essai anticipé, ni la pastille du micro, ni la ligne orange « Sous iOS 18… » ni les nouveautés 2.4 de l'Aide) — `MARKETING_VERSION = 2.4`, `CURRENT_PROJECT_VERSION = 26` (aux quatre configurations, app et extension de partage). La 2.3 (build 24) est en vente. Nouveautés détaillées dans `RELEASE_NOTES-2.4.md`.
 
 **2.3, build 24** (le 23, téléversé le 14/11, est remplacé : il affichait « 2.3 » au-dessus des nouveautés 2.2 dans l'Aide) — `MARKETING_VERSION = 2.3`, `CURRENT_PROJECT_VERSION = 24` (aux quatre configurations, app et extension de partage ; la 2.2, build 22, est en vente : à revérifier par `asc.py build` avant l'archive). Nouveautés détaillées dans `RELEASE_NOTES-2.3.md`.
 
@@ -484,6 +536,7 @@ git push origin main
 Au 19/08/2026, `main` est poussé au fil de l'eau (la nuit de travail du 18-19/08 a été poussée commit par commit). Vérifier malgré tout au moment de soumettre (`git log --oneline origin/main..HEAD | wc -l` doit rendre 0) : soumettre sans pousser publierait un binaire dont les sources annoncées ne correspondent pas.
 
 ### Historique des versions
+- **2.4** — build 26 (le 25 est sur TestFlight, remplacé) : coups à la voix, partie à l'aveugle, Visualisation, « Contre la montre », Nouvelle partie refaite, synchro iCloud revue (`RELEASE_NOTES-2.4.md`).
 - **2.3** — build 23, préparée (non soumise) : espagnol, allemand et italien complets (interface, aide, cours, noms d'ouvertures, notation), sélecteur de langue en pastilles, noms des joueurs par défaut traduits (`RELEASE_NOTES-2.3.md`).
 - **2.2** — build 22, en vente : scanner fiabilisé (photos d'écran, revue des cases douteuses, partage depuis Photos par l'extension ChessLabShare), export PGN et copie iCloud des collections de puzzles, réglage « Afficher le thème du puzzle », Laboratoire Chess960, Stockfish 19, jauge d'avancement de l'analyse (`RELEASE_NOTES-2.2.md`).
 - **2.1** — build 21, en vente depuis le 05/11/2026 : collections de puzzles importées, écran Puzzles repensé, réussite partielle, 130 935 puzzles (`RELEASE_NOTES-2.1.md`).
@@ -505,10 +558,10 @@ Au 19/08/2026, `main` est poussé au fil de l'eau (la nuit de travail du 18-19/0
 
 ## App Review Notes (paste into App Store Connect → App Review Information → Notes)
 
-English, for the Apple reviewer. Opens with the nature of the update (2.3 : localization update), puis la proposition de valeur (sept modes, entièrement gratuits), la permission caméra, le seul appel réseau, la situation de licence (moteur GPLv3, sources publiques), et qu'aucun compte de test n'est nécessaire.
+English, for the Apple reviewer. Opens with the nature of the update (2.4: voice moves, blindfold, Visualization, against-the-clock puzzles), puis la proposition de valeur (sept modes, entièrement gratuits), la permission caméra, le seul appel réseau, la situation de licence (moteur GPLv3, sources publiques), et qu'aucun compte de test n'est nécessaire.
 
 ```
-WHAT'S IN THIS UPDATE (2.3): a localization update. ChessLab is now available in Spanish, German and Italian, in addition to French and English: the whole interface, the help, every opening and endgame course and the opening names. The language is chosen in Settings (or follows the device language), and move notation follows the language (it can be set separately). Two small interface changes come with it: the language picker is now a row of compact chips, and the default player names in two-player mode (White, Black) are shown in the chosen language. No change to features, permissions, privacy or licensing: no new permission, still no network call of ours, no account, no data collected. To check: Settings → Language, pick Español, Deutsch or Italiano; the app then follows that language.
+WHAT'S IN THIS UPDATE (2.4): new, optional features. (1) VOICE MOVES, the one new permission: an option in New game, OFF by default (and off again every time New game opens), that lets the user SAY a move (“knight f3”, “castles kingside”, “undo”) during a game against the computer. The microphone listens only while the option is on, only in a game and only when it is the user's turn. Speech recognition is performed ON THE DEVICE (requiresOnDeviceRecognition on iOS 18, the on-device SpeechTranscriber on iOS 26): no audio is ever sent anywhere, recorded or kept, and no transcript is kept; each phrase lives in a temporary file for the time it takes to recognise it, then it is deleted. When the device has no on-device recognition for the language, the option is greyed out with an explanation. The microphone and speech-recognition permissions are asked when the user turns the option on, with usage descriptions in all five languages. To check: New game → turn on “Voice moves” (allow both permissions) → start a game and say “pawn e four”; without a microphone (Simulator), the board plays as always and the option changes nothing else. (2) BLINDFOLD play against the computer (hidden pieces, a counted “Peek”, an optional spoken repeat of the moves with a system voice). (3) VISUALIZATION, a new training module. (4) an “Against the clock” puzzle mode. (5) a redesigned New game screen, and a “Your devices” list in Settings for the optional iCloud sync. No new network call of ours, no account, no data collected.
 
 ChessLab is a free chess app — no paywall, no ads, no in-app purchases, no account, no login, no server. Nothing to set up before reviewing. It bundles seven modes: play against the embedded Stockfish engine (Elo ~900 to ~3190) or against one of nine "characters" played by the Maia-3 neural network (University of Toronto, AGPLv3), which predicts human moves at a given level and runs entirely on-device via Core ML; two players on one device; full game analysis with Stockfish; 58 hand-written opening courses with spaced-repetition training; over 130,000 Lichess puzzles; an engine-vs-engine laboratory; and twelve variants (Chess960, King of the Hill, Three-Check, Horde, Racing Kings, Atomic, Antichess, Crazyhouse, Duck Chess, two Barricades, and a house variant, Stolen Move).
 

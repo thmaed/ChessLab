@@ -2273,6 +2273,7 @@ Tests : `VoiceMoveParserTests` (+ 51 essais réels rejoués), `VoiceMoveParserLa
       d'interface tombés le 19/11 avant correction).
 - [ ] **Mesure sur le Galaxy** (écran « Mesure dictée » de la version de test) — prévue le 19/11 au soir, relevée par
       `tools/mesure-dictee-galaxy.sh` (rapport : chaque reconnaissance rejouée, face aux chiffres de l'iPhone).
+- [ ] **Aide « Nouveautés 2.4 »** (iOS, 20/11/2026, build 26) : bloc ajouté dans l'Aide iOS (coups à la voix, à l'aveugle, Visualisation, Contre la montre, Nouvelle partie, iCloud) ; le bloc 2.3 y devient « Nouveautés 2.3 ». PAS de pendant Android tant qu'Android n'a pas de version 2.4 : à écrire alors (`help_news24_*`, cinq langues), SANS la voix tant que l'écoute n'est pas branchée et SANS iCloud (hors périmètre).
 - [ ] **Ligne ORANGE « reconnaissance peut-être pas optimale » + conseil « e quatre »** (iOS, 20/11/2026, demande de
       l'utilisateur) : sous « Coups à la voix » de Nouvelle partie, quand la reconnaissance est la classique d'AVANT
       iOS 26 (`Availability.available(precise: false)` ; iPhone XS : la colonne e se confond avec c ou a) ; l'aide dit

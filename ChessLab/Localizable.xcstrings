@@ -53060,6 +53060,40 @@
         }
       }
     },
+    "• Coups à la voix : dictez votre coup (« cavalier f3 », « petit roque », « annule »), reconnu sur l'appareil, sans réseau. Réglage dans Nouvelle partie.\n• À l'aveugle : jouez sans voir tout ou partie des pièces ; « Coup d'œil » pour vérifier, et une voix au choix qui répète les coups.\n• Visualisation : un nouveau module pour voir l'échiquier dans sa tête, en cinq marches.\n• Puzzles : « Contre la montre » — 3 minutes, autant de puzzles que possible.\n• Nouvelle partie : écran refait, l'adversaire en vedette et les aides en pastilles.\n• iCloud : la liste « Vos appareils » dans les Réglages, et les changements d'un appareil arrivent plus vite sur l'autre.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Coups à la voix : dictez votre coup (« cavalier f3 », « petit roque », « annule »), reconnu sur l'appareil, sans réseau. Réglage dans Nouvelle partie.\n• À l'aveugle : jouez sans voir tout ou partie des pièces ; « Coup d'œil » pour vérifier, et une voix au choix qui répète les coups.\n• Visualisation : un nouveau module pour voir l'échiquier dans sa tête, en cinq marches.\n• Puzzles : « Contre la montre » — 3 minutes, autant de puzzles que possible.\n• Nouvelle partie : écran refait, l'adversaire en vedette et les aides en pastilles.\n• iCloud : la liste « Vos appareils » dans les Réglages, et les changements d'un appareil arrivent plus vite sur l'autre."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Voice moves: say your move (“knight f3”, “castles kingside”, “undo”), recognised on the device, without the network. Turn it on in New game.\n• Blindfold: play without seeing some or all of the pieces; “Peek” to check, and a voice of your choice that repeats the moves.\n• Visualization: a new module to see the board in your head, in five steps.\n• Puzzles: “Against the clock” — 3 minutes, as many puzzles as you can.\n• New game: a redesigned screen, with the opponent up front and the assists as pills.\n• iCloud: the “Your devices” list in Settings, and changes reach your other devices sooner."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Jugadas por voz: di tu jugada («caballo f3», «enroque corto», «deshacer»), reconocida en el dispositivo, sin red. Se activa en Nueva partida.\n• A ciegas: juega sin ver algunas o todas las piezas; «Vistazo» para comprobar y una voz a tu elección que repite las jugadas.\n• Visualización: un módulo nuevo para ver el tablero en la cabeza, en cinco peldaños.\n• Puzles: «Contrarreloj» — 3 minutos, tantos puzles como puedas.\n• Nueva partida: pantalla renovada, con el rival en primer plano y las ayudas en pastillas.\n• iCloud: la lista «Tus dispositivos» en Ajustes, y los cambios llegan antes a tus otros dispositivos."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Züge per Sprache: Sag deinen Zug („Springer f3“, „kurze Rochade“, „zurück“); er wird auf dem Gerät erkannt, ohne Netzwerk. Einschalten unter Neue Partie.\n• Blind: Spiele, ohne einen Teil oder alle Figuren zu sehen; „Blick“ zum Nachsehen und eine Stimme deiner Wahl, die die Züge wiederholt.\n• Visualisierung: ein neues Modul, um das Brett im Kopf zu sehen, in fünf Stufen.\n• Puzzles: „Gegen die Uhr“ — 3 Minuten, so viele Puzzles wie möglich.\n• Neue Partie: überarbeiteter Bildschirm, der Gegner im Vordergrund, die Hilfen als kleine Kapseln.\n• iCloud: die Liste „Deine Geräte“ in den Einstellungen, und Änderungen kommen schneller auf deinen anderen Geräten an."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Mosse a voce: di' la tua mossa («cavallo f3», «arrocco corto», «annulla»), riconosciuta sul dispositivo, senza rete. Si attiva in Nuova partita.\n• Alla cieca: gioca senza vedere alcuni pezzi o tutti; «Sbirciata» per controllare e una voce a scelta che ripete le mosse.\n• Visualizzazione: un nuovo modulo per vedere la scacchiera nella testa, in cinque gradini.\n• Puzzle: «Contro il tempo» — 3 minuti, più puzzle che puoi.\n• Nuova partita: schermata rinnovata, con l'avversario in primo piano e gli aiuti in pillole.\n• iCloud: l'elenco «I tuoi dispositivi» nelle Impostazioni, e le modifiche arrivano prima sugli altri dispositivi."
+          }
+        }
+      }
+    },
     "Nouveautés 2.2": {
       "localizations": {
         "en": {

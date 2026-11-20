@@ -72,11 +72,16 @@ struct HelpView: View {
 
     private let modules: [Module] = [
         // Le titre prend le numéro de version TOUT SEUL : le corps doit donc être celui de la version courante.
-        // (Build 23 : ce bloc annonçait « 2.3 » au-dessus des nouveautés de la 2.2.) À chaque version, écrire
+        // (Build 23 : ce bloc annonçait « 2.3 » au-dessus des nouveautés de la 2.2 ; 2.4 : même contrôle.) À chaque version, écrire
         // ici ses nouveautés et faire descendre les précédentes dans un bloc au titre FIGÉ, comme ci-dessous.
         .init(
             icon: "sparkles", tint: Theme.accent,
             title: "Nouveautés de la version \(Self.appVersion)",
+            body: "• Coups à la voix : dictez votre coup (« cavalier f3 », « petit roque », « annule »), reconnu sur l'appareil, sans réseau. Réglage dans Nouvelle partie.\n• À l'aveugle : jouez sans voir tout ou partie des pièces ; « Coup d'œil » pour vérifier, et une voix au choix qui répète les coups.\n• Visualisation : un nouveau module pour voir l'échiquier dans sa tête, en cinq marches.\n• Puzzles : « Contre la montre » — 3 minutes, autant de puzzles que possible.\n• Nouvelle partie : écran refait, l'adversaire en vedette et les aides en pastilles.\n• iCloud : la liste « Vos appareils » dans les Réglages, et les changements d'un appareil arrivent plus vite sur l'autre."
+        ),
+        .init(
+            icon: "sparkles", tint: Theme.info,
+            title: "Nouveautés 2.3",
             body: "• Langues : l'app parle aussi espagnol, allemand et italien — interface, aide, cours d'ouvertures et de finales.\n• Notation des coups : « Automatique » suit la langue de l'app ; un autre choix reste mémorisé.\n• Accueil : quatre grandes tuiles, les autres modes sous « Plus ».\n• Analyser : un seul « Importer un fichier », qui reconnaît une partie, une position ou une base de parties.\n• Réglages : thèmes et jeux de pièces en vignettes."
         ),
         .init(
