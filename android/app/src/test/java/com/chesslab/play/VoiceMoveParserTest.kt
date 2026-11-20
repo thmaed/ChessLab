@@ -41,11 +41,23 @@ class VoiceMoveParserTest {
         assertEquals(Outcome.NotUnderstood, VoiceMoveParser.resolve(listOf("bonjour"), candidates()))
     }
 
+    @Test fun `e4 entendu Au quatre`() {
+        // iPhone3 et iPhone XS, 20/11/2026 : « e4 » écrit « Au quatre » ou « O quatre ».
+        assertEquals("e2e4", uci("Au quatre", candidates()))
+        assertEquals("e2e4", uci("O quatre", candidates()))
+        assertEquals(Outcome.NotUnderstood, VoiceMoveParser.resolve(listOf("au revoir"), candidates()))
+    }
+
     @Test fun `les roques`() {
         val italian = candidates(after = listOf("e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "f8c5"))
         assertEquals("e1g1", uci("petit roque", italian))
         assertEquals(Outcome.Illegal, VoiceMoveParser.resolve(listOf("grand roque"), italian))
         assertEquals("e1g1", uci("roque", italian))
+        // Ce que la reconnaissance a écrit en partie sur iPhone3 (20/11/2026).
+        for (heard in listOf("Petit rock", "Roi, Petit roc", "P rock", "Roi Petitoc", "Rock")) {
+            assertEquals("« $heard »", "e1g1", uci(heard, italian))
+        }
+        assertEquals(Outcome.Illegal, VoiceMoveParser.resolve(listOf("Grand rock"), italian))
     }
 
     @Test fun `deux cavaliers pour une case demandent lequel`() {
@@ -87,6 +99,7 @@ class VoiceMoveParserTest {
         val trials = text.lines().filter { it.isNotBlank() }.map { JSONObject(it) }
         assertEquals(51, trials.size)
         val right = HashMap<String, Int>()
+        val wrong = HashMap<String, Int>()
         var anyRight = 0
         for (trial in trials) {
             fun candidate(o: JSONObject) = Candidate(o.getString("uci"), o.getString("san"))
@@ -101,15 +114,19 @@ class VoiceMoveParserTest {
                 if (outcome is Outcome.Move && outcome.move == target) {
                     right.merge(result.getString("engine"), 1, Int::plus)
                     found = true
+                } else if (outcome is Outcome.Move) {
+                    wrong.merge(result.getString("engine"), 1, Int::plus)
                 }
             }
             if (found) anyRight++
         }
+        println("REJEU justes : $right ; faux coups : $wrong ; au moins une : $anyRight")
         assertEquals(
-            mapOf("A classique" to 48, "B indices" to 48, "C vocabulaire" to 47, "D iOS 26" to 48, "E iOS 26 + vocab." to 47),
+            // D : 48 → 49 le 20/11/2026 avec « au »/« o » pour la colonne e (« Au quatre »).
+            mapOf("A classique" to 48, "B indices" to 48, "C vocabulaire" to 47, "D iOS 26" to 49, "E iOS 26 + vocab." to 47),
             right.toMap(),
         )
-        assertEquals(49, anyRight)
+        assertEquals(50, anyRight)
     }
 
     // Les cinq langues — pendant de `VoiceMoveParserLanguagesTests` (iOS).

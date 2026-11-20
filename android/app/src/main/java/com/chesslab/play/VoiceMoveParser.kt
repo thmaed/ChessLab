@@ -127,6 +127,8 @@ object VoiceMoveParser {
             "à" to 'a', "ah" to 'a', "ha" to 'a', "bey" to 'b', "baie" to 'b', "bée" to 'b',
             "ces" to 'c', "ses" to 'c', "c'est" to 'c', "s'est" to 'c', "sait" to 'c', "des" to 'd', "dès" to 'd', "dais" to 'd',
             "euh" to 'e', "eux" to 'e', "eu" to 'e', "et" to 'e', "est" to 'e', "ef" to 'f', "effet" to 'f',
+            // « e4 » entendu « Au quatre » / « O quatre », sur iPhone3 et sur l'iPhone XS (20/11/2026).
+            "au" to 'e', "o" to 'e',
             "j'ai" to 'g', "geai" to 'g', "jet" to 'g', "j" to 'g', "hash" to 'h', "hach" to 'h',
         ),
         ranks = mapOf(
@@ -134,9 +136,10 @@ object VoiceMoveParser {
             "sept" to '7', "set" to '7', "cette" to '7', "huit" to '8',
         ),
         writtenInitials = mapOf("c" to 'N', "f" to 'B', "t" to 'R', "d" to 'Q', "r" to 'K'),
-        shortCastle = listOf("petit roque", "petit-roque"),
-        longCastle = listOf("grand roque", "grand-roque"),
-        anyCastle = listOf("roque"),
+        // Entendus le 20/11 en partie sur iPhone3 : « Petit rock », « Roi, Petit roc », « P rock », « Petitoc ».
+        shortCastle = listOf("petit roque", "petit-roque", "petit roc", "petit rock", "p rock", "petitoc"),
+        longCastle = listOf("grand roque", "grand-roque", "grand roc", "grand rock"),
+        anyCastle = listOf("roque", "roc", "rock"),
         undo = listOf("annule", "annuler", "annulé", "reprends", "reprendre", "reprend le coup", "retour"),
         pieceNames = mapOf('K' to "roi", 'Q' to "dame", 'R' to "tour", 'B' to "fou", 'N' to "cavalier", 'P' to "pion"),
         to = "en", takes = "prend", shortCastleName = "petit roque", longCastleName = "grand roque",

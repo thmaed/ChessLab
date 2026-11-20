@@ -2276,6 +2276,8 @@ Tests : `VoiceMoveParserTests` (+ 51 essais réels rejoués), `VoiceMoveParserLa
 - [ ] **L'écoute** (`VoiceMoveListener` Android) après la mesure : AudioRecord → `UtteranceDetector` → la
       reconnaissance retenue (`EXTRA_AUDIO_SOURCE`, avec ou sans `EXTRA_BIASING_STRINGS` selon la mesure) →
       `handleVoice` ; pause pendant que la voix parle ; état réel de la barre (aujourd'hui figé sur « Préparation du
-      micro… » dans `PlayScreen`).
+      micro… » dans `PlayScreen`). Y brancher aussi l'ESSAI ANTICIPÉ (20/11/2026, iOS `recognizeEarly`) :
+      `UtteranceDetector.onPause` → reconnaissance → `PlayViewModel.voiceIsDecisive` → `claim(token)` → `handleVoice`.
+      Le détecteur et la décision sont déjà portés et testés (`UtteranceDetectorTest`, `VoiceMovesTest`).
 - [ ] Avant publication : formulaire « Sécurité des données » de Play — audio traité SUR L'APPAREIL seulement (non
       collecté au sens de Google) ; vérifier la ligne « Coups à la voix » sur le Galaxy (Android 15).

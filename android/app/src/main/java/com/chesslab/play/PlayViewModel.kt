@@ -1033,6 +1033,15 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         return decision
     }
 
+    /** L'essai anticipé de l'écoute (20/11/2026) : voir [VoiceMoves.isDecisive]. Rien n'est joué ni dit ici. */
+    fun voiceIsDecisive(transcripts: List<String>, language: String = appLanguage()): Boolean =
+        VoiceMoves.isDecisive(
+            transcripts, VoiceMoveParser.vocabulary(language),
+            listening = ui.settings.voiceMoves && ui.voiceMicOn && !ui.gameOver,
+            canAct = ui.canUserAct && !ui.isReviewing,
+            candidates = { VoiceMoveParser.candidates(board) },
+        )
+
     private fun tellVoice(id: Int, speaks: Boolean) {
         val text = s(id)
         showVoiceNotice(text, isError = true)

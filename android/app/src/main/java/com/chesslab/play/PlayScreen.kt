@@ -26,6 +26,8 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -187,7 +189,9 @@ fun PlayScreen(
             Spacer(Modifier.height(6.dp))
             BlindBar(gutter, ui, model)
         }
-        if (ui.settings.voiceMoves && !ui.gameOver) {
+        // Seulement quand le micro a un PROBLÈME à dire : sinon tout tient dans la pastille de MA ligne (iPhone Duo
+        // replié, 20/11/2026 : la rangée prenait sa hauteur au plateau, qui rapetissait). Pendant de `voiceBar` (iOS).
+        if (ui.settings.voiceMoves && !ui.gameOver && voiceHasProblem(ui, voiceStatus)) {
             Spacer(Modifier.height(6.dp))
             // L'état de l'écoute vient du micro (VoiceMoveListener, branché après la mesure du Galaxy).
             VoiceBar(gutter, ui, voiceStatus, onMic = model::setVoiceMic)
@@ -204,6 +208,9 @@ fun PlayScreen(
             advantage = ui.captured.advantage(ui.userColor),
             clockMs = if (ui.userColor == Piece.Color.white) ui.whiteClockMs else ui.blackClockMs,
             tag = "joueur-vous",
+            accessory = if (ui.settings.voiceMoves && !ui.gameOver && !voiceHasProblem(ui, voiceStatus)) {
+                { VoicePill(ui, voiceStatus, onMic = model::setVoiceMic) }
+            } else null,
         )
     }
     // Une victoire contre l'ordinateur : le bon moment, le cas échéant, pour
@@ -469,6 +476,8 @@ private fun PlayerRow(
     clockMs: Long?,
     tag: String,
     thinking: Boolean = false,
+    /** À droite, avant la pendule : la pastille du micro sur MA ligne (coups à la voix, 20/11/2026). */
+    accessory: (@Composable () -> Unit)? = null,
 ) {
     Row(
         modifier
@@ -503,6 +512,10 @@ private fun PlayerRow(
         Spacer(Modifier.width(8.dp))
         CapturedTray(captured, color.opposite, advantage)
         Spacer(Modifier.weight(1f))
+        if (accessory != null) {
+            accessory()
+            if (clockMs != null) Spacer(Modifier.width(8.dp))
+        }
 
         if (clockMs != null) {
             Text(
@@ -927,9 +940,67 @@ private fun PeekButton(ui: PlayUiState, model: PlayViewModel) {
 /** Ce que fait le micro, vu de la barre au-dessus du plateau. Pendant de `VoiceMoveListener.Status` (iOS). */
 enum class VoiceListenStatus { starting, listening, recognizing, waiting, denied, unavailable }
 
+/** Le micro a-t-il un problème à dire (non autorisé, indisponible) ? Pendant de `voiceHasProblem` (iOS). */
+private fun voiceHasProblem(ui: PlayUiState, status: VoiceListenStatus): Boolean =
+    ui.voiceMicOn && (status == VoiceListenStatus.denied || status == VoiceListenStatus.unavailable)
+
 /**
- * Au-dessus du plateau : ce que fait le micro, et l'interrupteur « Micro » pour le couper (une conversation à table,
- * envie de jouer au doigt) — le plateau joue dans tous les cas. Pendant de `voiceBar` (iOS).
+ * Sur MA ligne, sous le plateau : ce que fait le micro, d'un symbole (et « Dites votre coup » quand il écoute) ; la
+ * toucher coupe ou rallume le micro — le plateau joue dans tous les cas. Pendant de `voicePill` (iOS).
+ */
+@Composable
+private fun VoicePill(ui: PlayUiState, status: VoiceListenStatus, onMic: (Boolean) -> Unit) {
+    val micOn = ui.voiceMicOn
+    val listening = micOn && status == VoiceListenStatus.listening
+    val icon = when {
+        !micOn -> Icons.Default.MicOff
+        status == VoiceListenStatus.listening -> Icons.Default.Mic
+        status == VoiceListenStatus.recognizing -> Icons.Default.GraphicEq
+        else -> Icons.Outlined.Mic
+    }
+    val tint = when {
+        micOn && (status == VoiceListenStatus.listening || status == VoiceListenStatus.recognizing) -> Palette.accent
+        else -> Palette.textSecondary
+    }
+    val state = stringResource(
+        if (!micOn) R.string.voice_mic_off else when (status) {
+            VoiceListenStatus.starting -> R.string.voice_status_starting
+            VoiceListenStatus.listening -> R.string.voice_status_listening
+            VoiceListenStatus.recognizing -> R.string.voice_status_recognizing
+            VoiceListenStatus.waiting -> R.string.voice_status_waiting
+            VoiceListenStatus.denied -> R.string.voice_status_denied
+            VoiceListenStatus.unavailable -> R.string.voice_status_unavailable
+        },
+    )
+    val label = stringResource(R.string.voice_mic)
+    Row(
+        Modifier
+            .clip(CircleShape)
+            .background(if (listening) Palette.accent.copy(alpha = 0.15f) else Palette.surface)
+            .border(1.dp, if (listening) Palette.accent.copy(alpha = 0.45f) else Palette.stroke, CircleShape)
+            .toggleable(value = micOn, role = Role.Switch, onValueChange = onMic)
+            .semantics {
+                contentDescription = label
+                stateDescription = state
+            }
+            .padding(horizontal = 9.dp, vertical = 4.dp)
+            .testTag("voix-micro"),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+    ) {
+        Icon(icon, null, tint = tint, modifier = Modifier.size(16.dp))
+        if (listening) {
+            Text(
+                stringResource(R.string.voice_status_listening), fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
+                color = tint, maxLines = 1, softWrap = false,
+            )
+        }
+    }
+}
+
+/**
+ * Au-dessus du plateau, SEULEMENT quand le micro a un problème à dire (voir [voiceHasProblem]) : le message en
+ * entier, et l'interrupteur « Micro ». Pendant de `voiceBar` (iOS).
  */
 @Composable
 private fun VoiceBar(modifier: Modifier, ui: PlayUiState, status: VoiceListenStatus, onMic: (Boolean) -> Unit) {

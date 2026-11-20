@@ -62,6 +62,25 @@ class VoiceMovesTest {
         assertEquals("a7a8q", (decide("a8", fen = fen) as Decision.Play).move.uci)
     }
 
+    private fun decisive(text: String, fen: String? = null, listening: Boolean = true): Boolean {
+        val board = Board(fen?.let { Position.fromFen(it) } ?: Position.standard)
+        return VoiceMoves.isDecisive(listOf(text), french, listening, canAct = true) { VoiceMoveParser.candidates(board) }
+    }
+
+    /** L'essai anticipé (20/11/2026) ne joue que ce qui est déjà un coup sûr ; le reste attend la fin de la phrase. */
+    @Test fun `seul un coup sûr se joue avant la fin de la phrase`() {
+        assertTrue(decisive("cavalier f3"))
+        assertEquals("une moitié de phrase attend la suite", false, decisive("cavalier"))
+        assertEquals(false, decisive("fou c4"))
+        assertEquals(false, decisive("tu veux un café ?"))
+        assertEquals(false, decisive("annule"))
+        assertEquals(false, decisive("cavalier d2", fen = "4k3/8/8/8/8/5N2/8/1N2K3 w - - 0 1"))
+        assertEquals("a8 coupé avant cavalier deviendrait une dame", false,
+            decisive("a8", fen = "8/P7/8/8/8/8/8/k6K w - - 0 1"))
+        assertEquals(false, decisive("a8 cavalier", fen = "8/P7/8/8/8/8/8/k6K w - - 0 1"))
+        assertEquals(false, decisive("cavalier f3", listening = false))
+    }
+
     @Test fun `les autres langues jouent aussi`() {
         assertEquals("Nf3", played(decide("knight f3", vocabulary = VoiceMoveParser.english)))
         assertEquals("Nf3", played(decide("Springer f3", vocabulary = VoiceMoveParser.german)))

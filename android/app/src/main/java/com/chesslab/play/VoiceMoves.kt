@@ -48,4 +48,21 @@ object VoiceMoves {
             VoiceMoveParser.Outcome.NotUnderstood -> Decision.NotUnderstood
         }
     }
+
+    /**
+     * Pour l'essai ANTICIPÉ de l'écoute (20/11/2026, pendant de `PlayViewModel.voiceIsDecisive`) : la phrase entendue
+     * après une courte pause donne-t-elle déjà un coup sûr, à jouer sans attendre la fin ? « annule », un coup
+     * impossible, une moitié de phrase attendent la fin ; une promotion aussi (« e8… cavalier », coupé après « e8 »,
+     * deviendrait une dame).
+     */
+    fun isDecisive(
+        transcripts: List<String>,
+        vocabulary: VoiceMoveParser.Vocabulary,
+        listening: Boolean,
+        canAct: Boolean,
+        candidates: () -> List<VoiceMoveParser.Candidate>,
+    ): Boolean {
+        val decision = decide(transcripts, vocabulary, listening, canTakeback = false, canAct = canAct, candidates)
+        return decision is Decision.Play && decision.move.promotion == null
+    }
 }
