@@ -2321,12 +2321,17 @@ Tests : `VoiceMoveParserTests` (+ 51 essais réels rejoués), `VoiceMoveParserLa
       qui dit de dictée une phrase dans Notes pour télécharger le modèle de la langue, et ligne orange réécrite « Sur cet
       appareil… » (plus « Sous iOS 18… »). Rien de tout cela n'existe côté Android (autre moteur) ; le message
       « indisponible » Android devra dire de même où télécharger le pack de langue de la reconnaissance.
-- [ ] **Puzzles : « Analyser cette position » sous le verdict** (21/11/2026, retour de Nils sur le build 29 : « on voit la
+- [x] **Puzzles : « Analyser cette position » sous le verdict** (21/11/2026, retour de Nils sur le build 29 : « on voit la
       solution sans savoir pourquoi ») — iOS `PuzzleSolveView.onAnalyzePosition`, Android `ResultCard(analyzeFen,
       onAnalyzePosition)` + routes `Puzzles` et `Woodpecker` ; la position du puzzle part vers l'analyse (moteur
       allumé), EMPILÉE : le retour ramène au puzzle, verdict compris. Libellé réutilisé (« Analyser cette position »),
       clé `puzzle_analyze_position` ×5. Testé : iOS `WoodpeckerUITests.testAnalyzeFromTheVerdictThenBackToThePuzzle`
       (simulateur, iPhone SE vérifié à l'œil), Android `PuzzleDeviceFlowTest.leVerdictProposeDAnalyserLaPositionDuPuzzle`
-      (émulateur). RESTE : voir le rendu et le retour SUR LE GALAXY.
+      (émulateur). VÉRIFIÉ SUR LE GALAXY le 21/11/2026 (bouton, ouverture de l'analyse, retour au même puzzle).
+- [x] **Visite « Nouveautés 2.4 » et annonce du coup adverse à l'aveugle** (21/11/2026) : la visite (cinq étapes, `WHATS_NEW_ID`
+      = "2.4", chaînes ×5) se rejoue depuis l'Aide ; en partie à l'aveugle, l'app annonce le coup de l'ordinateur après le
+      sien (c'était du code mort dans `recordAndContinue`, déplacé dans la branche du moteur). VÉRIFIÉS SUR LE GALAXY le
+      21/11/2026 par l'utilisateur. RESTE sur le Galaxy : la voix (niveau du micro, « premier ou deuxième ») et la ligne
+      du répertoire dans la Séance du jour.
 - [ ] Avant publication : formulaire « Sécurité des données » de Play — audio traité SUR L'APPAREIL seulement (non
       collecté au sens de Google) ; vérifier la ligne « Coups à la voix » sur le Galaxy (Android 15).
