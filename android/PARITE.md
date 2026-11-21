@@ -2354,5 +2354,11 @@ Tests : `VoiceMoveParserTests` (+ 51 essais réels rejoués), `VoiceMoveParserLa
       changement, sur le Galaxy : « cavalier F3 » ×3, « fou B5 », « tour à huit » tous reconnus AVEC leur pièce, zéro
       erreur (petit échantillon, conditions différentes). iOS garde 0,3 s (`preRollSeconds`) : à ne changer que si un
       essai sur iPhone montre le même mot de pièce perdu. RESTE : confirmer sur plus de phrases.
+- [ ] **Voix Android en italien** (21/11/2026, essai sur le Galaxy) : « arrocco corto » entendu « a Rocco corto », « Rocco
+      corto », « a poco corto », « corto » → ajoutés au vocabulaire (`VoiceMoveParser.italian`), ainsi que « alfierebbe 5 » /
+      « fierebbe 5 » (= alfiere b5) et « ben » = b ; test `italien entendu par le Galaxy`. Italien : e4, cavallo f3 passaient.
+      Allemand : micro ouvert en de-DE mais l'accent de l'utilisateur ne permet pas de juger — la voix en allemand, en
+      espagnol et en italien reste À VÉRIFIER PAR UN LOCUTEUR NATIF (avec la relecture des textes). Anglais : « e four »,
+      « undo » reconnus ; « bishop b five » → « We shove a B5 » (case juste, pièce perdue → rattrapée par la case).
 - [ ] Avant publication : formulaire « Sécurité des données » de Play — audio traité SUR L'APPAREIL seulement (non
       collecté au sens de Google) ; vérifier la ligne « Coups à la voix » sur le Galaxy (Android 15).

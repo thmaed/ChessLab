@@ -78,6 +78,22 @@ class VoiceMoveParserTest {
         assertEquals("f1b5", (VoiceMoveParser.resolve(listOf("fou B5"), ruy) as? Outcome.Move)?.move?.uci)
     }
 
+    @Test fun `italien entendu par le Galaxy`() {
+        val it = VoiceMoveParser.italian
+        fun play(vararg heard: String, legal: List<Candidate>) =
+            (VoiceMoveParser.resolve(heard.toList(), legal, vocabulary = it) as? Outcome.Move)?.move?.uci
+        val italianGame = candidates(after = listOf("e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "f8c5"))
+        // « arrocco corto » : les quatre façons dont le Samsung l'a écrit en partie.
+        for (heard in listOf("a Rocco corto", "Rocco corto", "a poco corto", "corto", "arrocco corto")) {
+            assertEquals("« $heard »", "e1g1", play(heard, legal = italianGame))
+        }
+        val ruy = candidates(after = listOf("e2e4", "e7e5", "g1f3", "b8c6"))
+        assertEquals("f1b5", play("alfierebbe 5", "il fierebbe 5", "alfiere ben cinque", legal = ruy))
+        assertEquals("f1b5", play("fierebbe 5", legal = ruy))
+        assertEquals("e2e4", play("e 4", "e quattro", legal = candidates()))
+        assertEquals("g1f3", play("cavallo F3", legal = candidates()))
+    }
+
     @Test fun `e4 entendu OK quatre`() {
         val start = candidates()
         assertEquals("e2e4", uci("OK 4", start))
