@@ -166,9 +166,18 @@ fun PlayScreen(
     listener.isDecisive = { model.voiceIsDecisive(it) }
     val voiceStatus by listener.status.collectAsState()
     val wantsVoice = ui.started && ui.settings.voiceMoves && ui.voiceMicOn && !ui.gameOver && appInFront
+    // L'écran reste allumé tant que le micro écoute (21/11/2026) : un coup dit est un coup comme un autre, et on ne
+    // touche plus l'écran pour jouer — la veille couperait l'écoute. Rendu dès que l'écoute s'arrête.
+    val voiceView = androidx.compose.ui.platform.LocalView.current
     DisposableEffect(listener, wantsVoice) {
-        if (wantsVoice) listener.start()
-        onDispose { listener.stop() }
+        if (wantsVoice) {
+            listener.start()
+            voiceView.keepScreenOn = true
+        }
+        onDispose {
+            listener.stop()
+            voiceView.keepScreenOn = false
+        }
     }
     LaunchedEffect(listener, ui.isVoiceTurn, ui.sanMoves.size, wantsVoice) {
         val mine = ui.isVoiceTurn

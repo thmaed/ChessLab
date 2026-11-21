@@ -29,6 +29,9 @@ struct PlayView: View {
     @State private var dismissedBlindNoticeID = 0
     /// Coups à la voix (19/11/2026) : le micro, ouvert le temps de la partie si le réglage est allumé.
     @State private var voiceListener: VoiceMoveListener?
+    /// L'écran reste allumé tant que le micro écoute (21/11/2026, retour de l'utilisateur) : un coup dit est un coup
+    /// comme un autre, et on ne touche plus l'écran pour jouer — la veille couperait l'écoute au milieu de la partie.
+    @State private var voiceIdleGuard = IdleTimerGuard()
     @State private var dismissedVoiceNoticeID = 0
     @State private var copiedMessage: String?
     @State private var showResignConfirmation = false
@@ -586,6 +589,7 @@ struct PlayView: View {
         listener.onTranscripts = { transcripts in viewModel.handleVoice(transcripts) }
         listener.isDecisive = { transcripts in viewModel.voiceIsDecisive(transcripts) }
         voiceListener = listener
+        voiceIdleGuard.enable()
         Task {
             await listener.start()
             syncVoiceTurn()
@@ -595,6 +599,7 @@ struct PlayView: View {
     private func stopVoice() {
         voiceListener?.stop()
         voiceListener = nil
+        voiceIdleGuard.disable()
     }
 
     private func syncVoiceTurn() {

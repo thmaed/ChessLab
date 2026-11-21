@@ -2339,5 +2339,15 @@ Tests : `VoiceMoveParserTests` (+ 51 essais réels rejoués), `VoiceMoveParserLa
       essai : l'ambiguïté « premier ou deuxième » n'a pas été produite ; 2 « erreur 7 » (rien compris, côté moteur) et des
       « d » entendus « des » (déjà reconnus). iOS : pas de pendant tant qu'Apple ne déforme pas le roque de même. RESTE :
       retester « petit roque » et l'ambiguïté sur le Galaxy.
+- [ ] **Voix : l'écran reste allumé tant que le micro écoute** (21/11/2026, demande de l'utilisateur : un coup dit est un
+      coup comme un autre) : iOS `PlayView.voiceIdleGuard` (`IdleTimerGuard`, pris au démarrage de l'écoute, rendu à son
+      arrêt : fin de partie, micro coupé, arrière-plan, sortie de l'écran) ; Android `PlayScreen` (`keepScreenOn` dans le
+      même `DisposableEffect` que l'écoute). RESTE : vérifier SUR APPAREIL que l'écran ne s'éteint plus en partie à la
+      voix, et qu'il se rendormt après la partie.
+- [ ] **Voix Android : deux filets de plus pour le moteur Samsung** (21/11/2026) : (1) « e4 » entendu « OK 4 » → « ok »
+      lu comme la colonne e ; (2) si la pièce dite ne peut pas aller sur la case entendue mais qu'UN SEUL coup de pièce
+      (jamais un pion) y mène, c'est celui-là (« fou b5 » entendu « pions B5 », « tour a8 » entendu « cavalier à 8 »).
+      Le (2) pourrait aussi servir à iOS : à décider à la prochaine version (pas dans le 32, déjà soumis). Resterait
+      non corrigé : « e4 » entendu « à 4 » (= a4 légal aussi, rien à départager).
 - [ ] Avant publication : formulaire « Sécurité des données » de Play — audio traité SUR L'APPAREIL seulement (non
       collecté au sens de Google) ; vérifier la ligne « Coups à la voix » sur le Galaxy (Android 15).

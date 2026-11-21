@@ -144,6 +144,8 @@ object VoiceMoveParser {
             "euh" to 'e', "eux" to 'e', "eu" to 'e', "et" to 'e', "est" to 'e', "ef" to 'f', "effet" to 'f',
             // « e4 » entendu « Au quatre » / « O quatre », sur iPhone3 et sur l'iPhone XS (20/11/2026).
             "au" to 'e', "o" to 'e',
+            // Galaxy A16, 21/11/2026 : « e4 » reconnu « OK 4 » / « ok quatre » (Samsung).
+            "ok" to 'e', "okay" to 'e', "okey" to 'e',
             "j'ai" to 'g', "geai" to 'g', "jet" to 'g', "j" to 'g', "hash" to 'h', "hach" to 'h',
         ),
         ranks = mapOf(
@@ -502,8 +504,22 @@ object VoiceMoveParser {
             val leaders = votes.filterValues { it == best }.keys.toList()
             return if (leaders.size == 1) Outcome.Move(leaders[0]) else Outcome.Conflicting(leaders)
         }
-        return outcomes.firstOrNull { it is Outcome.Ambiguous }
-            ?: if (Outcome.Illegal in outcomes) Outcome.Illegal else Outcome.NotUnderstood
+        outcomes.firstOrNull { it is Outcome.Ambiguous }?.let { return it }
+        if (Outcome.Illegal in outcomes) {
+            // Le MOT de la pièce est ce que la reconnaissance abîme le plus (« fou b5 » → « pions B5 », « tour a8 » →
+            // « cavalier à 8 » sur le Galaxy, 21/11/2026 : il fallait le redire) ; la case, elle, passe. Si la pièce
+            // dite ne peut pas y aller mais qu'UN SEUL coup légal y mène, c'est celui-là — jamais un pion : « fou c4 » ne devient pas c2-c4 (l'app dit quelle pièce a joué,
+            // « annule » le reprend). Deux coups possibles ou plus : on ne devine pas.
+            val toSquare = transcripts.flatMap { text ->
+                val heard = heard(text, vocabulary)
+                val square = heard.squares.singleOrNull()
+                if (heard.castle != null || heard.piece == null || square == null) emptyList()
+                else candidates.filter { !it.isCastle && it.piece != 'P' && it.to == square }
+            }.distinct()
+            if (toSquare.size == 1) return Outcome.Move(toSquare[0])
+            return Outcome.Illegal
+        }
+        return Outcome.NotUnderstood
     }
 
     /**

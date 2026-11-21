@@ -63,6 +63,27 @@ class VoiceMoveParserTest {
     }
 
     /** Ce que le Galaxy a écrit en partie le 21/11/2026 pour des coups bien dits. */
+    @Test fun `le mot de la piece abime est rattrape par la case quand un seul coup y mene`() {
+        // Galaxy A16, 21/11/2026 : « fou b5 » reconnu « pions B5 », « tour a8 » reconnu « cavalier à 8 ».
+        val ruy = candidates(after = listOf("e2e4", "e7e5", "g1f3", "b8c6"))
+        assertEquals("f1b5", (VoiceMoveParser.resolve(listOf("pions B5", "pion B5", "pions"), ruy) as? Outcome.Move)?.move?.uci)
+        val rooks = candidates(fen = "r3k3/8/8/8/8/8/8/R3K3 w - - 0 1")
+        assertEquals("a1a8", (VoiceMoveParser.resolve(listOf("cavalier à 8", "cavalier à huit"), rooks) as? Outcome.Move)?.move?.uci)
+        // Deux coups possibles sur la case : on ne devine pas.
+        val twoKnights = candidates(fen = "4k3/8/8/8/8/5N2/8/1N2K3 w - - 0 1")
+        assertEquals(Outcome.Illegal, VoiceMoveParser.resolve(listOf("fou d2"), twoKnights))
+        // Aucun coup légal vers la case : impossible, comme avant.
+        assertEquals(Outcome.Illegal, VoiceMoveParser.resolve(listOf("fou h5"), ruy))
+        // La pièce juste n'est pas touchée.
+        assertEquals("f1b5", (VoiceMoveParser.resolve(listOf("fou B5"), ruy) as? Outcome.Move)?.move?.uci)
+    }
+
+    @Test fun `e4 entendu OK quatre`() {
+        val start = candidates()
+        assertEquals("e2e4", uci("OK 4", start))
+        assertEquals("e2e4", uci("ok quatre", start))
+    }
+
     @Test fun `phrases reelles du Galaxy`() {
         val start = candidates()
         assertEquals("e2e4", uci("E4", start))

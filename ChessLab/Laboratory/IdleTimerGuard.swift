@@ -1,6 +1,6 @@
 import UIKit
 
-/// Empêche la mise en veille pendant une série de laboratoire (Lot 2.D).
+/// Empêche la mise en veille pendant une série de laboratoire (Lot 2.D) et pendant que le micro écoute les coups à la voix.
 ///
 /// Une série de 20 parties dure plusieurs minutes sans le moindre contact avec
 /// l'écran : l'appareil s'endort, iOS suspend l'app, et la série s'arrête au
@@ -41,7 +41,7 @@ final class IdleTimerGuard {
                 guard held.token == nil else { return }
                 held.token = ProcessInfo.processInfo.beginActivity(
                     options: .idleSystemSleepDisabled,
-                    reason: "Série de parties du laboratoire"
+                    reason: "ChessLab : écran gardé allumé"
                 )
             } else if let token = held.token {
                 ProcessInfo.processInfo.endActivity(token)
