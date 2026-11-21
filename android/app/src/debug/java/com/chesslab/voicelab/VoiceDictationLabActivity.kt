@@ -385,6 +385,7 @@ class VoiceLab(private val activity: Activity) {
     private fun describe(outcome: Outcome) = when (outcome) {
         is Outcome.Move -> outcome.move.san
         is Outcome.Ambiguous -> "ambigu : " + outcome.moves.joinToString { it.san }
+        is Outcome.Conflicting -> "hésite : " + outcome.moves.joinToString(" ou ") { it.san }
         Outcome.Illegal -> "coup impossible"
         Outcome.NotUnderstood -> "pas compris"
     }

@@ -1621,6 +1621,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="voice_undone">Move taken back</string>
     <string name="voice_cannot_undo">This move can’t be taken back</string>
     <string name="voice_ambiguous">More than one piece can: also say the starting square</string>
+    <string name="voice_conflict">%1$s or %2$s? Say first or second.</string>
     <string name="voice_not_understood">I didn’t understand</string>
     <string name="help_voice_title">Playing by voice</string>
     <string name="help_voice_body">In New game, “Game” card, turn on “Voice moves”. During the game, the microphone listens by itself when it is your turn: say your move — “knight f3”, “bishop takes c6”, “e4”, “castles kingside”, “e8 queen” for a promotion.\n\nThe understood move is played at once and shown at the top of the board; say “undo” to take it back. An impossible move or a misunderstood phrase is said out loud. If two pieces can reach the same square, add the starting file: “knight b d2”. The microphone button below the board, next to your name, turns the microphone off during a conversation; tap it again to turn it back on. You can always play on the board, microphone on or off.\n\nYour voice is recognised on the device, without the network, and is never recorded.</string>

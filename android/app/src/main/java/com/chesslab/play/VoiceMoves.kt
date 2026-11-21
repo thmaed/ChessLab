@@ -16,6 +16,8 @@ object VoiceMoves {
         /** « annule » avec une pendule, ou le moteur qui réfléchit : on ne reprend pas. */
         data object CannotUndo : Decision
         data object Ambiguous : Decision
+        /** La reconnaissance hésite entre deux coups (« a3 » ou « e3 ») : on le dit et on demande, sans rien jouer. */
+        data class Conflicting(val moves: List<VoiceMoveParser.Candidate>) : Decision
         data object Illegal : Decision
         data object NotUnderstood : Decision
         data object Ignored : Decision
@@ -33,15 +35,24 @@ object VoiceMoves {
         listening: Boolean,
         canTakeback: Boolean,
         canAct: Boolean,
+        /** Les deux coups entre lesquels on vient de demander de choisir (encore valables), sinon vide. */
+        pendingChoice: List<VoiceMoveParser.Candidate> = emptyList(),
+        language: String = "fr",
         candidates: () -> List<VoiceMoveParser.Candidate>,
     ): Decision {
         if (!listening) return Decision.Ignored
         if (transcripts.any { VoiceMoveParser.isUndo(it, vocabulary) }) {
             return if (canTakeback) Decision.Undo else Decision.CannotUndo
         }
-        if (!canAct || !VoiceMoveParser.soundsLikeChess(transcripts, vocabulary)) return Decision.Ignored
-        return when (val outcome = VoiceMoveParser.resolve(transcripts, candidates(), vocabulary = vocabulary)) {
+        if (!canAct) return Decision.Ignored
+        val legal = candidates()
+        // Après « a 3 ou e 3 ? » : « premier » ou « deuxième » tranche (les lettres, elles, s'embrouillent).
+        val chosen = VoiceMoveParser.choice(transcripts, language)?.let { pendingChoice.getOrNull(it) }
+        if (chosen != null && chosen in legal) return Decision.Play(chosen)
+        if (!VoiceMoveParser.soundsLikeChess(transcripts, vocabulary)) return Decision.Ignored
+        return when (val outcome = VoiceMoveParser.resolve(transcripts, legal, vocabulary = vocabulary)) {
             is VoiceMoveParser.Outcome.Move -> Decision.Play(outcome.move)
+            is VoiceMoveParser.Outcome.Conflicting -> Decision.Conflicting(outcome.moves.take(2))
             // Sans dire OÙ sont les pièces : à l'aveugle, ce serait révéler la position.
             is VoiceMoveParser.Outcome.Ambiguous -> Decision.Ambiguous
             VoiceMoveParser.Outcome.Illegal -> Decision.Illegal
@@ -60,9 +71,14 @@ object VoiceMoves {
         vocabulary: VoiceMoveParser.Vocabulary,
         listening: Boolean,
         canAct: Boolean,
+        pendingChoice: List<VoiceMoveParser.Candidate> = emptyList(),
+        language: String = "fr",
         candidates: () -> List<VoiceMoveParser.Candidate>,
     ): Boolean {
-        val decision = decide(transcripts, vocabulary, listening, canTakeback = false, canAct = canAct, candidates)
+        val decision = decide(
+            transcripts, vocabulary, listening, canTakeback = false, canAct = canAct,
+            pendingChoice = pendingChoice, language = language, candidates = candidates,
+        )
         return decision is Decision.Play && decision.move.promotion == null
     }
 }

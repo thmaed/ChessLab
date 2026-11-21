@@ -1578,6 +1578,7 @@
     <string name="voice_undone">Mossa ritirata</string>
     <string name="voice_cannot_undo">Impossibile ritirare questa mossa</string>
     <string name="voice_ambiguous">Più pezzi possono farlo: di\' anche la casa di partenza</string>
+    <string name="voice_conflict">%1$s o %2$s? Di\' primo o secondo.</string>
     <string name="voice_not_understood">Non ho capito</string>
     <string name="help_voice_title">Giocare a voce</string>
     <string name="help_voice_body">In Nuova partita, scheda «Partita», attiva «Mosse a voce». Durante la partita il microfono ascolta da solo quando tocca a te: di\' la tua mossa — «cavallo f3», «alfiere prende c6», «e4», «arrocco corto», «e8 donna» per una promozione.\n\nLa mossa riconosciuta viene giocata subito e appare sopra la scacchiera; di\' «annulla» per ritirarla. Una mossa impossibile o una frase non compresa ti viene detta ad alta voce. Se due pezzi possono andare sulla stessa casa, aggiungi la colonna di partenza: «cavallo b d2». Il pulsante del microfono, sotto la scacchiera, accanto al tuo nome, spegne il microfono durante una conversazione; toccalo di nuovo per riaccenderlo. Puoi sempre giocare sulla scacchiera, con il microfono acceso o spento.\n\nLa tua voce è riconosciuta sul dispositivo, senza rete, e non viene mai registrata.</string>

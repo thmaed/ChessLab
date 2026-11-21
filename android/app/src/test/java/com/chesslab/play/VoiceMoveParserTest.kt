@@ -278,4 +278,42 @@ class VoiceMoveParserTest {
         }
         return report.toString()
     }
+
+    // Quand la reconnaissance hésite (pendant des tests iOS, iPhone 11, 21/11/2026).
+
+    @Test fun `deux coups legaux a egalite de voix font hesiter la reconnaissance`() {
+        val legal = candidates()
+        val outcome = VoiceMoveParser.resolve(listOf("A3", "E3"), legal)
+        assertTrue("« A3 » et « E3 » : deux coups légaux", outcome is VoiceMoveParser.Outcome.Conflicting)
+        assertEquals(listOf("a2a3", "e2e3"), (outcome as VoiceMoveParser.Outcome.Conflicting).moves.map { it.uci })
+        val other = VoiceMoveParser.resolve(listOf("pion c3", "Pion des quatre"), legal)
+        assertEquals(
+            listOf("c2c3", "d2d4"),
+            (other as VoiceMoveParser.Outcome.Conflicting).moves.map { it.uci },
+        )
+    }
+
+    @Test fun `le coup que le plus d alternatives designent l emporte`() {
+        val legal = candidates()
+        assertEquals("d2d4", uci("pion d4", legal))
+        val voted = VoiceMoveParser.resolve(listOf("A3", "13", "E3", "Eux trois"), legal)
+        assertEquals("e2e3", (voted as VoiceMoveParser.Outcome.Move).move.uci)
+        // Les variantes d'un MÊME coup ne sont pas une hésitation.
+        val same = VoiceMoveParser.resolve(listOf("D4", "Des quatre", "pion en d4"), legal)
+        assertEquals("d2d4", (same as VoiceMoveParser.Outcome.Move).move.uci)
+    }
+
+    @Test fun `la reponse premier ou deuxieme tranche entre deux coups dans les cinq langues`() {
+        val cases = listOf(
+            Triple("Premier", "fr", 0), Triple("le deuxième", "fr", 1), Triple("deux", "fr", 1),
+            Triple("Second", "fr", 1), Triple("e4", "fr", null),
+            Triple("first", "en", 0), Triple("the second one", "en", 1),
+            Triple("primero", "es", 0), Triple("el segundo", "es", 1),
+            Triple("erster", "de", 0), Triple("zweiter", "de", 1),
+            Triple("primo", "it", 0), Triple("il secondo", "it", 1),
+        )
+        for ((text, language, expected) in cases) {
+            assertEquals("« $text » ($language)", expected, VoiceMoveParser.choice(listOf(text), language))
+        }
+    }
 }

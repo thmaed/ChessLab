@@ -1578,6 +1578,7 @@
     <string name="voice_undone">Jugada deshecha</string>
     <string name="voice_cannot_undo">No se puede deshacer esta jugada</string>
     <string name="voice_ambiguous">Varias piezas pueden: di también la casilla de salida</string>
+    <string name="voice_conflict">¿%1$s o %2$s? Di primero o segundo.</string>
     <string name="voice_not_understood">No te he entendido</string>
     <string name="help_voice_title">Jugar por voz</string>
     <string name="help_voice_body">En Nueva partida, tarjeta «Partida», activa «Jugadas por voz». Durante la partida, el micrófono escucha solo cuando te toca jugar: di tu jugada — «caballo f3», «alfil come c6», «e4», «enroque corto», «e8 dama» para una coronación.\n\nLa jugada entendida se juega enseguida y aparece encima del tablero; di «deshacer» para anularla. Una jugada imposible o una frase mal entendida se dice en voz alta. Si dos piezas pueden ir a la misma casilla, añade la columna de salida: «caballo b d2». El botón del micrófono, bajo el tablero, junto a tu nombre, apaga el micrófono durante una conversación; tócalo de nuevo para volver a encenderlo. Siempre puedes jugar en el tablero, con el micrófono encendido o no.\n\nTu voz se reconoce en el dispositivo, sin red, y nunca se graba.</string>

@@ -35,6 +35,11 @@ object VoiceMoveParser {
         data class Move(val move: Candidate) : Outcome
         /** Plusieurs coups répondent (deux cavaliers peuvent aller en d2) : il faut préciser le départ. */
         data class Ambiguous(val moves: List<Candidate>) : Outcome
+        /**
+         * La reconnaissance HÉSITE : ses alternatives désignent des coups légaux DIFFÉRENTS, à égalité de voix (« a3 »
+         * ou « e3 »). Le meilleur d'abord. Rien ne se joue : on demande (pendant d'iOS, 21/11/2026).
+         */
+        data class Conflicting(val moves: List<Candidate>) : Outcome
         /** On a entendu un coup, mais aucun coup légal ne lui répond. */
         data object Illegal : Outcome
         data object NotUnderstood : Outcome
@@ -454,8 +459,10 @@ object VoiceMoveParser {
     }
 
     /**
-     * Plusieurs transcriptions d'un même enregistrement (la meilleure d'abord) : le premier coup trouvé l'emporte ;
-     * à défaut une ambiguïté, puis « impossible », puis « pas compris ».
+     * Plusieurs transcriptions d'un même enregistrement (la meilleure d'abord). Les coups qu'elles désignent se
+     * DÉPARTAGENT PAR LE VOTE : celui que le plus d'alternatives désignent l'emporte, et à égalité la reconnaissance
+     * hésite vraiment ([Outcome.Conflicting]) — on ne joue plus la première alternative venue (iPhone 11, 21/11/2026 :
+     * `["A3", "E3"]` jouait a3 pour un « e3 » dit). Pendant de `VoiceMoveParser.resolve(transcripts:…)` (iOS).
      */
     fun resolve(
         transcripts: List<String>,
@@ -471,10 +478,40 @@ object VoiceMoveParser {
                 else -> resolve(heard, candidates)
             }
         }
-        return outcomes.firstOrNull { it is Outcome.Move }
-            ?: outcomes.firstOrNull { it is Outcome.Ambiguous }
+        val votes = LinkedHashMap<Candidate, Int>()
+        for (outcome in outcomes) if (outcome is Outcome.Move) votes[outcome.move] = (votes[outcome.move] ?: 0) + 1
+        val best = votes.values.maxOrNull()
+        if (best != null) {
+            val leaders = votes.filterValues { it == best }.keys.toList()
+            return if (leaders.size == 1) Outcome.Move(leaders[0]) else Outcome.Conflicting(leaders)
+        }
+        return outcomes.firstOrNull { it is Outcome.Ambiguous }
             ?: if (Outcome.Illegal in outcomes) Outcome.Illegal else Outcome.NotUnderstood
     }
+
+    /**
+     * Après « a 3 ou e 3 ? » : « premier » (0) ou « deuxième » (1) — des mots que la reconnaissance n'embrouille pas,
+     * contrairement aux lettres. `null` si la phrase ne répond pas. Dans l'ordre où les mots sont dits.
+     */
+    fun choice(transcripts: List<String>, language: String): Int? {
+        val words = choiceWords[language.take(2)] ?: choiceWords.getValue("fr")
+        for (text in transcripts) {
+            for (token in text.lowercase().split(Regex("[^\\p{L}\\p{N}]+")).filter { it.isNotEmpty() }) {
+                if (token in words.first) return 0
+                if (token in words.second) return 1
+            }
+        }
+        return null
+    }
+
+    private val choiceWords: Map<String, Pair<Set<String>, Set<String>>> = mapOf(
+        "fr" to (setOf("premier", "première", "premiere", "un", "1") to
+            setOf("deuxième", "deuxieme", "second", "seconde", "deux", "2")),
+        "en" to (setOf("first", "one", "1", "1st") to setOf("second", "two", "to", "too", "2", "2nd")),
+        "es" to (setOf("primero", "primera", "uno", "1") to setOf("segundo", "segunda", "dos", "2")),
+        "de" to (setOf("erste", "erster", "ersten", "eins", "1") to setOf("zweite", "zweiter", "zweiten", "zwei", "2")),
+        "it" to (setOf("primo", "prima", "uno", "1") to setOf("secondo", "seconda", "due", "2")),
+    )
 
     /**
      * Une phrase sans rien d'échecs dedans (une conversation autour de la table) : l'écoute permanente l'ignore, au

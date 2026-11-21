@@ -169,4 +169,7 @@ object BlindfoldVoice {
     }
 
     fun stop() { tts?.stop() }
+
+    /** La voix parle-t-elle (ou a-t-elle des phrases en attente) ? L'écoute des coups se tait alors : elle ne doit pas s'entendre. */
+    val isSpeaking: Boolean get() = ready && tts?.isSpeaking == true
 }

@@ -1539,6 +1539,7 @@
     <string name="voice_undone">Zug zurückgenommen</string>
     <string name="voice_cannot_undo">Dieser Zug kann nicht zurückgenommen werden</string>
     <string name="voice_ambiguous">Mehrere Figuren können das: sag auch das Ausgangsfeld</string>
+    <string name="voice_conflict">%1$s oder %2$s? Sag erster oder zweiter.</string>
     <string name="voice_not_understood">Ich habe dich nicht verstanden</string>
     <string name="help_voice_title">Mit der Stimme spielen</string>
     <string name="help_voice_body">Schalte unter Neue Partie, Karte „Partie“, „Züge per Sprache“ ein. Während der Partie hört das Mikrofon von selbst zu, wenn du am Zug bist: Sag deinen Zug — „Springer f3“, „Läufer schlägt c6“, „e4“, „kurze Rochade“, „e8 Dame“ für eine Umwandlung.\n\nDer verstandene Zug wird sofort gespielt und oben am Brett angezeigt; sag „zurück“, um ihn zurückzunehmen. Ein unmöglicher Zug oder ein nicht verstandener Satz wird dir laut gesagt. Können zwei Figuren auf dasselbe Feld ziehen, nenne auch die Ausgangslinie: „Springer b d2“. Die Mikrofon-Schaltfläche unter dem Brett, neben deinem Namen, schaltet das Mikrofon während eines Gesprächs aus; tippe erneut darauf, um es wieder einzuschalten. Auf dem Brett kannst du immer spielen, ob das Mikrofon an ist oder nicht.\n\nDeine Stimme wird auf dem Gerät erkannt, ohne Netzwerk, und nie gespeichert.</string>

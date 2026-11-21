@@ -2280,11 +2280,35 @@ Tests : `VoiceMoveParserTests` (+ 51 essais réels rejoués), `VoiceMoveParserLa
       aussi de dire des coups COURTS. Pas de pendant Android tant que la mesure du Galaxy n'a pas dit si la
       reconnaissance de son pack de langue a le même défaut ; si oui : même ligne orange (`voice_note_*`), même phrase
       dans l'aide (cinq langues).
-- [ ] **L'écoute** (`VoiceMoveListener` Android) après la mesure : AudioRecord → `UtteranceDetector` → la
-      reconnaissance retenue (`EXTRA_AUDIO_SOURCE`, avec ou sans `EXTRA_BIASING_STRINGS` selon la mesure) →
-      `handleVoice` ; pause pendant que la voix parle ; état réel de la barre (aujourd'hui figé sur « Préparation du
-      micro… » dans `PlayScreen`). Y brancher aussi l'ESSAI ANTICIPÉ (20/11/2026, iOS `recognizeEarly`) :
-      `UtteranceDetector.onPause` → reconnaissance → `PlayViewModel.voiceIsDecisive` → `claim(token)` → `handleVoice`.
-      Le détecteur et la décision sont déjà portés et testés (`UtteranceDetectorTest`, `VoiceMovesTest`).
+- [~] **L'écoute** (21/11/2026, `VoiceMoveListener.kt`, pendant de `VoiceMoveListener.swift`) : ÉCRITE et branchée dans
+      `PlayScreen` (démarre quand la partie, « Coups à la voix » et l'interrupteur « Micro » sont allumés et l'app au
+      premier plan ; coupé, le micro est libéré ; se tait pendant que la voix parle). `AudioRecord` 16 kHz →
+      `UtteranceDetector` → chaque phrase donnée au reconnaisseur SUR L'APPAREIL par `EXTRA_AUDIO_SOURCE` (tube) avec
+      `EXTRA_BIASING_STRINGS` (les coups légaux) → `handleVoice` ; essai anticipé branché (`onPause` →
+      `voiceIsDecisive` → `claim`), une seule reconnaissance à la fois. Journal `ChessLabVoix` (versions debug).
+      **ÉCART assumé** : Android 13 minimum (`EXTRA_AUDIO_SOURCE`) ; sous Android 12 la ligne est grisée et le dit.
+      **VÉRIFIÉE sur le Galaxy A16 (Android 16), 21/11/2026** : « pion e4 » et « cavalier f3 » se jouent. DEUX
+      particularités de ce reconnaisseur, trouvées au journal (`ChessLabVoix`) : (1) le résultat FINAL arrive
+      toujours VIDE (paquet sans clé), seuls les résultats PARTIELS portent le texte → on lit le dernier partiel
+      (`EXTRA_PARTIAL_RESULTS`) ; (2) la source `VOICE_RECOGNITION` du Galaxy est très basse (crête de la voix à
+      −32…−37 dB) → chaque phrase est AMPLIFIÉE (crête ramenée vers −3 dB, gain borné à +30 dB) avant d'être donnée au
+      reconnaisseur. Il entend « pion e4 » comme « description E4 » / « pions E4 » (le parseur s'en sort : la case suffit).
+      [ ] Reste à mesurer : la fiabilité sur une série de coups (la mesure de dictée de la 2.3), le biais des indices
+      (`EXTRA_BIASING_STRINGS`, gardé), la ligne orange iOS 18 (sans objet ici). Tests JVM verts, instrumentés voix (9)
+      verts sur émulateur (qui n'a pas de reconnaissance sur l'appareil : le micro y reste « indisponible »).
+- [~] **Hésitation de la reconnaissance : vote entre alternatives + « premier ou deuxième »** (iOS, 21/11/2026, essais
+      sur iPhone 11, iPhone3 et iPhone XS) : `VoiceMoveParser.resolve(transcripts:)` ne prend plus la PREMIÈRE
+      alternative qui donne un coup légal (« e3 » dit, entendu `["A3","E3"]`, jouait a3) ; le coup que le plus
+      d'alternatives désignent l'emporte, et à égalité `Outcome.Conflicting` : rien ne se joue, l'app DIT « pion en a 3 ou
+      pion en e 3 ? Dites premier ou deuxième. » et la réponse (`VoiceMoveParser.choice`, cinq langues, valable 20 s)
+      joue le coup. PORTÉ en Kotlin (`VoiceMoveParser.kt`, `VoiceMoves.kt`, `PlayViewModel.handleVoice`, chaîne
+      `voice_conflict` ×5) ; tests JVM verts (VoiceMoveParserTest 24, VoiceMovesTest 13). RESTE : vérifier SUR LE GALAXY
+      que la question se dit et que « deuxième » joue (jamais vu sur appareil).
+- [ ] **Écarts iOS sans pendant Android** (21/11/2026) : (1) le transcripteur d'iOS 26 n'est utilisable que si
+      `SpeechTranscriber.isAvailable` (iPhone 11 : faux, statut `unsupported`) — `VoiceRecognizers.transcriberIsUsable` ;
+      (2) langue réservée (`AssetInventory.reserve`) avant le téléchargement de son modèle ; (3) message « Indisponible »
+      qui dit de dictée une phrase dans Notes pour télécharger le modèle de la langue, et ligne orange réécrite « Sur cet
+      appareil… » (plus « Sous iOS 18… »). Rien de tout cela n'existe côté Android (autre moteur) ; le message
+      « indisponible » Android devra dire de même où télécharger le pack de langue de la reconnaissance.
 - [ ] Avant publication : formulaire « Sécurité des données » de Play — audio traité SUR L'APPAREIL seulement (non
       collecté au sens de Google) ; vérifier la ligne « Coups à la voix » sur le Galaxy (Android 15).

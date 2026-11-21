@@ -110,11 +110,13 @@ fun PlayScreen(
     // La pendule s'arrête quand l'écran s'en va ou que l'app passe derrière.
     // Sans cela, le drapeau tombait pendant qu'on regardait l'analyse.
     val owner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    // Le micro ne reste pas ouvert derrière l'app (pendant de `scenePhase == .background` sur iOS).
+    var appInFront by remember { mutableStateOf(true) }
     DisposableEffect(owner) {
         val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
             when (event) {
-                androidx.lifecycle.Lifecycle.Event.ON_PAUSE -> model.pauseForBackground()
-                androidx.lifecycle.Lifecycle.Event.ON_RESUME -> model.resumeFromBackground()
+                androidx.lifecycle.Lifecycle.Event.ON_PAUSE -> { appInFront = false; model.pauseForBackground() }
+                androidx.lifecycle.Lifecycle.Event.ON_RESUME -> { appInFront = true; model.resumeFromBackground() }
                 else -> Unit
             }
         }
@@ -155,9 +157,23 @@ fun PlayScreen(
     // point de largeur gagné est un point sur les 64 cases. (Compose refuse
     // une marge négative, là où SwiftUI l'accepte.)
     val gutter = Modifier.padding(horizontal = 12.dp)
-    // L'écoute du micro (VoiceMoveListener) se branche après la mesure du Galaxy : d'ici là, la barre dit qu'elle
-    // se prépare.
-    val voiceStatus = VoiceListenStatus.starting
+    // L'écoute du micro (pendant de `startVoiceIfNeeded` / `stopVoice` / `syncVoiceTurn` d'iOS) : elle tourne tant que
+    // la partie est en cours, que « Coups à la voix » et l'interrupteur « Micro » sont allumés et que l'app est au
+    // premier plan ; coupé, le micro est LIBÉRÉ.
+    val voiceContext = LocalContext.current
+    val listener = remember { VoiceMoveListener(voiceContext) { model.voiceLanguage } }
+    listener.onTranscripts = { model.handleVoice(it) }
+    listener.isDecisive = { model.voiceIsDecisive(it) }
+    val voiceStatus by listener.status.collectAsState()
+    val wantsVoice = ui.started && ui.settings.voiceMoves && ui.voiceMicOn && !ui.gameOver && appInFront
+    DisposableEffect(listener, wantsVoice) {
+        if (wantsVoice) listener.start()
+        onDispose { listener.stop() }
+    }
+    LaunchedEffect(listener, ui.isVoiceTurn, ui.sanMoves.size, wantsVoice) {
+        val mine = ui.isVoiceTurn
+        listener.setTurn(mine, if (mine) model.voiceHints else emptyList())
+    }
 
     // Le contenu ne s'écrit QU'UNE FOIS : la disposition seule change entre
     // le portrait (tout empilé, plateau de bord à bord) et le paysage
@@ -193,7 +209,7 @@ fun PlayScreen(
         // replié, 20/11/2026 : la rangée prenait sa hauteur au plateau, qui rapetissait). Pendant de `voiceBar` (iOS).
         if (ui.settings.voiceMoves && !ui.gameOver && voiceHasProblem(ui, voiceStatus)) {
             Spacer(Modifier.height(6.dp))
-            // L'état de l'écoute vient du micro (VoiceMoveListener, branché après la mesure du Galaxy).
+            // L'état de l'écoute vient du micro (VoiceMoveListener).
             VoiceBar(gutter, ui, voiceStatus, onMic = model::setVoiceMic)
         }
     }

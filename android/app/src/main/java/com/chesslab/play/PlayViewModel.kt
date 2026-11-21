@@ -971,12 +971,22 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
 
     private var voiceNoticeId = 0
 
+    /** Les deux coups entre lesquels on a demandé de choisir (« a 3 ou e 3 ? »), et jusqu'à quand « premier/deuxième » vaut. */
+    private var pendingVoiceChoice: List<VoiceMoveParser.Candidate> = emptyList()
+    private var pendingVoiceChoiceUntil = 0L
+
+    private fun activeVoiceChoice(): List<VoiceMoveParser.Candidate> =
+        if (System.currentTimeMillis() < pendingVoiceChoiceUntil) pendingVoiceChoice else emptyList()
+
     /** Les façons de dire les coups légaux, données en indices à la reconnaissance. */
     val voiceHints: List<String>
         get() = VoiceMoveParser.spokenForms(VoiceMoveParser.candidates(board), VoiceMoveParser.vocabulary(appLanguage()))
 
     private fun appLanguage(): String =
         getApplication<Application>().resources.configuration.locales[0].language
+
+    /** La langue de l'app, pour l'écoute du micro (`VoiceMoveListener`). */
+    val voiceLanguage: String get() = appLanguage()
 
     fun setVoiceMic(on: Boolean) {
         if (!ui.settings.voiceMoves || ui.voiceMicOn == on) return
@@ -1004,9 +1014,24 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             canTakeback = ui.canTakeback,
             canAct = ui.canUserAct && !ui.isReviewing,
             candidates = { VoiceMoveParser.candidates(board) },
+            pendingChoice = activeVoiceChoice(),
+            language = language,
         )
         val app = getApplication<Application>()
+        if (decision !is VoiceMoves.Decision.Conflicting && decision != VoiceMoves.Decision.Ignored) pendingVoiceChoice = emptyList()
         when (decision) {
+            is VoiceMoves.Decision.Conflicting -> {
+                // La reconnaissance hésite entre deux coups : on le DIT et on demande, sans rien jouer. Seules les
+                // cases d'arrivée, que le joueur vient de dire lui-même, sont nommées (rien sur la position).
+                pendingVoiceChoice = decision.moves
+                pendingVoiceChoiceUntil = System.currentTimeMillis() + 20_000
+                val question = s(
+                    R.string.voice_conflict,
+                    com.chesslab.ui.MoveNarration.describe(app, decision.moves[0].san),
+                    com.chesslab.ui.MoveNarration.describe(app, decision.moves[1].san),
+                )
+                tellVoiceText(question, speaks)
+            }
             is VoiceMoves.Decision.Play -> {
                 val candidate = decision.move
                 play(Square(candidate.from), Square(candidate.to))
@@ -1040,10 +1065,13 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             listening = ui.settings.voiceMoves && ui.voiceMicOn && !ui.gameOver,
             canAct = ui.canUserAct && !ui.isReviewing,
             candidates = { VoiceMoveParser.candidates(board) },
+            pendingChoice = activeVoiceChoice(),
+            language = language,
         )
 
-    private fun tellVoice(id: Int, speaks: Boolean) {
-        val text = s(id)
+    private fun tellVoice(id: Int, speaks: Boolean) = tellVoiceText(s(id), speaks)
+
+    private fun tellVoiceText(text: String, speaks: Boolean) {
         showVoiceNotice(text, isError = true)
         ui = ui.copy(lastSpokenVoiceText = text)
         if (speaks) {

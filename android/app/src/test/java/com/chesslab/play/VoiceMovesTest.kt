@@ -99,4 +99,26 @@ class VoiceMovesTest {
         assertTrue(PlayGameSettings(voiceMoves = true).voiceMoves)
         assertEquals(false, PlayGameSettings().voiceMoves)
     }
+
+    /** iPhone 11 / pendant Android (21/11/2026) : « e3 » entendu `["A3", "E3"]` ne joue plus a3, on demande. */
+    @Test fun `quand la reconnaissance hesite on demande et la reponse joue`() {
+        val board = Board(Position.standard)
+        val legal = { VoiceMoveParser.candidates(board) }
+        val asked = VoiceMoves.decide(listOf("A3", "E3"), french, true, true, true, candidates = legal)
+        assertTrue(asked is Decision.Conflicting)
+        val pair = (asked as Decision.Conflicting).moves
+        assertEquals(listOf("a3", "e3"), pair.map { it.san })
+        val answer = VoiceMoves.decide(
+            listOf("le deuxième"), french, true, true, true, pendingChoice = pair, language = "fr", candidates = legal,
+        )
+        assertEquals("e3", played(answer))
+        assertTrue(
+            "la réponse se joue sans attendre",
+            VoiceMoves.isDecisive(
+                listOf("le deuxième"), french, true, true, pendingChoice = pair, language = "fr", candidates = legal,
+            ),
+        )
+        // Sans question posée, « premier » n'est qu'une phrase sans coup : ignorée.
+        assertEquals(Decision.Ignored, decide("premier"))
+    }
 }

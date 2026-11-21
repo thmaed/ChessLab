@@ -14,7 +14,8 @@ import java.util.Locale
  * reconnaisseur Google ordinaire, qui peut passer par le réseau — la promesse « aucune donnée qui sort de
  * l'appareil » l'exclut (et le manifeste ne déclare toujours pas `INTERNET`).
  *
- * `createOnDeviceSpeechRecognizer` n'existe qu'à partir d'Android 12 : avant, la ligne « Coups à la voix » est
+ * `createOnDeviceSpeechRecognizer` n'existe qu'à partir d'Android 12, et l'écoute (`VoiceMoveListener`) donne chaque
+ * phrase au reconnaisseur par `EXTRA_AUDIO_SOURCE`, d'Android 13 : avant, la ligne « Coups à la voix » est
  * grisée et dit pourquoi, comme un iPhone sans reconnaissance sur l'appareil dans la langue.
  */
 object VoiceRecognizers {
@@ -61,14 +62,12 @@ object VoiceRecognizers {
      * ouvre sa propre fenêtre par-dessus l'app — voir [requestModel], appelée quand on allume la fonction.
      */
     fun availability(context: Context, language: String, onResult: (Availability) -> Unit) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+        // Android 13 au moins : l'écoute donne chaque phrase au reconnaisseur par `EXTRA_AUDIO_SOURCE` (voir
+        // `VoiceMoveListener`), qui n'existe pas avant. Sous Android 12, la ligne est grisée et le dit.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
             !SpeechRecognizer.isOnDeviceRecognitionAvailable(context)
         ) {
             onResult(Availability.unavailable)
-            return
-        }
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            onResult(Availability.available)
             return
         }
         val wanted = Locale.forLanguageTag(defaultLocale(language)).language
