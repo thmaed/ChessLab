@@ -156,7 +156,7 @@ class UtteranceDetector(private val sampleRate: Int) {
         const val PAUSE_SILENCE = 0.3
         const val MINIMUM_SPEECH = 0.35
         const val MAXIMUM_LENGTH = 6.0
-        const val PRE_ROLL_SECONDS = 0.3
+        const val PRE_ROLL_SECONDS = 0.6
         const val SMOOTHING_SECONDS = 0.1
         /** Sous la voix de la phrase d'autant, c'est du silence, même si le bruit de fond a été mal estimé. */
         const val BELOW_VOICE = 20f

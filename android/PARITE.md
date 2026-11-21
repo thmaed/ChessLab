@@ -2349,5 +2349,10 @@ Tests : `VoiceMoveParserTests` (+ 51 essais réels rejoués), `VoiceMoveParserLa
       (jamais un pion) y mène, c'est celui-là (« fou b5 » entendu « pions B5 », « tour a8 » entendu « cavalier à 8 »).
       Le (2) pourrait aussi servir à iOS : à décider à la prochaine version (pas dans le 32, déjà soumis). Resterait
       non corrigé : « e4 » entendu « à 4 » (= a4 légal aussi, rien à départager).
+- [ ] **Voix Android : pré-tampon de la détection porté de 0,3 s à 0,6 s** (`UtteranceDetector.PRE_ROLL_SECONDS`, 21/11/2026) :
+      Samsung rendait `F3` pour « cavalier F3 » (mot de la pièce perdu) et une dizaine d'« erreur 7 » ; après le
+      changement, sur le Galaxy : « cavalier F3 » ×3, « fou B5 », « tour à huit » tous reconnus AVEC leur pièce, zéro
+      erreur (petit échantillon, conditions différentes). iOS garde 0,3 s (`preRollSeconds`) : à ne changer que si un
+      essai sur iPhone montre le même mot de pièce perdu. RESTE : confirmer sur plus de phrases.
 - [ ] Avant publication : formulaire « Sécurité des données » de Play — audio traité SUR L'APPAREIL seulement (non
       collecté au sens de Google) ; vérifier la ligne « Coups à la voix » sur le Galaxy (Android 15).
