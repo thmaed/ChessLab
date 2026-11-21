@@ -7,20 +7,31 @@ import Speech
 /// (« B »). Le vocabulaire appris (« C », « E ») n'apportait rien : écarté.
 enum VoiceRecognizers {
     /// La variante pour la reconnaissance CLASSIQUE (iOS 18 à 25) : celle du téléphone si iOS la connaît (fr-CH en
-    /// Suisse), sinon celle par défaut. Sur l'iPhone XS réglé en français de Suisse (19/11/2026), la dictée active,
-    /// « fr-FR » répondait quand même « Siri and Dictation are disabled » (kLSRErrorDomain 201) : la classique ne
-    /// reconnaît que dans la variante de la dictée. Le transcripteur d'iOS 26, lui, prend les équivalentes
-    /// (`supportedLocale(equivalentTo:)`) et garde `locale(for:)`. Pendant de `VoiceRecognizers.locale` (Android).
+    /// Suisse), sinon celle par défaut, et — si le modèle de dictée de celle-là n'est PAS installé sur l'appareil —
+    /// n'importe quelle variante de la même langue dont il l'est. Sur l'iPhone XS réglé en français de Suisse
+    /// (19/11/2026), la dictée active, « fr-FR » répondait quand même « Siri and Dictation are disabled »
+    /// (kLSRErrorDomain 201) : la classique ne reconnaît que dans la variante de la dictée. Et le 21/11/2026, un
+    /// iPhone XS en français avec le clavier « Anglais (Royaume-Uni) » : l'app demandait « en-US », dont le modèle
+    /// n'était pas là, et disait « indisponible » alors que l'anglais se dictait. Le transcripteur d'iOS 26, lui,
+    /// prend les équivalentes (`supportedLocale(equivalentTo:)`) et garde `locale(for:)`. Pendant de
+    /// `VoiceRecognizers.locale` (Android).
     nonisolated static func classicLocale(
         for language: String, device: Locale = .current,
-        supported: Set<String> = Set(SFSpeechRecognizer.supportedLocales().map { $0.identifier(.bcp47) })
+        supported: Set<String> = Set(SFSpeechRecognizer.supportedLocales().map { $0.identifier(.bcp47) }),
+        installed: (String) -> Bool = { SFSpeechRecognizer(locale: Locale(identifier: $0))?.supportsOnDeviceRecognition == true }
     ) -> Locale {
         let fallback = locale(for: language)
-        guard let code = device.language.languageCode?.identifier,
-              code == fallback.language.languageCode?.identifier,
-              let region = device.region?.identifier else { return fallback }
-        let tag = "\(code)-\(region)"
-        return supported.contains(tag) ? Locale(identifier: tag) : fallback
+        let code = fallback.language.languageCode?.identifier ?? ""
+        var candidates: [String] = []
+        if let deviceCode = device.language.languageCode?.identifier, deviceCode == code,
+           let region = device.region?.identifier, supported.contains("\(code)-\(region)") {
+            candidates.append("\(code)-\(region)")
+        }
+        candidates.append(fallback.identifier(.bcp47))
+        // Les autres variantes de la langue, dans un ordre stable.
+        candidates += supported.filter { $0.hasPrefix("\(code)-") && !candidates.contains($0) }.sorted()
+        let tag = candidates.first(where: installed) ?? candidates[0]
+        return Locale(identifier: tag)
     }
 
     /// La langue de reconnaissance d'une langue de l'app.

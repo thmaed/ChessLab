@@ -11649,3 +11649,14 @@ cinq langues, retour de mon coup à l'écran seulement, « annule » reprend, iO
 - Politique de confidentialité : section « Le micro » (19/11) ; page réengendrée.
 - Reste : essai à la voix sur iPhone (iOS 26) et sur un iPhone en iOS 18 ; mesure et portage Android.
 
+## 21/11/2026 — Puzzles : « Analyser cette position » sous le verdict (retour de Nils, build 29)
+- Sous « Résolu ! » / « Solution révélée », un bouton ouvre la position du puzzle (`puzzle.fen`, celle d'où l'on cherche
+  le bon coup) sur l'échiquier d'analyse, moteur allumé ; le retour de l'analyse ramène au puzzle, verdict compris
+  (route empilée, le modèle survit via `SessionStore`). Séries et programmes Woodpecker ; pas « Contre la montre », qui
+  avait déjà ses ratés cliquables dans le bilan. Pendant Android : `ResultCard` + routes `Puzzles` / `Woodpecker`.
+- Test d'interface `testAnalyzeFromTheVerdictThenBackToThePuzzle` ; Android `PuzzleDeviceFlowTest`.
+
+- Voix (même jour, iPhone XS en français + clavier « Anglais (Royaume-Uni) ») : la reconnaissance classique demandait
+  « en-US », dont le modèle n'était pas installé, et disait « indisponible ». `classicLocale` prend maintenant la variante
+  du téléphone, puis celle par défaut, puis n'importe quelle variante DONT LE MODÈLE EST INSTALLÉ (`installed`). Android
+  faisait déjà ainsi (`VoiceRecognizers.locale`, 19/11) : alignés. Build 31.

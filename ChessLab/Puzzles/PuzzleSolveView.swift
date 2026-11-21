@@ -12,6 +12,9 @@ struct PuzzleSolveView: View {
     var onOpenLab: (String) -> Void = { _ in }
     var onPlayVsEngine: (String) -> Void = { _ in }
     var onOpenTwoPlayer: (String) -> Void = { _ in }
+    /// La position du puzzle sur un échiquier d'analyse, moteur allumé : savoir POURQUOI c'est le bon coup
+    /// (retour de Nils : « on voit la solution sans savoir pourquoi »). Empilé, donc le retour revient ici.
+    var onAnalyzePosition: (String) -> Void = { _ in }
 
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
@@ -432,6 +435,22 @@ struct PuzzleSolveView: View {
                     .buttonStyle(.pressable)
                     .accessibilityIdentifier("puzzleNext")
                 }
+            }
+
+            // Sous le verdict, quel qu'il soit : une solution révélée ne dit pas pourquoi, une réussite
+            // peut aussi vouloir creuser. Le retour de l'analyse ramène à ce puzzle.
+            if let fen = viewModel.puzzle.fen, !fen.isEmpty {
+                Button { onAnalyzePosition(fen) } label: {
+                    Label("Analyser cette position", systemImage: "chart.xyaxis.line")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Theme.accent)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(Theme.accent.opacity(0.12), in: Capsule())
+                        .overlay(Capsule().strokeBorder(Theme.accent.opacity(0.45), lineWidth: 1))
+                }
+                .buttonStyle(.pressable)
+                .accessibilityIdentifier("puzzleAnalyze")
             }
 
             if let sourcePGN = viewModel.puzzle.sourceGamePGN {

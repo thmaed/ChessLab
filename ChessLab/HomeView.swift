@@ -1250,6 +1250,8 @@ struct HomeView: View {
                         path.append(Route.continueVsStockfish(fen))
                     } onOpenTwoPlayer: { fen in
                         path.append(Route.continueTwoPlayer(fen))
+                    } onAnalyzePosition: { fen in
+                        path.append(Route.activeAnalysis(.fen(fen)))
                     }
 
                 case let .activePuzzleSession(filter):
@@ -1263,6 +1265,9 @@ struct HomeView: View {
                         path.append(Route.continueVsStockfish(fen))
                     } onOpenTwoPlayer: { fen in
                         path.append(Route.continueTwoPlayer(fen))
+                    } onAnalyzePosition: { fen in
+                        // EMPILÉ au-dessus du puzzle : le retour le retrouve tel quel (voir ``SessionStore``).
+                        path.append(Route.activeAnalysis(.fen(fen)))
                     }
 
                 case .endgameList:
@@ -2517,6 +2522,7 @@ private struct WoodpeckerHost: View {
     var onOpenLab: (String) -> Void = { _ in }
     var onPlayVsEngine: (String) -> Void = { _ in }
     var onOpenTwoPlayer: (String) -> Void = { _ in }
+    var onAnalyzePosition: (String) -> Void = { _ in }
     @Environment(\.modelContext) private var modelContext
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: PuzzleSolveViewModel?
@@ -2527,7 +2533,8 @@ private struct WoodpeckerHost: View {
             if let viewModel {
                 PuzzleSolveView(
                     viewModel: viewModel, onExit: onExit, onViewSourceGame: { _ in },
-                    onOpenLab: onOpenLab, onPlayVsEngine: onPlayVsEngine, onOpenTwoPlayer: onOpenTwoPlayer
+                    onOpenLab: onOpenLab, onPlayVsEngine: onPlayVsEngine, onOpenTwoPlayer: onOpenTwoPlayer,
+                    onAnalyzePosition: onAnalyzePosition
                 )
             } else if hasAttemptedLoad {
                 ContentUnavailableView(
@@ -2614,6 +2621,7 @@ private struct PuzzleSessionHost: View {
     var onOpenLab: (String) -> Void = { _ in }
     var onPlayVsEngine: (String) -> Void = { _ in }
     var onOpenTwoPlayer: (String) -> Void = { _ in }
+    var onAnalyzePosition: (String) -> Void = { _ in }
     @Environment(\.modelContext) private var modelContext
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: PuzzleSolveViewModel?
@@ -2627,7 +2635,8 @@ private struct PuzzleSessionHost: View {
             if let viewModel {
                 PuzzleSolveView(
                     viewModel: viewModel, onExit: onExit, onViewSourceGame: onViewSourceGame,
-                    onOpenLab: onOpenLab, onPlayVsEngine: onPlayVsEngine, onOpenTwoPlayer: onOpenTwoPlayer
+                    onOpenLab: onOpenLab, onPlayVsEngine: onPlayVsEngine, onOpenTwoPlayer: onOpenTwoPlayer,
+                    onAnalyzePosition: onAnalyzePosition
                 )
             } else if hasAttemptedLoad {
                 // L'écran de choix n'affiche aucun compte (voir

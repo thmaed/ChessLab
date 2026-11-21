@@ -159,5 +159,73 @@ final class WoodpeckerUITests: XCTestCase {
         archive.tap()
         app.buttons.matching(NSPredicate(format: "label CONTAINS[c] 'programme'")).firstMatch.tap()
     }
-}
 
+    /// Retour de Nils : après un puzzle, « Analyser cette position » ouvre l'échiquier d'analyse (moteur allumé)
+    /// sur la position du puzzle, et le retour ramène AU puzzle, verdict compris.
+    func testAnalyzeFromTheVerdictThenBackToThePuzzle() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-discoveryTourSeen", "-openRoute", "puzzles", "-uiTestWoodpeckerDemo"]
+        app.launch()
+
+        let opened = Date().addingTimeInterval(15)
+        while Date() < opened, !element(app, "woodpeckerCard").exists, !element(app, "woodpeckerProgramme").exists {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.25))
+        }
+        let leftover = element(app, "woodpeckerArchive")
+        if leftover.exists {
+            scrollTo(leftover, in: app)
+            leftover.tap()
+            app.buttons.matching(NSPredicate(format: "label CONTAINS[c] 'programme'")).firstMatch.tap()
+        }
+        element(app, "woodpeckerCard").tap()
+        let create = element(app, "woodpeckerCreate")
+        XCTAssertTrue(create.waitForExistence(timeout: 5))
+        let size10 = app.segmentedControls.buttons["10"]
+        scrollTo(size10, in: app)
+        size10.tap()
+        create.tap()
+        XCTAssertTrue(element(app, "woodpeckerClock").waitForExistence(timeout: 15))
+
+        func square(_ name: String) -> XCUIElement { app.otherElements["square_\(name)"] }
+        XCTAssertTrue(square("e3").waitForExistence(timeout: 10))
+        square("e3").tap()
+        square("e8").tap()
+        let e8 = square("e8")
+        let deadline = Date().addingTimeInterval(10)
+        while Date() < deadline, !e8.label.lowercased().contains("noir"), !e8.label.lowercased().contains("black") {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+        }
+        for _ in 0..<4 {
+            square("e1").tap()
+            square("e8").tap()
+            if element(app, "puzzleAnalyze").waitForExistence(timeout: 3) { break }
+        }
+
+        let analyze = element(app, "puzzleAnalyze")
+        XCTAssertTrue(analyze.waitForExistence(timeout: 10), "« Analyser cette position » doit figurer sous le verdict")
+        let shot = XCTAttachment(screenshot: app.screenshot())
+        shot.name = "verdict-avec-analyse"
+        shot.lifetime = .keepAlways
+        add(shot)
+        analyze.tap()
+        let board = element(app, "coachBar")
+        let candidate = element(app, "candidate_1")
+        let arrived = Date().addingTimeInterval(30)
+        while Date() < arrived, !board.exists, !candidate.exists {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.3))
+        }
+        XCTAssertTrue(board.exists || candidate.exists, "l'échiquier d'analyse doit s'ouvrir, moteur allumé")
+        XCTAssertFalse(analyze.isHittable, "le verdict du puzzle est sous l'analyse")
+
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(element(app, "puzzleAnalyze").waitForExistence(timeout: 10), "le retour ramène au puzzle, verdict compris")
+
+        // Ménage : le programme de démonstration ne reste pas en cours.
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        let archive = element(app, "woodpeckerArchive")
+        XCTAssertTrue(archive.waitForExistence(timeout: 10))
+        scrollTo(archive, in: app)
+        archive.tap()
+        app.buttons.matching(NSPredicate(format: "label CONTAINS[c] 'programme'")).firstMatch.tap()
+    }
+}

@@ -34,16 +34,38 @@ struct VoiceMovesGameTests {
     /// la dictée, et non fr-FR (refusé avec la même erreur que la dictée coupée).
     @Test func theClassicRecognitionAsksForThePhonesOwnVariant() {
         let known: Set<String> = ["fr-FR", "fr-CH", "fr-CA", "de-DE", "de-CH", "en-US", "en-GB"]
-        #expect(VoiceRecognizers.classicLocale(for: "fr", device: Locale(identifier: "fr_CH"), supported: known)
+        #expect(VoiceRecognizers.classicLocale(for: "fr", device: Locale(identifier: "fr_CH"), supported: known, installed: { _ in true })
             .identifier(.bcp47) == "fr-CH")
-        #expect(VoiceRecognizers.classicLocale(for: "fr", device: Locale(identifier: "fr_FR"), supported: known)
+        #expect(VoiceRecognizers.classicLocale(for: "fr", device: Locale(identifier: "fr_FR"), supported: known, installed: { _ in true })
             .identifier(.bcp47) == "fr-FR")
-        #expect(VoiceRecognizers.classicLocale(for: "en", device: Locale(identifier: "en_GB"), supported: known)
+        #expect(VoiceRecognizers.classicLocale(for: "en", device: Locale(identifier: "en_GB"), supported: known, installed: { _ in true })
             .identifier(.bcp47) == "en-GB")
-        #expect(VoiceRecognizers.classicLocale(for: "de", device: Locale(identifier: "fr_CH"), supported: known)
+        #expect(VoiceRecognizers.classicLocale(for: "de", device: Locale(identifier: "fr_CH"), supported: known, installed: { _ in true })
             .identifier(.bcp47) == "de-DE", "téléphone dans une autre langue que l'app : la variante par défaut")
-        #expect(VoiceRecognizers.classicLocale(for: "it", device: Locale(identifier: "it_CH"), supported: known)
+        #expect(VoiceRecognizers.classicLocale(for: "it", device: Locale(identifier: "it_CH"), supported: known, installed: { _ in true })
             .identifier(.bcp47) == "it-IT", "variante inconnue d'iOS : celle par défaut")
+    }
+
+    /// iPhone XS en français, clavier « Anglais (Royaume-Uni) » seul (21/11/2026) : l'app, réglée en anglais, demandait
+    /// « en-US » (modèle absent) et se disait indisponible. Elle prend la variante dont le modèle est installé.
+    @Test func theClassicRecognitionFallsBackToAnInstalledVariantOfTheLanguage() {
+        let known: Set<String> = ["fr-FR", "fr-CH", "en-US", "en-GB", "en-AU", "de-DE"]
+        let phone = Locale(identifier: "fr_FR")
+        #expect(VoiceRecognizers.classicLocale(for: "en", device: phone, supported: known, installed: { $0 == "en-GB" })
+            .identifier(.bcp47) == "en-GB")
+        #expect(VoiceRecognizers.classicLocale(for: "en", device: phone, supported: known, installed: { $0 == "en-US" })
+            .identifier(.bcp47) == "en-US", "la variante par défaut reste préférée quand elle est là")
+        #expect(VoiceRecognizers.classicLocale(for: "en", device: Locale(identifier: "en_GB"), supported: known,
+                                               installed: { $0 == "en-US" || $0 == "en-GB" })
+            .identifier(.bcp47) == "en-GB", "celle du téléphone d'abord")
+        #expect(VoiceRecognizers.classicLocale(for: "en", device: phone, supported: known, installed: { $0 == "en-AU" })
+            .identifier(.bcp47) == "en-AU")
+        #expect(VoiceRecognizers.classicLocale(for: "en", device: phone, supported: known, installed: { _ in false })
+            .identifier(.bcp47) == "en-US", "aucun modèle : la défaut, l'app dira « indisponible »")
+        #expect(VoiceRecognizers.classicLocale(for: "fr", device: phone, supported: known, installed: { $0 == "fr-CH" })
+            .identifier(.bcp47) == "fr-CH", "le français aussi")
+        #expect(VoiceRecognizers.classicLocale(for: "de", device: phone, supported: known, installed: { $0 == "en-GB" })
+            .identifier(.bcp47) == "de-DE", "jamais une autre langue")
     }
 
     /// La ligne orange de Nouvelle partie (20/11/2026) : seulement avec la reconnaissance classique d'avant iOS 26.
