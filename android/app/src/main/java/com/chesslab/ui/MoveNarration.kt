@@ -22,13 +22,21 @@ object MoveNarration {
 
         val first = san.firstOrNull() ?: return san
         val named = pieceName(context, first)
-        val phrase = named ?: context.getString(R.string.narration_pawn)
+        var phrase = named ?: context.getString(R.string.narration_pawn)
         val rest = if (named != null) san.drop(1) else san
 
         val isCapture = rest.contains('x')
         // La destination : les deux caractères juste avant un éventuel =, + ou #.
         val core = rest.takeWhile { it != '=' && it != '+' && it != '#' }
         val destination = spell(core.takeLast(2))
+        // Entre la pièce et la case d'arrivée (hors « x ») : la colonne et/ou la rangée de départ, écrites seulement
+        // quand deux pièces pareilles peuvent aller là (« Rhe1 ») — sans elles, « tour en e 1 » ne dit pas LAQUELLE a
+        // bougé (retour de Nils, 21/11/2026). Un pion n'en porte pas ici : sa colonne ne figure que dans une prise,
+        // qui reste dite « pion prend en d 5 ».
+        if (named != null) {
+            val origin = core.dropLast(2).filter { it != 'x' }
+            if (origin.isNotEmpty()) phrase += " " + spell(origin)
+        }
 
         var sentence = context.getString(
             if (isCapture) R.string.narration_takes else R.string.narration_to,

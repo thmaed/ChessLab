@@ -90,6 +90,9 @@ object VoiceMoveParser {
         // Android refuse ce que la JVM tolère (voir la mémoire du projet) : ici seulement des lettres dans la classe.
         internal val initialThenSquare =
             Regex("""\b([${writtenInitials.keys.sorted().joinToString("")}])x?([a-h][1-8])\b""")
+        // L'initiale écrite, la colonne de départ et la case d'arrivée, tout collé (« The1 » = tour h, e1).
+        internal val initialThenFileThenSquare =
+            Regex("""\b([${writtenInitials.keys.sorted().joinToString("")}])([a-h])([a-h][1-8])\b""")
     }
 
     /** L'alphabet radio vaut dans toutes les langues : un filet pour les lettres difficiles (« Foxtrot 3 »). */
@@ -270,12 +273,16 @@ object VoiceMoveParser {
     // Lire une phrase
 
     private val letterThenDigit = Regex("""([a-h])([1-8])""")
+    private val fileThenSquare = Regex("""\b([a-h])([a-h][1-8])\b""")
     private val separators = Regex("""[^\p{L}\p{N}']+""")
 
     fun tokens(text: String, vocabulary: Vocabulary = french): List<String> {
         var lowered = text.lowercase().replace('’', '\'')
         // « Cf3 », « Fxc6 », « Sf3 » : une initiale de pièce collée à une case, comme on l'écrit.
         lowered = vocabulary.initialThenSquare.replace(lowered, "$1 $2")
+        lowered = vocabulary.initialThenFileThenSquare.replace(lowered, "$1 $2 $3")
+        // Deux colonnes collées à un chiffre (« he1 » pour « tour h, e1 », « ae1 ») : la première est le départ.
+        lowered = fileThenSquare.replace(lowered, "$1 $2")
         // Une lettre collée à son chiffre (« f3 », « e4 ») : deux mots.
         lowered = letterThenDigit.replace(lowered, "$1 $2")
         return lowered.split(separators).filter { it.isNotEmpty() }.flatMap { vocabulary.fused[it] ?: listOf(it) }
@@ -362,10 +369,14 @@ object VoiceMoveParser {
                 continue
             }
             // Une rangée seule : l'indice de départ (« tour 1 d1 »), ou l'arrivée quand la colonne s'est perdue. Pas
-            // devant une colonne : « knight to f3 », où « to » sonne comme « two ».
+            // devant une colonne : « knight to f3 », où « to » sonne comme « two » — sauf un CHIFFRE écrit (« tour 1 a3 »),
+            // et sauf en anglais, où la reconnaissance écrit « 2 » pour « to ».
             val beforeFile = next?.let { strongFile(it) != null || vocabulary.weakFiles[it] != null } ?: false
+            val isWrittenDigit = digits[word] != null && vocabulary.ranks["to"] == null
             val alone = rank(word)
-            if (alone != null && result.squares.isEmpty() && result.piece != null && !beforeFile) result.fromRank = alone
+            if (alone != null && result.squares.isEmpty() && result.piece != null && (!beforeFile || isWrittenDigit)) {
+                result.fromRank = alone
+            }
             index += 1
         }
         return result

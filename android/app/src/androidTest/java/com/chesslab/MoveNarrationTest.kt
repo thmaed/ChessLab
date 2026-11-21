@@ -55,4 +55,13 @@ class MoveNarrationTest {
             MoveNarration.announcement(context, "Blancs", "e4"),
         )
     }
+
+    @Test fun laCaseDeDepartSeDitQuandDeuxPiecesPouvaientYAller() {
+        // Retour de Nils (21/11/2026) : « tour en e 1 » ne dit pas laquelle des deux tours a bougé.
+        assertEquals("tour h en e 1", say("Rhe1"))
+        assertEquals("cavalier b en d 7", say("Nbd7"))
+        assertEquals("tour 1 en a 3", say("R1a3"))
+        assertEquals("tour h prend en e 1, échec", say("Rhxe1+"))
+        assertEquals("dame h 4 en e 1", say("Qh4e1"))
+    }
 }

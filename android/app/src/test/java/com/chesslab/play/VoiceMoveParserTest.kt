@@ -69,6 +69,40 @@ class VoiceMoveParserTest {
         assertEquals("f3d2", uci("cavalier f3 d2", legal))
     }
 
+    @Test fun `deux tours pour une case, dites à la façon officielle`() {
+        // Retour de Nils (21/11/2026). Tours a1 et h1, roi e2 : les deux tours peuvent aller en e1.
+        val legal = candidates("4k3/8/8/8/8/8/4K3/R6R w - - 0 1")
+        for (text in listOf(
+            "Tour H E 1", "Tour h e1", "Tour H E un", "tour he1", "Tour HE1", "Tour, H, E 1", "Tour hache e un",
+            "Tour H en e1", "Tour h1 en e1", "The1", "Tour H 1 en E 1", "Tour ache e un",
+        )) assertEquals("« $text »", "h1e1", uci(text, legal))
+        for (text in listOf("Tour A E 1", "Tour a e1", "Tour ae1", "Tour a1 en e1")) {
+            assertEquals("« $text »", "a1e1", uci(text, legal))
+        }
+    }
+
+    @Test fun `le SAN réel de deux tours porte la colonne de départ`() {
+        val legal = candidates("4k3/8/8/8/8/8/4K3/R6R w - - 0 1")
+        assertEquals(setOf("Rhe1", "Rae1"), legal.filter { it.to == "e1" && it.piece == 'R' }.map { it.san }.toSet())
+        // Ce que l'annonce répète (« tour h en e 1 ») se comprend en retour.
+        assertEquals("h1e1", uci("tour h en e 1", legal))
+    }
+
+    @Test fun `la rangée de départ distingue aussi deux tours`() {
+        // Tours a1 et a5, roi e1 : les deux vont en a3.
+        val legal = candidates("7k/8/8/R7/8/8/8/R3K3 w - - 0 1")
+        assertEquals("a1a3", uci("Tour 1 a3", legal))
+        assertEquals("a5a3", uci("Tour 5 en a 3", legal))
+        assertEquals("a5a3", uci("Tour 5 a 3", legal))
+    }
+
+    @Test fun `en anglais deux pour to n'est pas une rangée`() {
+        val english = VoiceMoveParser.vocabulary("en")
+        assertEquals(null, VoiceMoveParser.heard("knight 2 f3", english).fromRank)
+        assertEquals(null, VoiceMoveParser.heard("rook 1 a3", english).fromRank)
+        assertEquals('1', VoiceMoveParser.heard("tour 1 a3").fromRank)
+    }
+
     @Test fun `promotion en dame sauf si une autre pièce est nommée`() {
         val legal = candidates("8/P7/8/8/8/8/8/k6K w - - 0 1")
         assertEquals("a7a8q", uci("a8", legal))
