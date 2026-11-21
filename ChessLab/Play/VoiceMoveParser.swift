@@ -261,6 +261,11 @@ enum VoiceMoveParser {
         let initials = String(vocabulary.writtenInitials.keys.sorted().joined())
         lowered = lowered.replacingOccurrences(
             of: "\\b([\(initials)])x?([a-h][1-8])\\b", with: "$1 $2", options: .regularExpression)
+        // L'initiale écrite, la colonne de départ et la case d'arrivée, tout collé (« The1 » = tour h, e1).
+        lowered = lowered.replacingOccurrences(
+            of: "\\b([\(initials)])([a-h])([a-h][1-8])\\b", with: "$1 $2 $3", options: .regularExpression)
+        // Deux colonnes collées à un chiffre (« he1 » pour « tour h, e1 », « ae1 ») : la première est le départ.
+        lowered = lowered.replacingOccurrences(of: #"\b([a-h])([a-h][1-8])\b"#, with: "$1 $2", options: .regularExpression)
         // Une lettre collée à son chiffre (« f3 », « e4 ») : deux mots.
         lowered = lowered.replacingOccurrences(of: #"([a-h])([1-8])"#, with: "$1 $2", options: .regularExpression)
         let separators = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "'")).inverted
@@ -343,8 +348,11 @@ enum VoiceMoveParser {
             }
             // Une rangée seule : l'indice de départ (« tour 1 d1 »), ou l'arrivée quand la colonne s'est perdue. Pas
             // devant une colonne : « knight to f3 », où « to » sonne comme « two ».
+            // Un CHIFFRE écrit reste une rangée de départ devant une colonne (« tour 1 a3 ») — sauf en anglais, où la
+            // reconnaissance écrit « 2 » pour « to ».
             let beforeFile = next.map { strongFile($0) != nil || vocabulary.weakFiles[$0] != nil } ?? false
-            if let rank = rank(word), result.squares.isEmpty, result.piece != nil, !beforeFile {
+            let isWrittenDigit = digits[word] != nil && vocabulary.ranks["to"] == nil
+            if let rank = rank(word), result.squares.isEmpty, result.piece != nil, !beforeFile || isWrittenDigit {
                 result.fromRank = rank
             }
             index += 1

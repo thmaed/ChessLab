@@ -39,6 +39,14 @@ enum MoveNarration {
         // Destination = les deux caractères juste avant un éventuel =, + ou #.
         let core = rest.prefix { $0 != "=" && $0 != "+" && $0 != "#" }
         let destination = spell(String(core.suffix(2)))
+        // Ce que le SAN met entre la pièce et la case d'arrivée (hors « x ») : la colonne et/ou la rangée de départ,
+        // écrites seulement quand deux pièces pareilles peuvent aller là (« Rhe1 »). Sans elles, « tour en e 1 » ne
+        // dit pas LAQUELLE a bougé — retour de Nils, 21/11/2026. Un pion n'en porte pas ici (sa colonne ne figure que
+        // dans une prise, et celle-ci reste dite « pion prend en d 5 »).
+        if index == 1 {
+            let origin = String(core.dropLast(2)).filter { $0 != "x" }
+            if !origin.isEmpty { phrase += " " + spell(origin) }
+        }
 
         var sentence = isCapture
             ? LocalizationController.string("%@ prend en %@", phrase, destination)

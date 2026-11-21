@@ -68,6 +68,41 @@ struct VoiceMoveParserTests {
         #expect(uci("cavalier f3 d2", legal) == "f3d2")
     }
 
+    @Test(arguments: [
+        // Les façons de dire « tour h, en e1 » — la version officielle (Rhe1) — que la reconnaissance peut écrire.
+        "Tour H E 1", "Tour h e1", "Tour H E un", "tour he1", "Tour HE1", "Tour, H, E 1", "Tour hache e un",
+        "Tour H en e1", "Tour h1 en e1", "The1", "Tour H 1 en E 1", "Tour ache e un",
+    ])
+    func twoRooksForOneSquareTheOfficialWay(text: String) {
+        // Tours a1 et h1, roi e2 : les deux tours peuvent aller en e1.
+        let legal = candidates("4k3/8/8/8/8/8/4K3/R6R w - - 0 1")
+        #expect(uci(text, legal) == "h1e1", "« \(text) »")
+    }
+
+    @Test func theRealSANOfTwoRooksCarriesTheStartFileAndIsReadBack() {
+        // La position donne « Rhe1 » / « Rae1 » ; l'annonce qui répète le coup dit donc LAQUELLE a bougé.
+        let legal = candidates("4k3/8/8/8/8/8/4K3/R6R w - - 0 1")
+        let toE1 = legal.filter { $0.to == "e1" && $0.piece == "R" }
+        #expect(Set(toE1.map(\.san)) == ["Rhe1", "Rae1"])
+        #expect(MoveNarration.describe(san: "Rhe1") == "tour h en e 1")
+        // Et ce qu'elle répète se comprend en retour : « tour h en e 1 » → h1e1.
+        #expect(uci(MoveNarration.describe(san: "Rhe1"), legal) == "h1e1")
+    }
+
+    @Test(arguments: ["Tour A E 1", "Tour a e1", "Tour ae1", "Tour a1 en e1"])
+    func theOtherRookIsChosenByItsFile(text: String) {
+        let legal = candidates("4k3/8/8/8/8/8/4K3/R6R w - - 0 1")
+        #expect(uci(text, legal) == "a1e1", "« \(text) »")
+    }
+
+    @Test func theRankOfDepartureTellsTwoRooksApartToo() {
+        // Tours a1 et a5, roi h8 : les deux vont en a3.
+        let legal = candidates("7k/8/8/R7/8/8/8/R3K3 w - - 0 1")
+        #expect(uci("Tour 1 a3", legal) == "a1a3")
+        #expect(uci("Tour 5 en a 3", legal) == "a5a3")
+        #expect(uci("Tour 5 a 3", legal) == "a5a3")
+    }
+
     @Test func promotionToTheQueenUnlessAnotherPieceIsNamed() {
         let legal = candidates("8/P7/8/8/8/8/8/k6K w - - 0 1")
         #expect(uci("a8", legal) == "a7a8q")
@@ -167,6 +202,13 @@ struct VoiceMoveParserLanguagesTests {
     ])
     func theKnightToF3(text: String, language: String) {
         #expect(uci(text, language) == "g1f3", "« \(text) » (\(language))")
+    }
+
+    @Test func englishWritesTwoForToSoItIsNotARank() {
+        let english = VoiceMoveParser.vocabulary(for: "en")
+        #expect(VoiceMoveParser.heard("knight 2 f3", vocabulary: english).fromRank == nil)
+        #expect(VoiceMoveParser.heard("rook 1 a3", vocabulary: english).fromRank == nil)
+        #expect(VoiceMoveParser.heard("tour 1 a3").fromRank == "1")
     }
 
     @Test(arguments: [
