@@ -129,6 +129,46 @@ struct VoiceMoveParserTests {
         #expect(forms.contains("pion en e4"))
         #expect(forms.contains("e4"))
     }
+
+    // MARK: Quand la reconnaissance hésite (iPhone 11, 21/11/2026)
+
+    /// « e3 » dit, entendu `["A3", "E3"]` : a3 ET e3 sont légaux, à égalité de voix. On ne joue PLUS la première
+    /// alternative (c'était a3) : la reconnaissance hésite, et la partie le dira.
+    @Test func twoLegalMovesAtEqualVotesMakeTheRecognitionHesitate() {
+        let legal = candidates()
+        guard case let .conflicting(moves) = VoiceMoveParser.resolve(transcripts: ["A3", "E3"], among: legal) else {
+            Issue.record("« A3 » et « E3 » désignent deux coups légaux : il faut hésiter")
+            return
+        }
+        #expect(moves.map(\.uci) == ["a2a3", "e2e3"], "le meilleur d'abord")
+        guard case let .conflicting(others) = VoiceMoveParser.resolve(transcripts: ["pion c3", "Pion des quatre"],
+                                                                      among: legal) else {
+            Issue.record("c3 ou d4")
+            return
+        }
+        #expect(others.map(\.uci) == ["c2c3", "d2d4"])
+    }
+
+    /// Le coup que PLUS d'alternatives désignent l'emporte : `["A3", "13", "E3", "Eux trois"]` (entendu pour « e3 »).
+    @Test func theMoveMostAlternativesNameWins() {
+        let legal = candidates()
+        #expect(uci("pion d4", legal) == "d2d4")
+        #expect(VoiceMoveParser.resolve(transcripts: ["A3", "13", "E3", "Eux trois"], among: legal)
+            == .move(legal.first { $0.uci == "e2e3" }!))
+        // Les variantes d'un MÊME coup ne sont pas une hésitation.
+        #expect(VoiceMoveParser.resolve(transcripts: ["D4", "Des quatre", "pion en d4"], among: legal)
+            == .move(legal.first { $0.uci == "d2d4" }!))
+    }
+
+    /// Après « a 3 ou e 3 ? » : « premier » ou « deuxième », dans les cinq langues.
+    @Test(arguments: [
+        ("Premier", "fr", 0), ("le deuxième", "fr", 1), ("deux", "fr", 1), ("Second", "fr", 1), ("e4", "fr", nil),
+        ("first", "en", 0), ("the second one", "en", 1), ("primero", "es", 0), ("el segundo", "es", 1),
+        ("erster", "de", 0), ("zweiter", "de", 1), ("primo", "it", 0), ("il secondo", "it", 1),
+    ] as [(String, String, Int?)])
+    func theAnswerFirstOrSecondChoosesBetweenTwoMoves(text: String, language: String, expected: Int?) {
+        #expect(VoiceMoveParser.choice(in: [text], language: language) == expected, "« \(text) » (\(language))")
+    }
 }
 
 /// Les 51 essais RÉELS du 19/11/2026 (iPhone3, l'utilisateur, cinq reconnaissances) rejoués : ce que chaque

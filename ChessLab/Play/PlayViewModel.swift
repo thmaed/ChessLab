@@ -254,7 +254,7 @@ final class PlayViewModel {
     private var voiceNoticeID = 0
 
     enum VoiceReply: Equatable {
-        case played(String), undone, cannotUndo, ambiguous, illegal, notUnderstood, ignored
+        case played(String), undone, cannotUndo, ambiguous, conflicting, illegal, notUnderstood, ignored
     }
 
     /// L'interrupteur « Micro » au-dessus du plateau (19/11/2026, à la place de la pause) : coupé, le micro est
@@ -298,23 +298,28 @@ final class PlayViewModel {
             showVoiceNotice(LocalizationController.string("Coup repris"), isError: false)
             return .undone
         }
-        guard canUserAct, !isReviewing, VoiceMoveParser.soundsLikeChess(transcripts, vocabulary: vocabulary) else {
-            return .ignored
-        }
+        guard canUserAct, !isReviewing else { return .ignored }
         let candidates = VoiceMoveParser.candidates(in: board)
+        // Après « a 3 ou e 3 ? » : « premier » ou « deuxième » tranche (les lettres, elles, s'embrouillent).
+        if let chosen = pendingVoiceChoice(among: candidates, transcripts: transcripts, language: language) {
+            pendingVoiceChoiceMoves = nil
+            return playHeardVoiceMove(chosen, speaks: speaks)
+        }
+        guard VoiceMoveParser.soundsLikeChess(transcripts, vocabulary: vocabulary) else { return .ignored }
         switch VoiceMoveParser.resolve(transcripts: transcripts, among: candidates, vocabulary: vocabulary) {
         case let .move(candidate):
-            playVoiceMove(candidate)
-            let spoken = MoveNarration.describe(san: candidate.san)
-            showVoiceNotice(spoken, isError: false)
-            // À l'aveugle, voix allumée : l'app RÉPÈTE le coup, comme l'adversaire le fait dans les Règles du jeu
-            // FIDE (annexe D.2.1) — sans regarder l'écran, c'est le seul moyen d'entendre une méprise et de dire
-            // « annule » (décision du 19/11/2026 ; ailleurs, le retour reste à l'écran).
-            if settings.isBlindfold, settings.blindfoldVoice {
-                lastSpokenVoiceText = spoken
-                if speaks { BlindfoldVoice.shared.say(spoken) }
-            }
-            return .played(candidate.san)
+            pendingVoiceChoiceMoves = nil
+            return playHeardVoiceMove(candidate, speaks: speaks)
+        case let .conflicting(moves):
+            // La reconnaissance hésite entre deux coups : on le DIT et on demande, sans rien jouer. Seules les cases
+            // d'arrivée, que le joueur vient de dire lui-même, sont nommées (rien sur la position, même à l'aveugle).
+            let pair = Array(moves.prefix(2))
+            pendingVoiceChoiceMoves = (pair, Date.now.addingTimeInterval(20))
+            let question = LocalizationController.string("%@ ou %@ ? Dites premier ou deuxième.",
+                                                         MoveNarration.describe(san: pair[0].san),
+                                                         MoveNarration.describe(san: pair[1].san))
+            tellVoiceText(question, speaks: speaks)
+            return .conflicting
         case .ambiguous:
             // Sans dire OÙ sont les pièces : à l'aveugle, ce serait révéler la position.
             tellVoice("Plusieurs pièces le peuvent : dites aussi la case de départ", speaks: speaks)
@@ -328,15 +333,44 @@ final class PlayViewModel {
         }
     }
 
+    /// Les deux coups entre lesquels on a demandé de choisir, et jusqu'à quand la réponse « premier/deuxième » vaut.
+    private var pendingVoiceChoiceMoves: (moves: [VoiceMoveParser.Candidate], expires: Date)?
+
+    private func pendingVoiceChoice(among candidates: [VoiceMoveParser.Candidate], transcripts: [String],
+                                    language: String) -> VoiceMoveParser.Candidate? {
+        guard let pending = pendingVoiceChoiceMoves, Date.now < pending.expires,
+              let index = VoiceMoveParser.choice(in: transcripts, language: language),
+              pending.moves.indices.contains(index), candidates.contains(pending.moves[index]) else { return nil }
+        return pending.moves[index]
+    }
+
+    /// Joue le coup compris et le dit (à l'aveugle avec la voix : le répète).
+    private func playHeardVoiceMove(_ candidate: VoiceMoveParser.Candidate, speaks: Bool) -> VoiceReply {
+        playVoiceMove(candidate)
+        let spoken = MoveNarration.describe(san: candidate.san)
+        showVoiceNotice(spoken, isError: false)
+        // À l'aveugle, voix allumée : l'app RÉPÈTE le coup, comme l'adversaire le fait dans les Règles du jeu
+        // FIDE (annexe D.2.1) — sans regarder l'écran, c'est le seul moyen d'entendre une méprise et de dire
+        // « annule » (décision du 19/11/2026 ; ailleurs, le retour reste à l'écran).
+        if settings.isBlindfold, settings.blindfoldVoice {
+            lastSpokenVoiceText = spoken
+            if speaks { BlindfoldVoice.shared.say(spoken) }
+        }
+        return .played(candidate.san)
+    }
+
     /// Pour l'essai anticipé de l'écoute (20/11/2026) : ces transcriptions donnent-elles un coup sûr, à jouer sans
     /// attendre la fin de la phrase ? Rien n'est joué ni dit ici. Une promotion attend toujours : « e8… cavalier »,
     /// coupé après « e8 », deviendrait une dame.
     func voiceIsDecisive(_ transcripts: [String], language: String = LocalizationController.activeLanguageCode) -> Bool {
         guard settings.voiceMoves, voiceMicOn, outcome == nil, canUserAct, !isReviewing else { return false }
         let vocabulary = VoiceMoveParser.vocabulary(for: language)
-        guard !transcripts.contains(where: { VoiceMoveParser.isUndo($0, vocabulary: vocabulary) }),
-              VoiceMoveParser.soundsLikeChess(transcripts, vocabulary: vocabulary) else { return false }
+        guard !transcripts.contains(where: { VoiceMoveParser.isUndo($0, vocabulary: vocabulary) }) else { return false }
         let candidates = VoiceMoveParser.candidates(in: board)
+        if let chosen = pendingVoiceChoice(among: candidates, transcripts: transcripts, language: language) {
+            return chosen.promotion == nil
+        }
+        guard VoiceMoveParser.soundsLikeChess(transcripts, vocabulary: vocabulary) else { return false }
         guard case let .move(candidate) = VoiceMoveParser.resolve(transcripts: transcripts, among: candidates,
                                                                    vocabulary: vocabulary) else { return false }
         return candidate.promotion == nil
@@ -355,7 +389,10 @@ final class PlayViewModel {
     }
 
     private func tellVoice(_ key: String, speaks: Bool) {
-        let text = LocalizationController.string(key)
+        tellVoiceText(LocalizationController.string(key), speaks: speaks)
+    }
+
+    private func tellVoiceText(_ text: String, speaks: Bool) {
         showVoiceNotice(text, isError: true)
         lastSpokenVoiceText = text
         if speaks { BlindfoldVoice.shared.say(text) }

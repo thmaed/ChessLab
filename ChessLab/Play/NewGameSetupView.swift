@@ -524,10 +524,10 @@ struct NewGameSetupView: View {
                     .padding(.bottom, 10)
                     .accessibilityIdentifier("voiceMovesNote")
             }
-            // Sans le transcripteur d'iOS 26 — l'app exige iOS 18, donc c'est iOS 18 (iPhone XS : la colonne e se confond avec c ou a), le dire EN
+            // Sans le transcripteur d'iOS 26 — iOS 18 à 25, ou un iPhone ANCIEN sous iOS 26 (iPhone 11 : `isAvailable` faux ; la colonne e se confond avec c ou a), le dire EN
             // ORANGE au moment d'allumer, avec le geste qui aide : des coups courts (demande du 20/11/2026).
             if voiceMoves, Self.warnsAboutAccuracy(voiceAvailability) {
-                Text("Sous iOS 18, la reconnaissance n'est peut-être pas optimale (surtout les colonnes e, c et a). Dites des coups courts : « e quatre ».")
+                Text("Sur cet appareil, la reconnaissance peut ne pas être optimale (surtout les colonnes e, c et a). Dites des coups courts : « e quatre ».")
                     .font(.caption)
                     .foregroundStyle(Theme.warning)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -574,7 +574,7 @@ struct NewGameSetupView: View {
         .animation(Theme.gentle, value: opponentMode)
     }
 
-    /// Vrai quand la reconnaissance est la classique d'avant iOS 26 : moins fiable sur les lettres (voir la ligne orange).
+    /// Vrai quand la reconnaissance est la classique (iOS 18 à 25, ou appareil qui ne sait pas le transcripteur d'iOS 26) : moins fiable sur les lettres (voir la ligne orange).
     static func warnsAboutAccuracy(_ availability: VoiceRecognizers.Availability?) -> Bool {
         availability == .available(precise: false)
     }
@@ -586,7 +586,7 @@ struct NewGameSetupView: View {
             return "Micro ou reconnaissance vocale refusés : autorisez-les dans Réglages."
         }
         if voiceAvailability == .unavailable {
-            return "Indisponible sur cet appareil dans cette langue : la reconnaissance doit se faire sur l'appareil, sans réseau."
+            return "Indisponible pour l'instant : la reconnaissance doit se faire sur l'appareil, sans réseau, et le modèle de cette langue n'est peut-être pas téléchargé. Dictez une phrase avec le micro du clavier (Notes, en Wi-Fi), puis revenez ici."
         }
         if voiceAvailability == .dictationOff {
             return "La dictée est désactivée sur cet iPhone : activez-la dans Réglages › Général › Clavier (« Activer la dictée »), puis rallumez « Coups à la voix »."

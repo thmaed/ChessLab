@@ -244,6 +244,7 @@ final class VoiceDictationLab {
         switch outcome {
         case let .move(move): move.san
         case let .ambiguous(moves): "ambigu : " + moves.map(\.san).joined(separator: ", ")
+        case let .conflicting(moves): "hésite : " + moves.map(\.san).joined(separator: " ou ")
         case .illegal: "coup impossible"
         case .notUnderstood: "pas compris"
         }

@@ -47,7 +47,7 @@ enum VoiceRecognizers {
 
     static func availability(language: String) async -> Availability {
         let locale = locale(for: language)
-        if #available(iOS 26, *), await SpeechTranscriber.supportedLocale(equivalentTo: locale) != nil {
+        if #available(iOS 26, *), await transcriberIsUsable(locale: locale) {
             return .available(precise: true)
         }
         let classic = classicLocale(for: language)
@@ -92,12 +92,37 @@ enum VoiceRecognizers {
         return await classicOutcome(url: url, locale: locale, hints: nil, model: nil).dictationOff
     }
 
+    /// Le transcripteur d'iOS 26 est-il UTILISABLE ici ? Il faut la langue ET le matériel : `isAvailable` est faux sur
+    /// les iPhone qui ne savent pas l'exécuter. iPhone 11 sous iOS 26.6 (21/11/2026) : la langue était « prise en charge »
+    /// mais le statut du module `unsupported` — l'app se croyait précise, refusait chaque phrase (« Audio format is not
+    /// supported », message trompeur) et ne se rabattait sur rien d'utile : aucun coup reconnu. Tester la langue seule
+    /// ne suffit JAMAIS.
+    nonisolated static func transcriberIsUsable(locale: Locale) async -> Bool {
+        guard #available(iOS 26, *), SpeechTranscriber.isAvailable,
+              await SpeechTranscriber.supportedLocale(equivalentTo: locale) != nil else { return false }
+        return true
+    }
+
     /// Le transcripteur d'iOS 26 a besoin de son modèle de langue, que le SYSTÈME télécharge une fois (comme une voix).
     static func prepare(language: String) async {
-        guard #available(iOS 26, *) else { return }
-        let transcriber = SpeechTranscriber(locale: locale(for: language), preset: .transcriptionWithAlternatives)
-        if let request = try? await AssetInventory.assetInstallationRequest(supporting: [transcriber]) {
-            try? await request.downloadAndInstall()
+        guard #available(iOS 26, *), await transcriberIsUsable(locale: locale(for: language)) else { return }
+        let wanted = locale(for: language)
+        let transcriber = SpeechTranscriber(locale: wanted, preset: .transcriptionWithAlternatives)
+        do {
+            // La langue est RÉSERVÉE pour l'app avant le téléchargement, comme le fait l'exemple d'Apple. NON vérifié
+            // sur un appareil qui supporte le transcripteur : l'iPhone 11 (iOS 26.6, 21/11/2026) ne le supporte pas
+            // (`isAvailable` faux), et son « ChessLab is not subscribed to transcription.fr » venait de là, pas d'une
+            // réservation oubliée (elle ne l'a pas réglé).
+            _ = try await AssetInventory.reserve(locale: await SpeechTranscriber.supportedLocale(equivalentTo: wanted) ?? wanted)
+            let request = try await AssetInventory.assetInstallationRequest(supporting: [transcriber])
+            #if DEBUG
+            print("[voix] modèle du transcripteur : \(request == nil ? "rien à installer" : "à télécharger")")
+            #endif
+            try await request?.downloadAndInstall()
+        } catch {
+            #if DEBUG
+            print("[voix] modèle du transcripteur : ÉCHEC du téléchargement : \(error)")
+            #endif
         }
     }
 
@@ -106,9 +131,12 @@ enum VoiceRecognizers {
     static func transcripts(of url: URL, language: String,
                             hints: [String]) async -> (transcripts: [String], dictationOff: Bool) {
         let locale = locale(for: language)
-        if #available(iOS 26, *), await SpeechTranscriber.supportedLocale(equivalentTo: locale) != nil {
+        if #available(iOS 26, *), await transcriberIsUsable(locale: locale) {
             let heard = await transcriber(url: url, locale: locale, hints: hints)
             if !heard.isEmpty { return (heard, false) }
+            #if DEBUG
+            print("[voix] transcripteur iOS 26 (\(locale.identifier)) : rien rendu, on passe à la classique")
+            #endif
         }
         return await classicOutcome(url: url, locale: classicLocale(for: language), hints: hints, model: nil)
     }
@@ -189,6 +217,9 @@ enum VoiceRecognizers {
             if segments.count == 1 { return segments[0] }
             return [segments.compactMap(\.first).joined(separator: " ")]
         } catch {
+            #if DEBUG
+            print("[voix] transcripteur iOS 26 : erreur \(error)")
+            #endif
             return []
         }
     }
@@ -507,12 +538,34 @@ final class VoiceMoveListener {
     }
 
     /// La phrase dans un fichier temporaire (à effacer par l'appelant), nil si elle est vide ou illisible.
+    ///
+    /// Le fichier est écrit en 16 kHz, mono, entier 16 bits — le format que le labo a mesuré, et celui que le
+    /// transcripteur d'iOS 26 ACCEPTE : écrit dans le format natif du micro, il le refusait phrase après phrase
+    /// (« Audio format is not supported », SFSpeechErrorDomain 3, iPhone 11 sous iOS 26.6, 21/11/2026) ; l'erreur
+    /// était avalée, la classique ne rendait rien, et AUCUN coup n'était reconnu.
     private static func write(_ buffers: [AVAudioPCMBuffer]) -> URL? {
-        guard let format = buffers.first?.format else { return nil }
+        guard let source = buffers.first?.format,
+              let target = AVAudioFormat(commonFormat: .pcmFormatInt16, sampleRate: 16_000, channels: 1,
+                                         interleaved: true),
+              let converter = AVAudioConverter(from: source, to: target) else { return nil }
         let url = FileManager.default.temporaryDirectory.appending(path: "voice-move-\(UUID().uuidString).caf")
         do {
-            let file = try AVAudioFile(forWriting: url, settings: format.settings)
-            for buffer in buffers { try file.write(from: buffer) }
+            let file = try AVAudioFile(forWriting: url, settings: target.settings,
+                                       commonFormat: .pcmFormatInt16, interleaved: true)
+            for buffer in buffers {
+                let capacity = AVAudioFrameCount(Double(buffer.frameLength) * target.sampleRate / source.sampleRate) + 64
+                guard let converted = AVAudioPCMBuffer(pcmFormat: target, frameCapacity: capacity) else { continue }
+                var supplied = false
+                var failure: NSError?
+                let status = converter.convert(to: converted, error: &failure) { _, inputStatus in
+                    if supplied { inputStatus.pointee = .noDataNow; return nil }
+                    supplied = true
+                    inputStatus.pointee = .haveData
+                    return buffer
+                }
+                if status == .error { throw failure ?? CocoaError(.fileWriteUnknown) }
+                if converted.frameLength > 0 { try file.write(from: converted) }
+            }
             return url
         } catch {
             try? FileManager.default.removeItem(at: url)

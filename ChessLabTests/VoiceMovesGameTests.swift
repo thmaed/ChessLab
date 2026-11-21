@@ -223,4 +223,31 @@ struct VoiceMovesGameTests {
         let on = try #require(PlayViewModel(resuming: old, modelContext: ModelContext(container), startsEngine: false))
         #expect(on.voiceMicOn, "sauvegarde d'avant l'interrupteur : micro allumé")
     }
+
+    /// iPhone 11 (21/11/2026) : « e3 » entendu `["A3", "E3"]` jouait a3. Désormais la partie ne joue rien, DIT les
+    /// deux coups, et « deuxième » joue le second.
+    @Test func whenTheRecognitionHesitatesTheGameAsksAndTheAnswerPlays() throws {
+        let model = try Self.game()
+        #expect(model.handleVoice(["A3", "E3"], language: "fr", speaks: false) == .conflicting)
+        #expect(model.moveLog.isEmpty, "rien ne se joue tant qu'on n'a pas choisi")
+        #expect(model.lastSpokenVoiceText == "pion en a 3 ou pion en e 3 ? Dites premier ou deuxième.")
+        #expect(model.voiceIsDecisive(["le deuxième"], language: "fr"), "la réponse se joue sans attendre")
+        #expect(model.handleVoice(["le deuxième"], language: "fr", speaks: false) == .played("e3"))
+        #expect(model.board.position.piece(at: .e3)?.kind == .pawn)
+    }
+
+    /// « premier » sans question posée n'est pas un coup : rien ne se joue, et la phrase est ignorée.
+    @Test func firstOrSecondMeansNothingWithoutAQuestion() throws {
+        let model = try Self.game()
+        #expect(model.handleVoice(["premier"], language: "fr", speaks: false) == .ignored)
+        #expect(model.moveLog.isEmpty)
+        #expect(!model.voiceIsDecisive(["premier"], language: "fr"))
+    }
+
+    /// Une phrase qui donne un coup net (« pion e3 ») annule la question en attente et se joue.
+    @Test func aClearMoveAfterTheQuestionIsPlayedAsIs() throws {
+        let model = try Self.game()
+        _ = model.handleVoice(["A3", "E3"], language: "fr", speaks: false)
+        #expect(model.handleVoice(["pion e3"], language: "fr", speaks: false) == .played("e3"))
+    }
 }

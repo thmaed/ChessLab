@@ -34,6 +34,10 @@ enum VoiceMoveParser {
         case move(Candidate)
         /// Plusieurs coups répondent (deux cavaliers peuvent aller en d2) : il faut préciser le départ.
         case ambiguous([Candidate])
+        /// La reconnaissance HÉSITE : ses alternatives désignent des coups légaux DIFFÉRENTS, à égalité de voix (« a3 »
+        /// ou « e3 », « c3 » ou « d4 »). Le meilleur d'abord. Rien ne se joue : on demande (décision du 21/11/2026,
+        /// iPhone 11 — « e3 » entendu « a3 » jouait le mauvais coup, alors que le bon était la 2e alternative).
+        case conflicting([Candidate])
         /// On a entendu un coup, mais aucun coup légal ne lui répond.
         case illegal
         case notUnderstood
@@ -438,8 +442,11 @@ enum VoiceMoveParser {
         return found.count == 1 ? .move(found[0]) : direct
     }
 
-    /// Plusieurs transcriptions d'un même enregistrement (la meilleure d'abord) : le premier coup trouvé l'emporte ;
-    /// à défaut une ambiguïté, puis « impossible », puis « pas compris ».
+    /// Plusieurs transcriptions d'un même enregistrement (la meilleure d'abord). Chacune désigne, ou non, un coup
+    /// légal ; les coups désignés se DÉPARTAGENT PAR LE VOTE : celui que le plus d'alternatives désignent l'emporte,
+    /// et à égalité de voix la reconnaissance hésite vraiment (`.conflicting`) — on ne joue plus la première
+    /// alternative venue (iPhone 11, 21/11/2026 : `["A3", "E3"]` jouait a3 pour un « e3 » dit, `["pion c3",
+    /// "Pion des quatre"]` jouait c3 pour d4). À défaut de coup : une ambiguïté, puis « impossible », puis « pas compris ».
     static func resolve(transcripts: [String], among candidates: [Candidate], confusions: Bool = true,
                         vocabulary: Vocabulary = french) -> Outcome {
         let outcomes = transcripts.map { text -> Outcome in
@@ -447,11 +454,46 @@ enum VoiceMoveParser {
             if heard.isEmpty { return .notUnderstood }
             return confusions ? resolveWithConfusions(heard, among: candidates) : resolve(heard, among: candidates)
         }
-        if let move = outcomes.first(where: { if case .move = $0 { true } else { false } }) { return move }
+        var votes: [Candidate: Int] = [:]
+        var order: [Candidate] = []
+        for case let .move(move) in outcomes {
+            if votes[move] == nil { order.append(move) }
+            votes[move, default: 0] += 1
+        }
+        if let best = votes.values.max() {
+            let leaders = order.filter { votes[$0] == best }
+            if leaders.count == 1 { return .move(leaders[0]) }
+            return .conflicting(leaders)
+        }
         if let ambiguous = outcomes.first(where: { if case .ambiguous = $0 { true } else { false } }) { return ambiguous }
         if outcomes.contains(.illegal) { return .illegal }
         return .notUnderstood
     }
+
+    // MARK: Choisir entre deux coups
+
+    /// Après « a 3 ou e 3 ? », la réponse : « premier » (0) ou « deuxième » (1) — des mots que la reconnaissance
+    /// n'embrouille pas, contrairement aux lettres. `nil` si la phrase ne répond pas.
+    static func choice(in transcripts: [String], language: String) -> Int? {
+        let words = choiceWords[String(language.prefix(2))] ?? choiceWords["fr"]!
+        for text in transcripts {
+            let tokens = text.lowercased().split { !$0.isLetter && !$0.isNumber }.map(String.init)
+            // Dans l'ordre où les mots sont dits : « the second one » est le deuxième, pas le premier (« one »).
+            for token in tokens {
+                if words.first.contains(token) { return 0 }
+                if words.second.contains(token) { return 1 }
+            }
+        }
+        return nil
+    }
+
+    private static let choiceWords: [String: (first: Set<String>, second: Set<String>)] = [
+        "fr": (["premier", "première", "premiere", "un", "1"], ["deuxième", "deuxieme", "second", "seconde", "deux", "2"]),
+        "en": (["first", "one", "1", "1st"], ["second", "two", "to", "too", "2", "2nd"]),
+        "es": (["primero", "primera", "uno", "1"], ["segundo", "segunda", "dos", "2"]),
+        "de": (["erste", "erster", "ersten", "eins", "1"], ["zweite", "zweiter", "zweiten", "zwei", "2"]),
+        "it": (["primo", "prima", "uno", "1"], ["secondo", "seconda", "due", "2"]),
+    ]
 
     /// Une phrase sans rien d'échecs dedans (une conversation autour de la table) : l'écoute permanente l'ignore,
     /// au lieu de répondre « pas compris » à chaque mot prononcé dans la pièce.

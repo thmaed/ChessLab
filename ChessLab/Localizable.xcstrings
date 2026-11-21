@@ -1124,6 +1124,40 @@
         }
       }
     },
+    "%@ ou %@ ? Dites premier ou deuxième.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ou %@ ? Dites premier ou deuxième."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ or %@? Say first or second."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿%@ o %@? Di primero o segundo."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ oder %@? Sag erster oder zweiter."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ o %@? Di' primo o secondo."
+          }
+        }
+      }
+    },
     "%@ parties": {
       "extractionState": "stale",
       "localizations": {
@@ -58677,70 +58711,70 @@
         }
       }
     },
-    "Indisponible sur cet appareil dans cette langue : la reconnaissance doit se faire sur l'appareil, sans réseau.": {
+    "Indisponible pour l'instant : la reconnaissance doit se faire sur l'appareil, sans réseau, et le modèle de cette langue n'est peut-être pas téléchargé. Dictez une phrase avec le micro du clavier (Notes, en Wi-Fi), puis revenez ici.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Unavailable on this device in this language: recognition must happen on the device, without the network."
+            "value": "Unavailable for now: recognition must happen on the device, without the network, and this language's model may not be downloaded. Dictate a sentence with the keyboard microphone (Notes, on Wi-Fi), then come back here."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Indisponible sur cet appareil dans cette langue : la reconnaissance doit se faire sur l'appareil, sans réseau."
+            "value": "Indisponible pour l'instant : la reconnaissance doit se faire sur l'appareil, sans réseau, et le modèle de cette langue n'est peut-être pas téléchargé. Dictez une phrase avec le micro du clavier (Notes, en Wi-Fi), puis revenez ici."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "No disponible en este dispositivo en este idioma: el reconocimiento debe hacerse en el dispositivo, sin red."
+            "value": "No disponible por ahora: el reconocimiento debe hacerse en el dispositivo, sin red, y puede que el modelo de este idioma no esté descargado. Dicta una frase con el micrófono del teclado (Notas, con Wi-Fi) y vuelve aquí."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Auf diesem Gerät in dieser Sprache nicht verfügbar: Die Erkennung muss auf dem Gerät erfolgen, ohne Netzwerk."
+            "value": "Vorerst nicht verfügbar: Die Erkennung muss auf dem Gerät erfolgen, ohne Netzwerk, und das Modell dieser Sprache ist vielleicht nicht geladen. Diktiere einen Satz mit dem Tastaturmikrofon (Notizen, im WLAN) und komm dann hierher zurück."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Non disponibile su questo dispositivo in questa lingua: il riconoscimento deve avvenire sul dispositivo, senza rete."
+            "value": "Non disponibile per ora: il riconoscimento deve avvenire sul dispositivo, senza rete, e il modello di questa lingua potrebbe non essere scaricato. Detta una frase con il microfono della tastiera (Note, con Wi-Fi), poi torna qui."
           }
         }
       }
     },
-    "Sous iOS 18, la reconnaissance n'est peut-être pas optimale (surtout les colonnes e, c et a). Dites des coups courts : « e quatre ».": {
+    "Sur cet appareil, la reconnaissance peut ne pas être optimale (surtout les colonnes e, c et a). Dites des coups courts : « e quatre ».": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "On iOS 18, recognition may not be optimal (especially files e, c and a). Say short moves: “e four”."
+            "value": "On this device, recognition may not be optimal (especially files e, c and a). Say short moves: “e four”."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sous iOS 18, la reconnaissance n'est peut-être pas optimale (surtout les colonnes e, c et a). Dites des coups courts : « e quatre »."
+            "value": "Sur cet appareil, la reconnaissance peut ne pas être optimale (surtout les colonnes e, c et a). Dites des coups courts : « e quatre »."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "En iOS 18, el reconocimiento puede no ser óptimo (sobre todo las columnas e, c y a). Di jugadas cortas: «e cuatro»."
+            "value": "En este dispositivo, el reconocimiento puede no ser óptimo (sobre todo las columnas e, c y a). Di jugadas cortas: «e cuatro»."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Unter iOS 18 ist die Erkennung möglicherweise nicht optimal (vor allem die Linien e, c und a). Sag kurze Züge: „e vier“."
+            "value": "Auf diesem Gerät ist die Erkennung möglicherweise nicht optimal (vor allem die Linien e, c und a). Sag kurze Züge: „e vier“."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Con iOS 18 il riconoscimento potrebbe non essere ottimale (soprattutto le colonne e, c e a). Di' mosse brevi: «e quattro»."
+            "value": "Su questo dispositivo il riconoscimento potrebbe non essere ottimale (soprattutto le colonne e, c e a). Di' mosse brevi: «e quattro»."
           }
         }
       }
@@ -58949,36 +58983,36 @@
         }
       }
     },
-    "Dans Nouvelle partie, carte « Partie », allumez « Coups à la voix ». Pendant la partie, le micro écoute seul quand c'est à vous de jouer : dites votre coup — « cavalier f3 », « fou prend c6 », « e4 », « petit roque », « e8 dame » pour une promotion.\n\nLe coup compris est joué tout de suite et s'affiche en haut de l'échiquier ; dites « annule » pour le reprendre. Un coup impossible ou une phrase mal comprise vous est dit à voix haute. Si deux pièces peuvent aller sur la même case, ajoutez la colonne de départ : « cavalier b d2 ». La pastille du micro, sous l'échiquier, à côté de votre nom, coupe le micro le temps d'une conversation ; touchez-la de nouveau pour le rallumer. Vous pouvez toujours jouer sur l'échiquier, que le micro soit allumé ou non.\n\nVotre voix est reconnue sur l'appareil, sans réseau, et n'est jamais enregistrée. La reconnaissance est plus précise à partir d'iOS 26 ; avant, dites des coups courts, « e quatre » plutôt que « pion en e quatre ».": {
+    "Dans Nouvelle partie, carte « Partie », allumez « Coups à la voix ». Pendant la partie, le micro écoute seul quand c'est à vous de jouer : dites votre coup — « cavalier f3 », « fou prend c6 », « e4 », « petit roque », « e8 dame » pour une promotion.\n\nLe coup compris est joué tout de suite et s'affiche en haut de l'échiquier ; dites « annule » pour le reprendre. Un coup impossible ou une phrase mal comprise vous est dit à voix haute. Si deux pièces peuvent aller sur la même case, ajoutez la colonne de départ : « cavalier b d2 ». La pastille du micro, sous l'échiquier, à côté de votre nom, coupe le micro le temps d'une conversation ; touchez-la de nouveau pour le rallumer. Vous pouvez toujours jouer sur l'échiquier, que le micro soit allumé ou non.\n\nVotre voix est reconnue sur l'appareil, sans réseau, et n'est jamais enregistrée. La reconnaissance est plus précise sur les iPhone récents ; sur un appareil plus ancien, dites des coups courts, « e quatre » plutôt que « pion en e quatre ».": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "In New game, “Game” card, turn on “Voice moves”. During the game, the microphone listens by itself when it is your turn: say your move — “knight f3”, “bishop takes c6”, “e4”, “castles kingside”, “e8 queen” for a promotion.\n\nThe understood move is played at once and shown at the top of the board; say “undo” to take it back. An impossible move or a misunderstood phrase is said out loud. If two pieces can reach the same square, add the starting file: “knight b d2”. The microphone button below the board, next to your name, turns the microphone off during a conversation; tap it again to turn it back on. You can always play on the board, microphone on or off.\n\nYour voice is recognised on the device, without the network, and is never recorded. Recognition is more accurate from iOS 26; before that, say short moves, “e four” rather than “pawn to e four”."
+            "value": "In New game, “Game” card, turn on “Voice moves”. During the game, the microphone listens by itself when it is your turn: say your move — “knight f3”, “bishop takes c6”, “e4”, “castles kingside”, “e8 queen” for a promotion.\n\nThe understood move is played at once and shown at the top of the board; say “undo” to take it back. An impossible move or a misunderstood phrase is said out loud. If two pieces can reach the same square, add the starting file: “knight b d2”. The microphone button below the board, next to your name, turns the microphone off during a conversation; tap it again to turn it back on. You can always play on the board, microphone on or off.\n\nYour voice is recognised on the device, without the network, and is never recorded. Recognition is more accurate on recent iPhones; on an older device, say short moves, “e four” rather than “pawn to e four”."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dans Nouvelle partie, carte « Partie », allumez « Coups à la voix ». Pendant la partie, le micro écoute seul quand c'est à vous de jouer : dites votre coup — « cavalier f3 », « fou prend c6 », « e4 », « petit roque », « e8 dame » pour une promotion.\n\nLe coup compris est joué tout de suite et s'affiche en haut de l'échiquier ; dites « annule » pour le reprendre. Un coup impossible ou une phrase mal comprise vous est dit à voix haute. Si deux pièces peuvent aller sur la même case, ajoutez la colonne de départ : « cavalier b d2 ». La pastille du micro, sous l'échiquier, à côté de votre nom, coupe le micro le temps d'une conversation ; touchez-la de nouveau pour le rallumer. Vous pouvez toujours jouer sur l'échiquier, que le micro soit allumé ou non.\n\nVotre voix est reconnue sur l'appareil, sans réseau, et n'est jamais enregistrée. La reconnaissance est plus précise à partir d'iOS 26 ; avant, dites des coups courts, « e quatre » plutôt que « pion en e quatre »."
+            "value": "Dans Nouvelle partie, carte « Partie », allumez « Coups à la voix ». Pendant la partie, le micro écoute seul quand c'est à vous de jouer : dites votre coup — « cavalier f3 », « fou prend c6 », « e4 », « petit roque », « e8 dame » pour une promotion.\n\nLe coup compris est joué tout de suite et s'affiche en haut de l'échiquier ; dites « annule » pour le reprendre. Un coup impossible ou une phrase mal comprise vous est dit à voix haute. Si deux pièces peuvent aller sur la même case, ajoutez la colonne de départ : « cavalier b d2 ». La pastille du micro, sous l'échiquier, à côté de votre nom, coupe le micro le temps d'une conversation ; touchez-la de nouveau pour le rallumer. Vous pouvez toujours jouer sur l'échiquier, que le micro soit allumé ou non.\n\nVotre voix est reconnue sur l'appareil, sans réseau, et n'est jamais enregistrée. La reconnaissance est plus précise sur les iPhone récents ; sur un appareil plus ancien, dites des coups courts, « e quatre » plutôt que « pion en e quatre »."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "En Nueva partida, tarjeta «Partida», activa «Jugadas por voz». Durante la partida, el micrófono escucha solo cuando te toca jugar: di tu jugada — «caballo f3», «alfil come c6», «e4», «enroque corto», «e8 dama» para una coronación.\n\nLa jugada entendida se juega enseguida y aparece encima del tablero; di «deshacer» para anularla. Una jugada imposible o una frase mal entendida se dice en voz alta. Si dos piezas pueden ir a la misma casilla, añade la columna de salida: «caballo b d2». El botón del micrófono, bajo el tablero, junto a tu nombre, apaga el micrófono durante una conversación; tócalo de nuevo para volver a encenderlo. Siempre puedes jugar en el tablero, con el micrófono encendido o no.\n\nTu voz se reconoce en el dispositivo, sin red, y nunca se graba. El reconocimiento es más preciso a partir de iOS 26; antes, di jugadas cortas: «e cuatro» mejor que «peón a e cuatro»."
+            "value": "En Nueva partida, tarjeta «Partida», activa «Jugadas por voz». Durante la partida, el micrófono escucha solo cuando te toca jugar: di tu jugada — «caballo f3», «alfil come c6», «e4», «enroque corto», «e8 dama» para una coronación.\n\nLa jugada entendida se juega enseguida y aparece encima del tablero; di «deshacer» para anularla. Una jugada imposible o una frase mal entendida se dice en voz alta. Si dos piezas pueden ir a la misma casilla, añade la columna de salida: «caballo b d2». El botón del micrófono, bajo el tablero, junto a tu nombre, apaga el micrófono durante una conversación; tócalo de nuevo para volver a encenderlo. Siempre puedes jugar en el tablero, con el micrófono encendido o no.\n\nTu voz se reconoce en el dispositivo, sin red, y nunca se graba. El reconocimiento es más preciso en los iPhone recientes; en un dispositivo más antiguo, di jugadas cortas: «e cuatro» mejor que «peón a e cuatro»."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schalte unter Neue Partie, Karte „Partie“, „Züge per Sprache“ ein. Während der Partie hört das Mikrofon von selbst zu, wenn du am Zug bist: Sag deinen Zug — „Springer f3“, „Läufer schlägt c6“, „e4“, „kurze Rochade“, „e8 Dame“ für eine Umwandlung.\n\nDer verstandene Zug wird sofort gespielt und oben am Brett angezeigt; sag „zurück“, um ihn zurückzunehmen. Ein unmöglicher Zug oder ein nicht verstandener Satz wird dir laut gesagt. Können zwei Figuren auf dasselbe Feld ziehen, nenne auch die Ausgangslinie: „Springer b d2“. Die Mikrofon-Schaltfläche unter dem Brett, neben deinem Namen, schaltet das Mikrofon während eines Gesprächs aus; tippe erneut darauf, um es wieder einzuschalten. Auf dem Brett kannst du immer spielen, ob das Mikrofon an ist oder nicht.\n\nDeine Stimme wird auf dem Gerät erkannt, ohne Netzwerk, und nie gespeichert. Ab iOS 26 ist die Erkennung genauer; davor sag kurze Züge: „e vier“ statt „Bauer nach e vier“."
+            "value": "Schalte unter Neue Partie, Karte „Partie“, „Züge per Sprache“ ein. Während der Partie hört das Mikrofon von selbst zu, wenn du am Zug bist: Sag deinen Zug — „Springer f3“, „Läufer schlägt c6“, „e4“, „kurze Rochade“, „e8 Dame“ für eine Umwandlung.\n\nDer verstandene Zug wird sofort gespielt und oben am Brett angezeigt; sag „zurück“, um ihn zurückzunehmen. Ein unmöglicher Zug oder ein nicht verstandener Satz wird dir laut gesagt. Können zwei Figuren auf dasselbe Feld ziehen, nenne auch die Ausgangslinie: „Springer b d2“. Die Mikrofon-Schaltfläche unter dem Brett, neben deinem Namen, schaltet das Mikrofon während eines Gesprächs aus; tippe erneut darauf, um es wieder einzuschalten. Auf dem Brett kannst du immer spielen, ob das Mikrofon an ist oder nicht.\n\nDeine Stimme wird auf dem Gerät erkannt, ohne Netzwerk, und nie gespeichert. Auf neueren iPhones ist die Erkennung genauer; auf einem älteren Gerät sag kurze Züge: „e vier“ statt „Bauer nach e vier“."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "In Nuova partita, scheda «Partita», attiva «Mosse a voce». Durante la partita il microfono ascolta da solo quando tocca a te: di' la tua mossa — «cavallo f3», «alfiere prende c6», «e4», «arrocco corto», «e8 donna» per una promozione.\n\nLa mossa riconosciuta viene giocata subito e appare sopra la scacchiera; di' «annulla» per ritirarla. Una mossa impossibile o una frase non compresa ti viene detta ad alta voce. Se due pezzi possono andare sulla stessa casa, aggiungi la colonna di partenza: «cavallo b d2». Il pulsante del microfono, sotto la scacchiera, accanto al tuo nome, spegne il microfono durante una conversazione; toccalo di nuovo per riaccenderlo. Puoi sempre giocare sulla scacchiera, con il microfono acceso o spento.\n\nLa tua voce è riconosciuta sul dispositivo, senza rete, e non viene mai registrata. Il riconoscimento è più preciso da iOS 26; prima, di' mosse brevi: «e quattro» meglio di «pedone in e quattro»."
+            "value": "In Nuova partita, scheda «Partita», attiva «Mosse a voce». Durante la partita il microfono ascolta da solo quando tocca a te: di' la tua mossa — «cavallo f3», «alfiere prende c6», «e4», «arrocco corto», «e8 donna» per una promozione.\n\nLa mossa riconosciuta viene giocata subito e appare sopra la scacchiera; di' «annulla» per ritirarla. Una mossa impossibile o una frase non compresa ti viene detta ad alta voce. Se due pezzi possono andare sulla stessa casa, aggiungi la colonna di partenza: «cavallo b d2». Il pulsante del microfono, sotto la scacchiera, accanto al tuo nome, spegne il microfono durante una conversazione; toccalo di nuovo per riaccenderlo. Puoi sempre giocare sulla scacchiera, con il microfono acceso o spento.\n\nLa tua voce è riconosciuta sul dispositivo, senza rete, e non viene mai registrata. Il riconoscimento è più preciso sugli iPhone recenti; su un dispositivo più vecchio, di' mosse brevi: «e quattro» meglio di «pedone in e quattro»."
           }
         }
       }
