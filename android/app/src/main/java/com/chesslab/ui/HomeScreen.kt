@@ -172,8 +172,16 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
                     )
                 }
             }
-            // C7 / A5 (2.0) : la séance du jour en tête de l'accueil.
-            com.chesslab.dailysession.DailySessionCard(Modifier.discoveryAnchor(DiscoverySpot.dailySession)) { onOpen(Route.DailySession) }
+            // C7 / A5 (2.0) : la séance du jour en tête de l'accueil. « 1 position de votre répertoire à revoir »
+            // n'est plus une carte de plus : une ligne DANS la séance (21/11/2026, comme iOS — l'accueil empilait
+            // quatre cartes). La position est déjà dans les révisions de la séance ; l'ouvrir acquitte l'invitation.
+            com.chesslab.dailysession.DailySessionCard(
+                Modifier.discoveryAnchor(DiscoverySpot.dailySession),
+                repertoireExits = com.chesslab.analysis.AnalysisFollowUpService.repertoireExitCount,
+            ) {
+                com.chesslab.analysis.AnalysisFollowUpService.acknowledgeRepertoireExits(context)
+                onOpen(Route.DailySession)
+            }
             // A2 (2.0) : « 2 nouveaux puzzles de votre dernière partie ». Un tap
             // ouvre les puzzles et efface la pastille.
             val newPuzzles = com.chesslab.analysis.AnalysisFollowUpService.newPuzzleCount
@@ -185,17 +193,6 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
                 ) {
                     com.chesslab.analysis.AnalysisFollowUpService.acknowledgeNewPuzzles(context)
                     onOpen(Route.PuzzleQueue)
-                }
-            }
-            val repertoireExits = com.chesslab.analysis.AnalysisFollowUpService.repertoireExitCount
-            if (repertoireExits > 0) {
-                Banner(
-                    Icons.Default.Replay,
-                    pluralStringResource(R.plurals.home_repertoire_exits, repertoireExits, repertoireExits),
-                    "", Palette.warning, "sortie-repertoire",
-                ) {
-                    com.chesslab.analysis.AnalysisFollowUpService.acknowledgeRepertoireExits(context)
-                    onOpen(Route.Openings)
                 }
             }
             SectionHeader(stringResource(R.string.home_modes), Modifier.padding(top = 8.dp))

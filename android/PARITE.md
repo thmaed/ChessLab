@@ -2304,6 +2304,17 @@ Tests : `VoiceMoveParserTests` (+ 51 essais réels rejoués), `VoiceMoveParserLa
       joue le coup. PORTÉ en Kotlin (`VoiceMoveParser.kt`, `VoiceMoves.kt`, `PlayViewModel.handleVoice`, chaîne
       `voice_conflict` ×5) ; tests JVM verts (VoiceMoveParserTest 24, VoiceMovesTest 13). RESTE : vérifier SUR LE GALAXY
       que la question se dit et que « deuxième » joue (jamais vu sur appareil).
+- [~] **Accueil allégé et « mise de côté » retirée** (iOS, 21/11/2026, retours de l'utilisateur : « l'affichage est un peu
+      chargé avec les 4 box au-dessus des modes », puis « je comprends pas à quoi sert "partie mise de côté" : quand je
+      clique ça va alternativement sur la partie en cours ou sur une partie à l'aveugle ») : la mise de côté (une AUTRE
+      partie venue d'un autre appareil laissait la nôtre de côté, la bande d'accueil ÉCHANGEAIT les deux à chaque tap)
+      est supprimée de bout en bout — `SyncedAutosave` (la partie plus récente venue d'ailleurs REMPLACE la locale, au
+      prix de la nôtre qui n'est plus gardée ; un fichier de côté laissé par une version précédente est effacé à la
+      lecture), bande, section de la barre latérale iPad, aide (cinq langues). « 1 position de votre répertoire à
+      revoir » n'est plus une carte mais une LIGNE dans la « Séance du jour » (l'ouvrir acquitte l'invitation, la
+      position étant déjà dans les révisions de la séance). Android : la ligne du répertoire est PORTÉE
+      (`DailySessionCard(repertoireExits)`, `HomeScreen.kt`) ; la mise de côté n'a jamais existé côté Android
+      (iCloud, écart assumé), rien à retirer. RESTE : vérifier le rendu SUR LE GALAXY (jamais vu).
 - [ ] **Écarts iOS sans pendant Android** (21/11/2026) : (1) le transcripteur d'iOS 26 n'est utilisable que si
       `SpeechTranscriber.isAvailable` (iPhone 11 : faux, statut `unsupported`) — `VoiceRecognizers.transcriberIsUsable` ;
       (2) langue réservée (`AssetInventory.reserve`) avant le téléchargement de son modèle ; (3) message « Indisponible »

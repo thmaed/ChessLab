@@ -86,7 +86,7 @@ private fun style(kind: DailySessionStep.Kind): StepStyle = when (kind) {
 
 /** C7 / A5 : la carte « Séance du jour » en tête de l'accueil. Pendant de `DailySessionCard` (iOS). */
 @Composable
-fun DailySessionCard(modifier: Modifier = Modifier, onOpen: () -> Unit) {
+fun DailySessionCard(modifier: Modifier = Modifier, repertoireExits: Int = 0, onOpen: () -> Unit) {
     val context = LocalContext.current
     var plan by remember { mutableStateOf<DailySessionPlan?>(null) }
     LaunchedEffect(Unit) { plan = DailySessionBuilder.load(context) }
@@ -113,6 +113,17 @@ fun DailySessionCard(modifier: Modifier = Modifier, onOpen: () -> Unit) {
                 plan?.let { summary(it) } ?: " ", fontSize = 13.sp, color = Palette.textSecondary, maxLines = 2,
                 modifier = Modifier.testTag("seance-resume"),
             )
+            // Les positions du répertoire quittées en partie, à revoir (A3, 2.0) : une ligne dans la carte.
+            if (repertoireExits > 0) {
+                Row(Modifier.testTag("sortie-repertoire"), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Replay, null, tint = tint, modifier = Modifier.size(14.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        pluralStringResource(R.plurals.home_repertoire_exits, repertoireExits, repertoireExits),
+                        fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = tint,
+                    )
+                }
+            }
         }
         plan?.streak?.takeIf { it > 0 }?.let { streak ->
             val medal = StreakMedal.earned(streak)

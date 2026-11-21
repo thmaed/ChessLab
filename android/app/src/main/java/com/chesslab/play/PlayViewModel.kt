@@ -470,17 +470,6 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         // jamais. iOS les met dans la même file, pour la même raison ; le
         // joueur attend donc 300 ms de plus, une fois par coup.
         val mustReply = board.position.sideToMove != humanColor
-        if (!wasHuman && ui.settings.isBlindfold && ui.settings.blindfoldVoice) {
-            val app = getApplication<Application>()
-            BlindfoldVoice.say(
-                app,
-                // Le coup seul, sans le nom de l'adversaire — comme iOS (retour du 19/11/2026).
-                com.chesslab.ui.MoveNarration.describe(app, move.san),
-                app.resources.configuration.locales[0].toLanguageTag(),
-                // À LA SUITE de la phrase en cours (mon coup répété, un « coup impossible »), comme iOS.
-                interrupting = false,
-            )
-        }
         // À l'aveugle, l'alerte dirait ce que le plateau cache.
         if (wasHuman && ui.settings.blunderAlertEnabled && !ui.settings.isBlindfold &&
             !ui.settings.timeControl.hasClock) {
@@ -689,6 +678,19 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             clock?.stopAndIncrement(System.currentTimeMillis())
             autosave()
             refresh(null, move)
+            // À l'aveugle, voix allumée : le coup de l'ordinateur est DIT, seul (sans le nom de l'adversaire — retour du
+            // 19/11/2026), À LA SUITE de la phrase en cours (mon coup répété), comme iOS. Cette annonce vivait dans
+            // `recordAndContinue`, que seuls les coups du JOUEUR empruntent : elle ne se disait donc jamais
+            // (retour de l'utilisateur sur le Galaxy, 21/11/2026).
+            if (ui.settings.isBlindfold && ui.settings.blindfoldVoice) {
+                val app = getApplication<Application>()
+                BlindfoldVoice.say(
+                    app,
+                    com.chesslab.ui.MoveNarration.describe(app, move.san),
+                    app.resources.configuration.locales[0].toLanguageTag(),
+                    interrupting = false,
+                )
+            }
             if (!ui.gameOver) {
                 startClockForSideToMove()
                 maybeResignOrOfferDraw()

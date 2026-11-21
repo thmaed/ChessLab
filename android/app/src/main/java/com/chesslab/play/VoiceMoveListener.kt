@@ -109,8 +109,12 @@ class VoiceMoveListener(context: Context, private val language: () -> String) {
         )
         if (minimum <= 0) { statusFlow.value = VoiceListenStatus.unavailable; return }
         val audio = try {
+            // Source MIC, pas VOICE_RECOGNITION : mesuré sur le Galaxy A16 (Android 16, 21/11/2026, écran de débogage
+            // « Niveau micro », même voix, même distance de 20 cm) — VOICE_RECOGNITION : crête -36 dB, voix -48 dB ;
+            // MIC : crête -5 dB, voix -24 dB, soit ~25 dB de plus pour le MÊME écart voix/bruit (35 dB des deux côtés).
+            // Samsung applique à VOICE_RECOGNITION un gain très bas ; il fallait le compenser par +30 dB d'amplification.
             AudioRecord(
-                MediaRecorder.AudioSource.VOICE_RECOGNITION, SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
+                MediaRecorder.AudioSource.MIC, SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT, maxOf(minimum, SAMPLE_RATE / 2),
             )
         } catch (e: SecurityException) {
