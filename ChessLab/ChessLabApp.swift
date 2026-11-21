@@ -84,6 +84,11 @@ struct ChessLabApp: App {
             DiscoveryTourMemory.markWhatsNewSeen()
         }
 
+        #if DEBUG
+        // Banc de voix synthétiques (voir `VoiceSynthBench`) : seulement avec l'argument, jamais dans une version publiée.
+        if VoiceSynthBench.isRequested { Task { await VoiceSynthBench.run() } }
+        #endif
+
         // Pré-chauffe le moteur audio (session + synthèse des buffers) et
         // les générateurs haptiques hors du premier coup : sans ça, jouer le
         // tout premier coup subit un à-coup (init de SoundPlayer sur le

@@ -94,6 +94,32 @@ class VoiceMoveParserTest {
         assertEquals("g1f3", play("cavallo F3", legal = candidates()))
     }
 
+    /** Banc de voix SYNTHÉTIQUES du 21/11/2026 (Galaxy et iPhone, plusieurs voix) : ce que les moteurs ont écrit. */
+    @Test fun `formes ecrites par les moteurs sur des voix de synthese`() {
+        val start = candidates()
+        val rooks = candidates(fen = "r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1")
+        val italianGame = candidates(after = listOf("e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "f8c5"))
+        val ruy = candidates(after = listOf("e2e4", "e7e5", "g1f3", "b8c6"))
+        fun play(lang: String, heard: String, legal: List<Candidate>) =
+            (VoiceMoveParser.resolve(listOf(heard), legal, vocabulary = VoiceMoveParser.vocabulary(lang)) as? Outcome.Move)?.move?.uci
+        val cases = listOf(
+            Triple("en", "Rotates H8", rooks) to "h1h8", Triple("en", "Castles queen size", rooks) to "e1c1",
+            Triple("en", "Castle skin side", italianGame) to "e1g1", Triple("en", "Night C3", start) to "b1c3",
+            Triple("de", "Tom schlägt A8", rooks) to "a1a8", Triple("de", "Kurze Rockade", italianGame) to "e1g1",
+            Triple("de", "Baue D3", ruy) to "d2d3", Triple("de", "Bauer definiert", start) to "d2d4",
+            Triple("de", "Die vier", start) to "d2d4", Triple("de", "springen als C3", start) to "b1c3",
+            Triple("it", "Cavallo Citroën", start) to "b1c3", Triple("it", "Marocco corto", italianGame) to "e1g1",
+            Triple("it", "A Rocco Cordo", italianGame) to "e1g1",
+            Triple("es", "Caballo centro", start) to "b1c3", Triple("es", "Entró que cortó", italianGame) to "e1g1",
+            Triple("es", "Zorro come a ocho", rooks) to "a1a8",
+            Triple("fr", "Détroit", start) to "d2d3", Triple("fr", "Les quatre", start) to "d2d4",
+        )
+        for ((key, expected) in cases) assertEquals("« ${key.second} » (${key.first})", expected, play(key.first, key.second, key.third))
+        for (heard in listOf("I do", "Under", "undue")) {
+            assertTrue("« $heard »", VoiceMoveParser.isUndo(heard, VoiceMoveParser.vocabulary("en")))
+        }
+    }
+
     @Test fun `e4 entendu OK quatre`() {
         val start = candidates()
         assertEquals("e2e4", uci("OK 4", start))

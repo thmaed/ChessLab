@@ -104,15 +104,13 @@ enum VoiceMoveParser {
             "tour": "R", "tours": "R", "fou": "B", "fous": "B",
             "cavalier": "N", "cavaliers": "N", "chevalier": "N", "chevaliers": "N", "pion": "P", "pions": "P",
             // Entendus le 19/11 (mesure sur iPhone3) : « Tout en cinq » pour « Tour en e5 », « Roy », « Rouen » (roi en).
-            "tout": "R", "roy": "K", "rouen": "K",
-        ],
+            "tout": "R", "roy": "K", "rouen": "K", "plus": "P", "faux": "B"],
         // Mesure du 19/11/2026, 51 essais : « en g1 » → « géant », « en d1 » → « indien », « en c1 » → « ancien »,
         // « en h6 » → « hachis », « d7 » → « décède », « 17 » (dix-sept), « b1 » → « bien un », « en g » → « Angers ».
         fused: [
             "géant": ["g", "1"], "indien": ["d", "1"], "indéen": ["d", "1"], "ancien": ["c", "1"], "hachis": ["h", "6"],
             "décède": ["d", "7"], "décès": ["d", "7"], "17": ["d", "7"], "18": ["d", "8"], "dix": ["d"], "10": ["d"],
-            "bien": ["b"], "angers": ["g"], "of": ["f"], "off": ["f"],
-        ],
+            "bien": ["b"], "angers": ["g"], "of": ["f"], "off": ["f"], "détroit": ["d", "3"], "detroit": ["d", "3"]],
         captureWords: ["prend", "prends", "prent", "pren", "mange", "manges", "x", "prise"],
         promotionWords: ["promotion", "promu", "promeut", "promouvoir"],
         strongFiles: [
@@ -125,8 +123,7 @@ enum VoiceMoveParser {
             "euh": "e", "eux": "e", "eu": "e", "et": "e", "est": "e", "ef": "f", "effet": "f",
             // « e4 » entendu « Au quatre » / « O quatre », sur iPhone3 et sur l'iPhone XS (20/11/2026).
             "au": "e", "o": "e",
-            "j'ai": "g", "geai": "g", "jet": "g", "j": "g", "hash": "h", "hach": "h",
-        ],
+            "j'ai": "g", "geai": "g", "jet": "g", "j": "g", "hash": "h", "hach": "h", "les": "d"],
         ranks: [
             "un": "1", "une": "1", "deux": "2", "trois": "3", "quatre": "4", "cinq": "5", "six": "6",
             "sept": "7", "set": "7", "cette": "7", "huit": "8",
@@ -147,7 +144,7 @@ enum VoiceMoveParser {
             "bishop": "B", "bishops": "B", "knight": "N", "knights": "N", "night": "N", "nights": "N",
             "pawn": "P", "pawns": "P",
         ],
-        fused: ["before": ["b", "4"]],
+        fused: ["before": ["b", "4"], "rotates": ["rook", "takes"], "shade": ["h", "8"]],
         captureWords: ["takes", "take", "captures", "capture", "x", "times"],
         promotionWords: ["promotes", "promote", "promotion", "equals"],
         strongFiles: [
@@ -161,11 +158,11 @@ enum VoiceMoveParser {
         ],
         writtenInitials: ["n": "N", "b": "B", "r": "R", "q": "Q", "k": "K"],
         shortCastle: ["castles kingside", "castle kingside", "kingside castle", "short castle", "castle short",
-                      "castles short", "king side"],
+                      "castles short", "king side", "castles king size", "castle skin side"],
         longCastle: ["castles queenside", "castle queenside", "queenside castle", "long castle", "castle long",
-                     "castles long", "queen side"],
+                     "castles long", "queen side", "castles queen size", "castle's queenside", "castle's queen side"],
         anyCastle: ["castle", "castles", "castling"],
-        undo: ["undo", "take back", "takeback", "take it back", "cancel"],
+        undo: ["undo", "take back", "takeback", "take it back", "cancel", "i do", "undue", "under", "and do"],
         pieceNames: ["K": "king", "Q": "queen", "R": "rook", "B": "bishop", "N": "knight", "P": "pawn"],
         to: "to", takes: "takes", shortCastleName: "castles kingside", longCastleName: "castles queenside"
     )
@@ -173,22 +170,21 @@ enum VoiceMoveParser {
     static let spanish = Vocabulary(
         pieces: [
             "rey": "K", "reyes": "K", "dama": "Q", "damas": "Q", "reina": "Q", "torre": "R", "torres": "R",
-            "alfil": "B", "alfiles": "B", "caballo": "N", "caballos": "N", "peón": "P", "peon": "P", "peones": "P",
-        ],
-        fused: [:],
+            "alfil": "B", "alfiles": "B", "caballo": "N", "caballos": "N", "peón": "P", "peon": "P", "peones": "P", "zorro": "R"],
+        fused: ["centro": ["c", "3"]],
         captureWords: ["come", "comes", "captura", "toma", "por", "x"],
         promotionWords: ["corona", "promociona", "promoción", "promocion"],
         strongFiles: [
             "b": "b", "c": "c", "d": "d", "e": "e", "f": "f", "efe": "f", "g": "g", "h": "h", "hache": "h", "ache": "h",
         ],
-        weakFiles: ["a": "a", "ah": "a", "be": "b", "ve": "b", "ce": "c", "se": "c", "de": "d", "ge": "g", "je": "g"],
+        weakFiles: ["a": "a", "ah": "a", "be": "b", "ve": "b", "ce": "c", "se": "c", "de": "d", "ge": "g", "je": "g", "ne": "d"],
         ranks: [
             "uno": "1", "una": "1", "un": "1", "dos": "2", "tres": "3", "cuatro": "4", "cinco": "5", "seis": "6",
             "siete": "7", "ocho": "8",
         ],
         writtenInitials: ["c": "N", "a": "B", "t": "R", "d": "Q", "r": "K"],
-        shortCastle: ["enroque corto"],
-        longCastle: ["enroque largo"],
+        shortCastle: ["enroque corto", "en roque corto", "en bloque corto", "entró que cortó", "el bloque corto", "el brote corto"],
+        longCastle: ["enroque largo", "en roque largo", "en bloque largo", "en broque largo"],
         anyCastle: ["enroque", "enroca"],
         undo: ["deshacer", "deshaz", "anula", "anular", "atrás", "atras"],
         pieceNames: ["K": "rey", "Q": "dama", "R": "torre", "B": "alfil", "N": "caballo", "P": "peón"],
@@ -198,24 +194,23 @@ enum VoiceMoveParser {
     static let german = Vocabulary(
         pieces: [
             "könig": "K", "koenig": "K", "dame": "Q", "turm": "R", "türme": "R", "läufer": "B", "laeufer": "B",
-            "springer": "N", "pferd": "N", "bauer": "P", "bauern": "P",
-        ],
-        fused: [:],
+            "springer": "N", "pferd": "N", "bauer": "P", "bauern": "P", "tom": "R", "baue": "P", "springen": "N", "spring": "N"],
+        fused: ["definiert": ["d", "4"], "definieren": ["d", "4"]],
         captureWords: ["schlägt", "schlaegt", "nimmt", "x", "mal"],
         promotionWords: ["umwandlung", "wandelt", "verwandelt"],
         strongFiles: [
             "a": "a", "b": "b", "be": "b", "c": "c", "ce": "c", "zeh": "c", "d": "d", "de": "d", "e": "e",
             "f": "f", "ef": "f", "g": "g", "ge": "g", "h": "h", "ha": "h",
         ],
-        weakFiles: ["beh": "b", "tse": "c", "dee": "d", "eh": "e", "eff": "f", "geh": "g", "hah": "h"],
+        weakFiles: ["beh": "b", "tse": "c", "dee": "d", "eh": "e", "eff": "f", "geh": "g", "hah": "h", "die": "d"],
         ranks: [
             "eins": "1", "ein": "1", "zwei": "2", "zwo": "2", "drei": "3", "vier": "4", "fünf": "5", "fuenf": "5",
             "sechs": "6", "sieben": "7", "acht": "8",
         ],
         writtenInitials: ["s": "N", "l": "B", "t": "R", "d": "Q", "k": "K"],
-        shortCastle: ["kurze rochade", "rochade kurz", "kleine rochade"],
-        longCastle: ["lange rochade", "rochade lang", "große rochade", "grosse rochade"],
-        anyCastle: ["rochade", "rochiert"],
+        shortCastle: ["kurze rochade", "rochade kurz", "kleine rochade", "kurze rockade", "rockade kurz", "kleine rockade"],
+        longCastle: ["lange rochade", "rochade lang", "große rochade", "grosse rochade", "lange rockade", "rockade lang", "große rockade", "grosse rockade"],
+        anyCastle: ["rochade", "rochiert", "rockade"],
         undo: ["zurück", "zurueck", "rückgängig", "rueckgaengig", "nimm zurück", "abbrechen"],
         pieceNames: ["K": "König", "Q": "Dame", "R": "Turm", "B": "Läufer", "N": "Springer", "P": "Bauer"],
         to: "nach", takes: "schlägt", shortCastleName: "kurze Rochade", longCastleName: "lange Rochade"
@@ -224,23 +219,22 @@ enum VoiceMoveParser {
     static let italian = Vocabulary(
         pieces: [
             "re": "K", "donna": "Q", "regina": "Q", "torre": "R", "torri": "R", "alfiere": "B", "alfieri": "B",
-            "cavallo": "N", "cavalli": "N", "pedone": "P", "pedoni": "P",
-        ],
-        fused: [:],
+            "cavallo": "N", "cavalli": "N", "pedone": "P", "pedoni": "P", "benone": "P"],
+        fused: ["alfierebbe": ["alfiere", "b"], "fierebbe": ["alfiere", "b"], "citroën": ["c", "3"], "citroen": ["c", "3"], "dietro": ["d", "3"]],
         captureWords: ["prende", "mangia", "cattura", "per", "x"],
         promotionWords: ["promozione", "promuove"],
         strongFiles: [
             "b": "b", "bi": "b", "c": "c", "d": "d", "f": "f", "effe": "f", "g": "g", "gi": "g", "h": "h", "acca": "h",
         ],
-        weakFiles: ["a": "a", "ci": "c", "di": "d", "e": "e", "è": "e"],
+        weakFiles: ["a": "a", "ci": "c", "di": "d", "e": "e", "è": "e", "ben": "b"],
         ranks: [
             "uno": "1", "un": "1", "due": "2", "tre": "3", "quattro": "4", "cinque": "5", "sei": "6",
             "sette": "7", "otto": "8",
         ],
         writtenInitials: ["c": "N", "a": "B", "t": "R", "d": "Q", "r": "K"],
-        shortCastle: ["arrocco corto"],
-        longCastle: ["arrocco lungo"],
-        anyCastle: ["arrocco", "arrocca"],
+        shortCastle: ["arrocco corto", "rocco corto", "a rocco corto", "a poco corto", "arocco corto", "corto", "marocco corto", "rocco cordo", "a rocco cordo"],
+        longCastle: ["arrocco lungo", "rocco lungo", "a rocco lungo", "arocco lungo", "lungo", "marocco lungo", "al rocco lungo"],
+        anyCastle: ["arrocco", "arrocca", "rocco"],
         undo: ["annulla", "indietro", "riprendi"],
         pieceNames: ["K": "re", "Q": "donna", "R": "torre", "B": "alfiere", "N": "cavallo", "P": "pedone"],
         to: "in", takes: "prende", shortCastleName: "arrocco corto", longCastleName: "arrocco lungo"

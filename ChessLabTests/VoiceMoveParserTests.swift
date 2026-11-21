@@ -19,6 +19,37 @@ struct VoiceMoveParserTests {
         return nil
     }
 
+    /// Banc de voix SYNTHÉTIQUES du 21/11/2026 (Galaxy et iPhone, plusieurs voix) : ce que les moteurs ont écrit.
+    @Test func writtenFormsFromSyntheticVoices() {
+        let start = candidates()
+        let rooks = candidates("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1")
+        let italianGame = candidates(after: ["e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "f8c5"])
+        let ruy = candidates(after: ["e2e4", "e7e5", "g1f3", "b8c6"])
+        func play(_ language: String, _ heard: String, _ legal: [VoiceMoveParser.Candidate]) -> String? {
+            if case let .move(move) = VoiceMoveParser.resolve(
+                transcripts: [heard], among: legal, vocabulary: VoiceMoveParser.vocabulary(for: language)) { return move.uci }
+            return nil
+        }
+        let cases: [(String, String, [VoiceMoveParser.Candidate], String)] = [
+            ("en", "Rotates H8", rooks, "h1h8"), ("en", "Castles queen size", rooks, "e1c1"),
+            ("en", "Castle skin side", italianGame, "e1g1"), ("en", "Night C3", start, "b1c3"),
+            ("de", "Tom schlägt A8", rooks, "a1a8"), ("de", "Kurze Rockade", italianGame, "e1g1"),
+            ("de", "Baue D3", ruy, "d2d3"), ("de", "Bauer definiert", start, "d2d4"),
+            ("de", "Die vier", start, "d2d4"), ("de", "springen als C3", start, "b1c3"),
+            ("it", "Cavallo Citroën", start, "b1c3"), ("it", "Marocco corto", italianGame, "e1g1"),
+            ("it", "A Rocco Cordo", italianGame, "e1g1"),
+            ("es", "Caballo centro", start, "b1c3"), ("es", "Entró que cortó", italianGame, "e1g1"),
+            ("es", "Zorro come a ocho", rooks, "a1a8"),
+            ("fr", "Détroit", start, "d2d3"), ("fr", "Les quatre", start, "d2d4"),
+        ]
+        for (language, heard, legal, expected) in cases {
+            #expect(play(language, heard, legal) == expected, "« \(heard) » (\(language))")
+        }
+        for heard in ["I do", "Under", "undue"] {
+            #expect(VoiceMoveParser.isUndo(heard, vocabulary: VoiceMoveParser.vocabulary(for: "en")), "« \(heard) »")
+        }
+    }
+
     @Test func theStartingPositionHasTwentyMoves() {
         #expect(candidates().count == 20)
     }

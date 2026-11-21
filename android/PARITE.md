@@ -2360,5 +2360,18 @@ Tests : `VoiceMoveParserTests` (+ 51 essais réels rejoués), `VoiceMoveParserLa
       Allemand : micro ouvert en de-DE mais l'accent de l'utilisateur ne permet pas de juger — la voix en allemand, en
       espagnol et en italien reste À VÉRIFIER PAR UN LOCUTEUR NATIF (avec la relecture des textes). Anglais : « e four »,
       « undo » reconnus ; « bishop b five » → « We shove a B5 » (case juste, pièce perdue → rattrapée par la case).
+- [ ] **Banc de voix SYNTHÉTIQUES et formes apprises** (21/11/2026, `tools/voix-synthese/`, iOS + Android) : `generer.py` fait lire
+      chaque coup, dans les cinq langues, par plusieurs voix du Mac ; `VoiceSynthBatchActivity` (Android, debug) et
+      `VoiceSynthBench` (iOS, DEBUG, argument `-synthBench`) les font passer par la reconnaissance de l'appareil, avec les
+      indices du jeu ; `SynthEvalTest` / `SynthEvalTests` jugent avec le lecteur de coups. Les voix « multilingues » du Mac
+      (Flo, Reed, Shelley…) parlent avec un accent d'anglophone : bon substitut d'un locuteur non natif. Les chiffres
+      absolus sont optimistes OU pessimistes selon la voix (Jacques, robotique, est très mal compris) : seul compte ce que
+      les moteurs ÉCRIVENT. Formes ajoutées aux DEUX lecteurs (mêmes mots, iOS et Android) quand elles revenaient sur les deux
+      plateformes avec plusieurs voix : en « rotates », « castles queen size », « i do » ; de « Rockade », « Tom » (Turm),
+      « definiert » (d vier), « die vier » ; it « Citroën » (c tre), « Marocco corto » ; fr « Détroit » (d trois),
+      « les quatre », « plus » (pion) ; es « zorro » (torre), « centro » (c tres), « entró que cortó ». Avant/après sur les
+      MÊMES enregistrements (biaisé) : Android de 45→52, en 55→59, it 53→58, fr 17→23 ; iOS de 36→51, en 43→51, it 45→54, fr 23→33.
+      Android espagnol : paquet de langue non installé sur le Galaxy (erreur 13) — rien mesuré. RESTE : série avec variantes
+      (voix et vitesses) pour juger SANS biais, et l'essai à la voix réelle (un natif).
 - [ ] Avant publication : formulaire « Sécurité des données » de Play — audio traité SUR L'APPAREIL seulement (non
       collecté au sens de Google) ; vérifier la ligne « Coups à la voix » sur le Galaxy (Android 15).

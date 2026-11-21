@@ -19,6 +19,11 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="com.chesslab.voicelab.VoiceSynthBatchActivity"
+            android:label="Banc voix synthétiques"
+            android:exported="true"
+            android:theme="@style/Theme.ChessLab" />
+        <activity
             android:name="com.chesslab.voicelab.MicLevelActivity"
             android:label="Niveau micro"
             android:exported="true"

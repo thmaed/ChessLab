@@ -121,8 +121,7 @@ object VoiceMoveParser {
             "tour" to 'R', "tours" to 'R', "fou" to 'B', "fous" to 'B',
             "cavalier" to 'N', "cavaliers" to 'N', "chevalier" to 'N', "chevaliers" to 'N', "pion" to 'P', "pions" to 'P',
             // Entendus le 19/11 (mesure sur iPhone3) : « Tout en cinq » pour « Tour en e5 », « Roy », « Rouen ».
-            "tout" to 'R', "roy" to 'K', "rouen" to 'K',
-        ),
+            "tout" to 'R', "roy" to 'K', "rouen" to 'K', "plus" to 'P', "faux" to 'B'),
         // Mesure du 19/11/2026, 51 essais : « en g1 » → « géant », « en d1 » → « indien », « en c1 » → « ancien »,
         // « en h6 » → « hachis », « d7 » → « décède », « 17 » (dix-sept), « b1 » → « bien un », « en g » → « Angers ».
         fused = mapOf(
@@ -130,8 +129,7 @@ object VoiceMoveParser {
             "ancien" to listOf("c", "1"), "hachis" to listOf("h", "6"),
             "décède" to listOf("d", "7"), "décès" to listOf("d", "7"), "17" to listOf("d", "7"), "18" to listOf("d", "8"),
             "dix" to listOf("d"), "10" to listOf("d"),
-            "bien" to listOf("b"), "angers" to listOf("g"), "of" to listOf("f"), "off" to listOf("f"),
-        ),
+            "bien" to listOf("b"), "angers" to listOf("g"), "of" to listOf("f"), "off" to listOf("f"), "détroit" to listOf("d", "3"), "detroit" to listOf("d", "3")),
         captureWords = setOf("prend", "prends", "prent", "pren", "mange", "manges", "x", "prise"),
         promotionWords = setOf("promotion", "promu", "promeut", "promouvoir"),
         strongFiles = mapOf(
@@ -146,8 +144,7 @@ object VoiceMoveParser {
             "au" to 'e', "o" to 'e',
             // Galaxy A16, 21/11/2026 : « e4 » reconnu « OK 4 » / « ok quatre » (Samsung).
             "ok" to 'e', "okay" to 'e', "okey" to 'e',
-            "j'ai" to 'g', "geai" to 'g', "jet" to 'g', "j" to 'g', "hash" to 'h', "hach" to 'h',
-        ),
+            "j'ai" to 'g', "geai" to 'g', "jet" to 'g', "j" to 'g', "hash" to 'h', "hach" to 'h', "les" to 'd'),
         ranks = mapOf(
             "un" to '1', "une" to '1', "deux" to '2', "trois" to '3', "quatre" to '4', "cinq" to '5', "six" to '6',
             "sept" to '7', "set" to '7', "cette" to '7', "huit" to '8',
@@ -171,7 +168,7 @@ object VoiceMoveParser {
             "bishop" to 'B', "bishops" to 'B', "knight" to 'N', "knights" to 'N', "night" to 'N', "nights" to 'N',
             "pawn" to 'P', "pawns" to 'P',
         ),
-        fused = mapOf("before" to listOf("b", "4")),
+        fused = mapOf("before" to listOf("b", "4"), "rotates" to listOf("rook", "takes"), "shade" to listOf("h", "8")),
         captureWords = setOf("takes", "take", "captures", "capture", "x", "times"),
         promotionWords = setOf("promotes", "promote", "promotion", "equals"),
         strongFiles = mapOf(
@@ -186,14 +183,12 @@ object VoiceMoveParser {
         writtenInitials = mapOf("n" to 'N', "b" to 'B', "r" to 'R', "q" to 'Q', "k" to 'K'),
         shortCastle = listOf(
             "castles kingside", "castle kingside", "kingside castle", "short castle", "castle short",
-            "castles short", "king side",
-        ),
+            "castles short", "king side", "castles king size", "castle skin side"),
         longCastle = listOf(
             "castles queenside", "castle queenside", "queenside castle", "long castle", "castle long",
-            "castles long", "queen side",
-        ),
+            "castles long", "queen side", "castles queen size", "castle's queenside", "castle's queen side"),
         anyCastle = listOf("castle", "castles", "castling"),
-        undo = listOf("undo", "take back", "takeback", "take it back", "cancel"),
+        undo = listOf("undo", "take back", "takeback", "take it back", "cancel", "i do", "undue", "under", "and do"),
         pieceNames = mapOf('K' to "king", 'Q' to "queen", 'R' to "rook", 'B' to "bishop", 'N' to "knight", 'P' to "pawn"),
         to = "to", takes = "takes", shortCastleName = "castles kingside", longCastleName = "castles queenside",
     )
@@ -201,9 +196,8 @@ object VoiceMoveParser {
     val spanish = Vocabulary(
         pieces = mapOf(
             "rey" to 'K', "reyes" to 'K', "dama" to 'Q', "damas" to 'Q', "reina" to 'Q', "torre" to 'R', "torres" to 'R',
-            "alfil" to 'B', "alfiles" to 'B', "caballo" to 'N', "caballos" to 'N', "peón" to 'P', "peon" to 'P', "peones" to 'P',
-        ),
-        fused = emptyMap(),
+            "alfil" to 'B', "alfiles" to 'B', "caballo" to 'N', "caballos" to 'N', "peón" to 'P', "peon" to 'P', "peones" to 'P', "zorro" to 'R'),
+        fused = mapOf("centro" to listOf("c", "3")),
         captureWords = setOf("come", "comes", "captura", "toma", "por", "x"),
         promotionWords = setOf("corona", "promociona", "promoción", "promocion"),
         strongFiles = mapOf(
@@ -211,15 +205,14 @@ object VoiceMoveParser {
             "hache" to 'h', "ache" to 'h',
         ),
         weakFiles = mapOf(
-            "a" to 'a', "ah" to 'a', "be" to 'b', "ve" to 'b', "ce" to 'c', "se" to 'c', "de" to 'd', "ge" to 'g', "je" to 'g',
-        ),
+            "a" to 'a', "ah" to 'a', "be" to 'b', "ve" to 'b', "ce" to 'c', "se" to 'c', "de" to 'd', "ge" to 'g', "je" to 'g', "ne" to 'd'),
         ranks = mapOf(
             "uno" to '1', "una" to '1', "un" to '1', "dos" to '2', "tres" to '3', "cuatro" to '4', "cinco" to '5',
             "seis" to '6', "siete" to '7', "ocho" to '8',
         ),
         writtenInitials = mapOf("c" to 'N', "a" to 'B', "t" to 'R', "d" to 'Q', "r" to 'K'),
-        shortCastle = listOf("enroque corto"),
-        longCastle = listOf("enroque largo"),
+        shortCastle = listOf("enroque corto", "en roque corto", "en bloque corto", "entró que cortó", "el bloque corto", "el brote corto"),
+        longCastle = listOf("enroque largo", "en roque largo", "en bloque largo", "en broque largo"),
         anyCastle = listOf("enroque", "enroca"),
         undo = listOf("deshacer", "deshaz", "anula", "anular", "atrás", "atras"),
         pieceNames = mapOf('K' to "rey", 'Q' to "dama", 'R' to "torre", 'B' to "alfil", 'N' to "caballo", 'P' to "peón"),
@@ -229,24 +222,23 @@ object VoiceMoveParser {
     val german = Vocabulary(
         pieces = mapOf(
             "könig" to 'K', "koenig" to 'K', "dame" to 'Q', "turm" to 'R', "türme" to 'R', "läufer" to 'B', "laeufer" to 'B',
-            "springer" to 'N', "pferd" to 'N', "bauer" to 'P', "bauern" to 'P',
-        ),
-        fused = emptyMap(),
+            "springer" to 'N', "pferd" to 'N', "bauer" to 'P', "bauern" to 'P', "tom" to 'R', "baue" to 'P', "springen" to 'N', "spring" to 'N'),
+        fused = mapOf("definiert" to listOf("d", "4"), "definieren" to listOf("d", "4")),
         captureWords = setOf("schlägt", "schlaegt", "nimmt", "x", "mal"),
         promotionWords = setOf("umwandlung", "wandelt", "verwandelt"),
         strongFiles = mapOf(
             "a" to 'a', "b" to 'b', "be" to 'b', "c" to 'c', "ce" to 'c', "zeh" to 'c', "d" to 'd', "de" to 'd', "e" to 'e',
             "f" to 'f', "ef" to 'f', "g" to 'g', "ge" to 'g', "h" to 'h', "ha" to 'h',
         ),
-        weakFiles = mapOf("beh" to 'b', "tse" to 'c', "dee" to 'd', "eh" to 'e', "eff" to 'f', "geh" to 'g', "hah" to 'h'),
+        weakFiles = mapOf("beh" to 'b', "tse" to 'c', "dee" to 'd', "eh" to 'e', "eff" to 'f', "geh" to 'g', "hah" to 'h', "die" to 'd'),
         ranks = mapOf(
             "eins" to '1', "ein" to '1', "zwei" to '2', "zwo" to '2', "drei" to '3', "vier" to '4', "fünf" to '5',
             "fuenf" to '5', "sechs" to '6', "sieben" to '7', "acht" to '8',
         ),
         writtenInitials = mapOf("s" to 'N', "l" to 'B', "t" to 'R', "d" to 'Q', "k" to 'K'),
-        shortCastle = listOf("kurze rochade", "rochade kurz", "kleine rochade"),
-        longCastle = listOf("lange rochade", "rochade lang", "große rochade", "grosse rochade"),
-        anyCastle = listOf("rochade", "rochiert"),
+        shortCastle = listOf("kurze rochade", "rochade kurz", "kleine rochade", "kurze rockade", "rockade kurz", "kleine rockade"),
+        longCastle = listOf("lange rochade", "rochade lang", "große rochade", "grosse rochade", "lange rockade", "rockade lang", "große rockade", "grosse rockade"),
+        anyCastle = listOf("rochade", "rochiert", "rockade"),
         undo = listOf("zurück", "zurueck", "rückgängig", "rueckgaengig", "nimm zurück", "abbrechen"),
         pieceNames = mapOf('K' to "König", 'Q' to "Dame", 'R' to "Turm", 'B' to "Läufer", 'N' to "Springer", 'P' to "Bauer"),
         to = "nach", takes = "schlägt", shortCastleName = "kurze Rochade", longCastleName = "lange Rochade",
@@ -255,10 +247,9 @@ object VoiceMoveParser {
     val italian = Vocabulary(
         pieces = mapOf(
             "re" to 'K', "donna" to 'Q', "regina" to 'Q', "torre" to 'R', "torri" to 'R', "alfiere" to 'B', "alfieri" to 'B',
-            "cavallo" to 'N', "cavalli" to 'N', "pedone" to 'P', "pedoni" to 'P',
-        ),
+            "cavallo" to 'N', "cavalli" to 'N', "pedone" to 'P', "pedoni" to 'P', "benone" to 'P'),
         // Galaxy A16, 21/11/2026 : « alfiere b cinque » entendu « alfierebbe 5 » / « fierebbe 5 ».
-        fused = mapOf("alfierebbe" to listOf("alfiere", "b"), "fierebbe" to listOf("alfiere", "b")),
+        fused = mapOf("alfierebbe" to listOf("alfiere", "b"), "fierebbe" to listOf("alfiere", "b"), "citroën" to listOf("c", "3"), "citroen" to listOf("c", "3"), "dietro" to listOf("d", "3")),
         captureWords = setOf("prende", "mangia", "cattura", "per", "x"),
         promotionWords = setOf("promozione", "promuove"),
         strongFiles = mapOf(
@@ -272,8 +263,8 @@ object VoiceMoveParser {
         ),
         writtenInitials = mapOf("c" to 'N', "a" to 'B', "t" to 'R', "d" to 'Q', "r" to 'K'),
         // Galaxy A16, 21/11/2026 : « arrocco corto » entendu « a Rocco corto », « Rocco corto », « a poco corto », « corto ».
-        shortCastle = listOf("arrocco corto", "rocco corto", "a rocco corto", "a poco corto", "arocco corto", "corto"),
-        longCastle = listOf("arrocco lungo", "rocco lungo", "a rocco lungo", "arocco lungo", "lungo"),
+        shortCastle = listOf("arrocco corto", "rocco corto", "a rocco corto", "a poco corto", "arocco corto", "corto", "marocco corto", "rocco cordo", "a rocco cordo"),
+        longCastle = listOf("arrocco lungo", "rocco lungo", "a rocco lungo", "arocco lungo", "lungo", "marocco lungo", "al rocco lungo"),
         anyCastle = listOf("arrocco", "arrocca", "rocco"),
         undo = listOf("annulla", "indietro", "riprendi"),
         pieceNames = mapOf('K' to "re", 'Q' to "donna", 'R' to "torre", 'B' to "alfiere", 'N' to "cavallo", 'P' to "pedone"),
