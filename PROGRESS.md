@@ -11660,3 +11660,7 @@ cinq langues, retour de mon coup à l'écran seulement, « annule » reprend, iO
   « en-US », dont le modèle n'était pas installé, et disait « indisponible ». `classicLocale` prend maintenant la variante
   du téléphone, puis celle par défaut, puis n'importe quelle variante DONT LE MODÈLE EST INSTALLÉ (`installed`). Android
   faisait déjà ainsi (`VoiceRecognizers.locale`, 19/11) : alignés. Build 31.
+- « Revoir les nouveautés » (même jour) : la visite rejouait encore les étapes de la 2.2 (la 2.3 ne les avait pas réécrites).
+  Réécrite en 2.4 — voix, à l'aveugle, contre la montre, visualisation, aide —, `whatsNewID` = "2.4" ; iOS + Android,
+  chaînes ×5. Elle s'ouvre seule une fois après la mise à jour (sauf partie à reprendre : alors au lancement suivant).
+  Build 32. À réécrire à chaque version : `buildWhatsNewSteps` + `whatsNewID`.

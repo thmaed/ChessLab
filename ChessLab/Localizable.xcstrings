@@ -61736,6 +61736,176 @@
           }
         }
       }
+    },
+    "Nouveautés 2.4": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What's new in 2.4"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nouveautés 2.4"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Novedades 2.4"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neu in 2.4"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Novità della 2.4"
+          }
+        }
+      }
+    },
+    "Dictez votre coup (« cavalier f3 », « petit roque », « annule »). Il est reconnu sur l'appareil, sans réseau. Le réglage se trouve dans Nouvelle partie.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Say your move (“knight f3”, “castles kingside”, “undo”). It is recognised on your device, without the network. The setting is in New game."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dictez votre coup (« cavalier f3 », « petit roque », « annule »). Il est reconnu sur l'appareil, sans réseau. Le réglage se trouve dans Nouvelle partie."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Di tu jugada («caballo f3», «enroque corto», «deshacer»). Se reconoce en el dispositivo, sin red. El ajuste está en Nueva partida."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sag deinen Zug („Springer f3“, „kurze Rochade“, „zurück“). Er wird auf dem Gerät erkannt, ohne Netzwerk. Die Einstellung findest du unter Neue Partie."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Di' la tua mossa («cavallo f3», «arrocco corto», «annulla»). Viene riconosciuta sul dispositivo, senza rete. L'impostazione si trova in Nuova partita."
+          }
+        }
+      }
+    },
+    "Jouez sans voir tout ou partie des pièces, en cinq niveaux. « Coup d'œil » permet de vérifier, et une voix au choix répète les coups.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play without seeing some or all of the pieces, in five levels. “Peek” lets you check, and a voice of your choice repeats the moves."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jouez sans voir tout ou partie des pièces, en cinq niveaux. « Coup d'œil » permet de vérifier, et une voix au choix répète les coups."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Juega sin ver algunas o todas las piezas, en cinco niveles. «Vistazo» permite comprobar y una voz a tu elección repite las jugadas."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spiele, ohne einen Teil oder alle Figuren zu sehen, in fünf Stufen. Mit „Blick“ kannst du nachsehen, und eine Stimme deiner Wahl wiederholt die Züge."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gioca senza vedere alcuni pezzi o tutti, in cinque livelli. «Sbirciata» permette di controllare e una voce a scelta ripete le mosse."
+          }
+        }
+      }
+    },
+    "Dans Puzzles : trois minutes, autant de problèmes que possible, trois erreurs et c'est fini. Battez votre record.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Puzzles: three minutes, as many problems as you can, and three mistakes end the run. Beat your record."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dans Puzzles : trois minutes, autant de problèmes que possible, trois erreurs et c'est fini. Battez votre record."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En Puzles: tres minutos, tantos problemas como puedas, y con tres errores se acaba. Supera tu récord."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Puzzles: drei Minuten, so viele Aufgaben wie möglich; nach drei Fehlern ist Schluss. Schlage deinen Rekord."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Puzzle: tre minuti, più problemi che puoi, e con tre errori è finita. Batti il tuo record."
+          }
+        }
+      }
+    },
+    "Un nouveau module pour voir l'échiquier dans sa tête, en cinq marches, des cases du plateau jusqu'au calcul mental.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A new module to see the board in your head, in five steps, from the squares of the board to calculating in your head."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un nouveau module pour voir l'échiquier dans sa tête, en cinq marches, des cases du plateau jusqu'au calcul mental."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un módulo nuevo para ver el tablero en la cabeza, en cinco peldaños, desde las casillas del tablero hasta el cálculo mental."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein neues Modul, um das Brett im Kopf zu sehen, in fünf Stufen, von den Feldern des Bretts bis zum Berechnen im Kopf."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un nuovo modulo per vedere la scacchiera nella testa, in cinque gradini, dalle case della scacchiera fino al calcolo mentale."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

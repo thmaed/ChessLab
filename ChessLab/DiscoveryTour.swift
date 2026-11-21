@@ -331,33 +331,34 @@ final class DiscoveryTourController {
 }
 
 extension DiscoveryTourController {
-    /// Le court parcours des NOUVEAUTÉS de la 2.2, montré une seule fois à qui met
-    /// à jour depuis la 1.x : chaque étape pointe un vrai contrôle nouveau, à
-    /// l'endroit où il vit.
+    /// Le court parcours des NOUVEAUTÉS de la 2.4, montré une seule fois à qui met
+    /// à jour : chaque étape pointe un vrai contrôle nouveau, à l'endroit où il vit
+    /// (ou, faute d'ancre, une carte centrée devant l'écran concerné). À RÉÉCRIRE à chaque version : la 2.3 est
+    /// restée sur les étapes de la 2.2 (retour de l'utilisateur, 21/11/2026) — penser aussi à `whatsNewID`.
     static func buildWhatsNewSteps() -> [DiscoveryStep] {
         [
             DiscoveryStep(
-                id: 0, section: "Nouveautés 2.2", spot: nil, destination: .analysisEntry,
-                title: "Un scanner plus fiable",
-                body: "Le scanner lit mieux les captures, les photos d'écran et les plateaux réels. Depuis Photos, « Partager › ChessLab » envoie l'image directement au scanner."
+                id: 0, section: "Nouveautés 2.4", spot: nil, destination: .newGame,
+                title: "Coups à la voix",
+                body: "Dictez votre coup (« cavalier f3 », « petit roque », « annule »). Il est reconnu sur l'appareil, sans réseau. Le réglage se trouve dans Nouvelle partie."
             ),
             DiscoveryStep(
-                id: 1, section: "Nouveautés 2.2", spot: .puzzlesTile, destination: .home,
-                title: "Vos collections de puzzles",
-                body: "Importez un PGN : chaque fichier devient une collection, travaillée en série ou en programme Woodpecker complet, et exportable en PGN. Un réglage permet de masquer le thème du puzzle."
+                id: 1, section: "Nouveautés 2.4", spot: nil, destination: .newGame,
+                title: "À l'aveugle",
+                body: "Jouez sans voir tout ou partie des pièces, en cinq niveaux. « Coup d'œil » permet de vérifier, et une voix au choix répète les coups."
             ),
             DiscoveryStep(
-                id: 2, section: "Nouveautés 2.2", spot: .variantsTile, destination: .home,
-                title: "Chess960 au Laboratoire",
-                body: "Le Laboratoire joue aussi des séries en Chess960 : une position différente pour chaque paire de parties, ou le numéro de votre choix."
+                id: 2, section: "Nouveautés 2.4", spot: .puzzlesTile, destination: .home,
+                title: "Contre la montre",
+                body: "Dans Puzzles : trois minutes, autant de problèmes que possible, trois erreurs et c'est fini. Battez votre record."
             ),
             DiscoveryStep(
-                id: 3, section: "Nouveautés 2.2", spot: nil, destination: .analysisEntry,
-                title: "Stockfish 19",
-                body: "Le moteur passe à Stockfish 19, et une jauge de progression suit l'analyse en cours."
+                id: 3, section: "Nouveautés 2.4", spot: nil, destination: .home,
+                title: "Visualisation",
+                body: "Un nouveau module pour voir l'échiquier dans sa tête, en cinq marches, des cases du plateau jusqu'au calcul mental."
             ),
             DiscoveryStep(
-                id: 4, section: "Nouveautés 2.2", spot: .helpButton, destination: .home,
+                id: 4, section: "Nouveautés 2.4", spot: .helpButton, destination: .home,
                 title: "Tout est dans l'aide",
                 body: "Le « ? » rassemble le détail des nouveautés, et vous pouvez rejouer cette visite quand vous voulez."
             ),
@@ -418,7 +419,7 @@ enum DiscoveryTourMemory {
 
     /// L'identifiant du parcours des nouveautés en cours. Se change à la version
     /// majeure suivante : tout le monde le revoit alors une fois.
-    static let whatsNewID = "2.2"
+    static let whatsNewID = "2.4"
     private static let whatsNewKey = "whatsNewSeenVersion"
 
     /// À mettre à jour depuis la 1.x : la visite complète a déjà été vue sur CETTE

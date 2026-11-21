@@ -139,7 +139,7 @@ import Testing
         UserDefaults.standard.removeObject(forKey: "discoveryTourSeenInstallStamp")
     }
 
-    @Test("Les nouveautés 2.2 : un court parcours, proposé une seule fois à qui met à jour")
+    @Test("Les nouveautés 2.4 : un court parcours, proposé une seule fois à qui met à jour")
     @MainActor func whatsNewTour() {
         let tour = DiscoveryTourController()
         tour.startWhatsNew()
