@@ -2371,7 +2371,10 @@ Tests : `VoiceMoveParserTests` (+ 51 essais réels rejoués), `VoiceMoveParserLa
       « definiert » (d vier), « die vier » ; it « Citroën » (c tre), « Marocco corto » ; fr « Détroit » (d trois),
       « les quatre », « plus » (pion) ; es « zorro » (torre), « centro » (c tres), « entró que cortó ». Avant/après sur les
       MÊMES enregistrements (biaisé) : Android de 45→52, en 55→59, it 53→58, fr 17→23 ; iOS de 36→51, en 43→51, it 45→54, fr 23→33.
-      Android espagnol : paquet de langue non installé sur le Galaxy (erreur 13) — rien mesuré. RESTE : série avec variantes
-      (voix et vitesses) pour juger SANS biais, et l'essai à la voix réelle (un natif).
+      Android espagnol : paquet de langue non installé sur le Galaxy (erreur 13) — rien mesuré. SÉRIE AVEC VARIANTES (6 voix × 2 vitesses, 1 440 enregistrements par
+      plateforme, NON utilisée pour choisir les formes), score avant → après les corrections : Android de 95→113, en 173→180,
+      es 99→111, fr 56→68, it 140→182 ; iOS de 95→122, en 147→156, es 112→137, fr 75→101, it 135→153 (sur 288 chacun). Les voix
+      naturelles (Anna, Daniel, Alice) font 70-90 %, les voix à accent d'anglophone 15-45 %. RESTE : l'essai à la voix réelle
+      (un natif) ; outillage : voir `tools/voix-synthese/`.
 - [ ] Avant publication : formulaire « Sécurité des données » de Play — audio traité SUR L'APPAREIL seulement (non
       collecté au sens de Google) ; vérifier la ligne « Coups à la voix » sur le Galaxy (Android 15).

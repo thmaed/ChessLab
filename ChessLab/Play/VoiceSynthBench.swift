@@ -1,6 +1,7 @@
 #if DEBUG
 import ChessKit
 import Foundation
+import UIKit
 
 /// BANC DE VOIX SYNTHÉTIQUES (21/11/2026) — DÉBOGAGE SEULEMENT. Pendant de `VoiceSynthBatchActivity` (Android) : fait
 /// passer par la reconnaissance SUR L'APPAREIL (celle que l'app choisit : transcripteur d'iOS 26, sinon la classique)
@@ -13,7 +14,11 @@ import Foundation
 enum VoiceSynthBench {
     static var isRequested: Bool { CommandLine.arguments.contains("-synthBench") }
 
+    @MainActor static func keepAwake() { UIApplication.shared.isIdleTimerDisabled = true }
+
     static func run() async {
+        // Une série dure une demi-heure sans qu'on touche l'écran : sans cela l'iPhone s'endort et la reconnaissance se fige.
+        await keepAwake()
         let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appending(path: "synth")
         let outURL = dir.appending(path: "out.jsonl")
         try? FileManager.default.removeItem(at: dir.appending(path: "done"))

@@ -76,7 +76,8 @@ class VoiceSynthBatchActivity : Activity() {
             usable[language] = state != VoiceRecognizers.Availability.unavailable
             availability.appendText("$language : $state\n")
         }
-        val recognizer = SpeechRecognizer.createOnDeviceSpeechRecognizer(this)
+        var recognizer = SpeechRecognizer.createOnDeviceSpeechRecognizer(this)
+        var current = ""
         for ((index, row) in rows.withIndex()) {
             status.text = "${index + 1} / ${rows.size} — ${row.getString("lang")} · ${row.getString("text")}"
             val language = row.getString("lang")
@@ -88,6 +89,14 @@ class VoiceSynthBatchActivity : Activity() {
                 out.appendText(JSONObject().put("id", row.getString("id")).put("transcripts", JSONArray())
                     .put("error", "langue indisponible").toString() + "\n")
                 continue
+            }
+            // Un reconnaisseur NEUF à chaque changement de langue : après l'espagnol, le même rendait des phrases vides
+            // pour le français et l'italien (essai du 21/11/2026).
+            if (language != current) {
+                recognizer.destroy()
+                recognizer = SpeechRecognizer.createOnDeviceSpeechRecognizer(this)
+                current = language
+                delay(1000)
             }
             val audio = bundle.copyOfRange(row.getInt("offset"), row.getInt("offset") + row.getInt("length"))
             val (transcripts, error) = recognize(recognizer, language, audio, hints)
@@ -145,7 +154,7 @@ class VoiceSynthBatchActivity : Activity() {
                     try {
                         ParcelFileDescriptor.AutoCloseOutputStream(pipe[1]).use { out ->
                             out.write(audio)
-                            out.write(ByteArray(16_000 * 2 * 7 / 10)) // 0,7 s de silence : la fin de phrase de l'app
+                            out.write(ByteArray(16_000 * 2 * 7 / 10)) // 0,7 s de silence : la fin de phrase de l'app (plus, le français rendait des phrases vides)
                         }
                     } catch (_: IOException) { }
                 }

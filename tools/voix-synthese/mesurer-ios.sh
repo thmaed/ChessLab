@@ -11,6 +11,7 @@ dc() { xcrun devicectl device "$@"; }
 dc copy to --device "$UDID" --domain-type appDataContainer --domain-identifier $BUNDLE --source "$DIR/index.jsonl" --destination Documents/synth/index.jsonl > /dev/null
 dc copy to --device "$UDID" --domain-type appDataContainer --domain-identifier $BUNDLE --source "$DIR/wav" --destination Documents/synth/wav > /dev/null
 dc process launch --terminate-existing --device "$UDID" $BUNDLE -- -synthBench > /dev/null
+sleep 20  # l'app efface l'ancien « done » à son démarrage : ne pas le lire avant
 echo "banc lancé ($(grep -c . "$DIR/index.jsonl") enregistrements)…"
 rm -f "$DIR/done-ios"
 until dc copy from --device "$UDID" --domain-type appDataContainer --domain-identifier $BUNDLE --source Documents/synth/done --destination "$DIR/done-ios" > /dev/null 2>&1; do
