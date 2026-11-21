@@ -48,6 +48,37 @@ class VoiceMoveParserTest {
         assertEquals(Outcome.NotUnderstood, VoiceMoveParser.resolve(listOf("au revoir"), candidates()))
     }
 
+    @Test fun `le roque deforme par la reconnaissance du Galaxy`() {
+        // Galaxy A16, 21/11/2026 : « petit roque » reconnu « potiro » — l'utilisateur devait répéter.
+        val italian = candidates(after = listOf("e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "f8c5"))
+        for (heard in listOf("potiro", "Potiro", "petiro", "petit ro", "petitrock", "Roi potiro", "petit roque")) {
+            assertEquals("« $heard »", "e1g1", uci(heard, italian))
+        }
+        // Le grand roque n'est pas permis ici : dit de travers, il reste « impossible », jamais un autre coup.
+        assertEquals(Outcome.Illegal, VoiceMoveParser.resolve(listOf("grandroque"), italian))
+        // Des mots ordinaires ne sont pas pris pour un roque.
+        for (word in listOf("pion", "potiron", "petit", "bonjour", "partie")) {
+            assertEquals("« $word »", Outcome.NotUnderstood, VoiceMoveParser.resolve(listOf(word), italian))
+        }
+    }
+
+    /** Ce que le Galaxy a écrit en partie le 21/11/2026 pour des coups bien dits. */
+    @Test fun `phrases reelles du Galaxy`() {
+        val start = candidates()
+        assertEquals("e2e4", uci("E4", start))
+        assertEquals("g1f3", uci("cavalier F3", start))
+        assertEquals("d2d3", uci("pion des trois", start))
+        assertEquals("d2d3", uci("puis on des trois", start))
+        // Deux cavaliers peuvent aller en d2 : la colonne de départ colle au mot (« fd2 ») ou non (« B D2 »).
+        val twoKnights = candidates(fen = "4k3/8/8/8/8/5N2/8/1N2K3 w - - 0 1")
+        assertEquals("f3d2", uci("cavalier fd2", twoKnights))
+        // Les trois hypothèses que le Galaxy a rendues d'un coup (la deuxième seule ne se lit pas : « FD 2 »).
+        assertEquals("f3d2", (VoiceMoveParser.resolve(
+            listOf("cavalier fd2", "cavalier FD 2", "cavaliers fd2"), twoKnights) as? Outcome.Move)?.move?.uci)
+        assertEquals("b1d2", uci("cavalier B D2", twoKnights))
+        assertEquals("b1d2", uci("cavalier bd2", twoKnights))
+    }
+
     @Test fun `les roques`() {
         val italian = candidates(after = listOf("e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "f8c5"))
         assertEquals("e1g1", uci("petit roque", italian))

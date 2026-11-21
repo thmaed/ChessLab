@@ -91,6 +91,13 @@ object VoiceMoveParser {
         val takes: String,
         val shortCastleName: String,
         val longCastleName: String,
+        /**
+         * Le roque DÉFORMÉ par la reconnaissance, lu sur les mots COLLÉS : « petit roque » devient « potiro » sur le
+         * Galaxy (21/11/2026) — un mot que nulle liste n'attrape, d'où ce filet. Sans effet si le roque n'est pas
+         * légal : la réponse est alors « coup impossible », pas un coup au hasard.
+         */
+        val fuzzyShortCastle: Regex? = null,
+        val fuzzyLongCastle: Regex? = null,
     ) {
         // Android refuse ce que la JVM tolère (voir la mémoire du projet) : ici seulement des lettres dans la classe.
         internal val initialThenSquare =
@@ -151,6 +158,9 @@ object VoiceMoveParser {
         undo = listOf("annule", "annuler", "annulé", "reprends", "reprendre", "reprend le coup", "retour"),
         pieceNames = mapOf('K' to "roi", 'Q' to "dame", 'R' to "tour", 'B' to "fou", 'N' to "cavalier", 'P' to "pion"),
         to = "en", takes = "prend", shortCastleName = "petit roque", longCastleName = "grand roque",
+        // Seulement des lettres dans les classes : Android refuse ce que la JVM tolère.
+        fuzzyShortCastle = Regex("^p[eéoa]t[ií]+t?r[oôa]c?k?q?u?e?$"),
+        fuzzyLongCastle = Regex("^gr[aoe]n?d?r[oôa]c?k?q?u?e?$"),
     )
 
     val english = Vocabulary(
@@ -309,7 +319,14 @@ object VoiceMoveParser {
             says(vocabulary.longCastle) || "o-o-o" in raw || "0-0-0" in raw -> Castle.long
             says(vocabulary.shortCastle) || "o-o" in raw || "0-0" in raw -> Castle.short
             says(vocabulary.anyCastle) -> Castle.unspecified
-            else -> null
+            else -> {
+                val joined = words.filter { it != "roi" }.joinToString("")
+                when {
+                    vocabulary.fuzzyLongCastle?.matches(joined) == true -> Castle.long
+                    vocabulary.fuzzyShortCastle?.matches(joined) == true -> Castle.short
+                    else -> null
+                }
+            }
         }
 
         fun strongFile(word: String): Char? = vocabulary.strongFiles[word] ?: radioAlphabet[word]

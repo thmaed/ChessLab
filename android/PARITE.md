@@ -2333,5 +2333,11 @@ Tests : `VoiceMoveParserTests` (+ 51 essais réels rejoués), `VoiceMoveParserLa
       sien (c'était du code mort dans `recordAndContinue`, déplacé dans la branche du moteur). VÉRIFIÉS SUR LE GALAXY le
       21/11/2026 par l'utilisateur. RESTE sur le Galaxy : la voix (niveau du micro, « premier ou deuxième ») et la ligne
       du répertoire dans la Séance du jour.
+- [ ] **Voix Android : le roque DÉFORMÉ** (21/11/2026, essai sur le Galaxy) : « petit roque » est reconnu « potiro » par le
+      Samsung, que ni liste ni synonymes n'attrapaient — l'utilisateur répétait. Filet `Vocabulary.fuzzyShortCastle` /
+      `fuzzyLongCastle` (français seulement, lu sur les mots collés, sans effet si le roque est illégal) + tests. Même
+      essai : l'ambiguïté « premier ou deuxième » n'a pas été produite ; 2 « erreur 7 » (rien compris, côté moteur) et des
+      « d » entendus « des » (déjà reconnus). iOS : pas de pendant tant qu'Apple ne déforme pas le roque de même. RESTE :
+      retester « petit roque » et l'ambiguïté sur le Galaxy.
 - [ ] Avant publication : formulaire « Sécurité des données » de Play — audio traité SUR L'APPAREIL seulement (non
       collecté au sens de Google) ; vérifier la ligne « Coups à la voix » sur le Galaxy (Android 15).
