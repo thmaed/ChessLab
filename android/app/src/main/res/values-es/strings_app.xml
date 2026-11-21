@@ -1042,6 +1042,7 @@
     <string name="entry_also_library_note">Sin efecto sobre una posición FEN: la biblioteca guarda partidas.</string>
     <string name="analysis_summary_partial">Análisis en curso: el resumen se completa a medida que se clasifican las jugadas.</string>
     <string name="puzzle_view_source">Ver en la partida original</string>
+    <string name="puzzle_analyze_position">Analizar esta posición</string>
     <string name="woodpecker_title">Método Woodpecker</string>
     <string name="woodpecker_create">Crear el programa</string>
     <string name="woodpecker_resume">Reanudar</string>

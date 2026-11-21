@@ -1014,6 +1014,7 @@
     <string name="entry_also_library_note">Ohne Wirkung bei einer FEN-Stellung – die Bibliothek speichert Partien.</string>
     <string name="analysis_summary_partial">Analyse läuft – die Bilanz füllt sich, sobald Züge bewertet sind.</string>
     <string name="puzzle_view_source">In der Originalpartie ansehen</string>
+    <string name="puzzle_analyze_position">Diese Stellung analysieren</string>
     <string name="woodpecker_title">Woodpecker-Methode</string>
     <string name="woodpecker_create">Programm erstellen</string>
     <string name="woodpecker_resume">Fortsetzen</string>

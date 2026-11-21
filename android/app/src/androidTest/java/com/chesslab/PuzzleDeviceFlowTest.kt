@@ -115,6 +115,39 @@ class PuzzleDeviceFlowTest {
     }
 
     /**
+     * Retour de Nils : sous le verdict, « Analyser cette position » envoie la position DU PUZZLE (celle d'où l'on
+     * cherche le bon coup) vers l'analyse — pendant du test d'interface iOS.
+     */
+    @Test fun leVerdictProposeDAnalyserLaPositionDuPuzzle() {
+        val fen = "7k/6pp/8/8/8/8/8/RR4K1 w - - 0 1"
+        runBlocking {
+            db.ownPuzzles().insert(
+                OwnPuzzle(
+                    uid = "test-analyse", fen = fen, playedSan = "Kf1",
+                    solution = "a1a8", theme = "checkmate", rating = 0,
+                    createdAt = System.currentTimeMillis(), sourcePgn = "",
+                )
+            )
+        }
+        val model = makeModel()
+        var analysed: String? = null
+        compose.setContent {
+            PuzzleScreen(
+                filter = PuzzleFilter(source = PuzzleSource.ownGames), model = model,
+                onAnalyzePosition = { analysed = it },
+            )
+        }
+        compose.waitUntil(30_000) { model.ui.puzzle?.id == "test-analyse" && !model.ui.loading }
+        // Pas de bouton tant que le puzzle se cherche : il n'apparaît qu'avec le verdict.
+        assertTrue(compose.onAllNodesWithTag("puzzleAnalyze").fetchSemanticsNodes().isEmpty())
+
+        tap("a1", "a8")
+        compose.waitUntil(10_000) { model.ui.outcome == PuzzleOutcome.solved }
+        compose.onNodeWithTag("puzzleAnalyze").performClick()
+        assertEquals(fen, analysed)
+    }
+
+    /**
      * Dix VRAIS puzzles de la bibliothèque, résolus coup par coup — ripostes du
      * moteur comprises — jusqu'au bilan du cycle, puis le cycle 2.
      */

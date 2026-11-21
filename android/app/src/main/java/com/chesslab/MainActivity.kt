@@ -322,11 +322,13 @@ private fun App(
                 onPlayVsEngine = { stack.add(Route.NewGame(startFen = it)) },
                 onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup(startFen = it)) },
                 onOpenLab = { stack.add(Route.Laboratory(it)) },
+                onAnalyzePosition = { stack.add(Route.AnalysisBoard(fen = it)) },
             )
             is Route.Puzzles -> PuzzleScreen(
                 initialTheme = current.theme,
                 filter = current.filter,
                 onViewSourceGame = { stack.add(Route.AnalysisBoard(pgn = it)) },
+                onAnalyzePosition = { stack.add(Route.AnalysisBoard(fen = it)) },
                 onPlayVsEngine = { stack.add(Route.NewGame(startFen = it)) },
                 onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup(startFen = it)) },
                 onOpenLab = { stack.add(Route.Laboratory(it)) },

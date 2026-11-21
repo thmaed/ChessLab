@@ -1078,6 +1078,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="entry_also_library_note">Sans effet sur une position FEN — la bibliothèque range des parties.</string>
     <string name="analysis_summary_partial">Analyse en cours — le bilan se complète au fil des coups classés.</string>
     <string name="puzzle_view_source">Voir dans la partie d\'origine</string>
+    <string name="puzzle_analyze_position">Analyser cette position</string>
 
     <string name="woodpecker_title">Méthode Woodpecker</string>
     <string name="woodpecker_create">Créer le programme</string>

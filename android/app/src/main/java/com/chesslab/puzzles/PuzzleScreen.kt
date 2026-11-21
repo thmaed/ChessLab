@@ -62,6 +62,11 @@ fun PuzzleScreen(
     onOpenLab: (String) -> Unit = {},
     /** Revoir la faute DANS sa partie : le PGN d'origine part vers l'analyse. */
     onViewSourceGame: (String) -> Unit = {},
+    /**
+     * La position du puzzle sur un échiquier d'analyse, moteur allumé : savoir POURQUOI c'est le bon coup
+     * (retour de Nils). Empilé, donc le retour revient ici — pendant d'`onAnalyzePosition` d'iOS.
+     */
+    onAnalyzePosition: (String) -> Unit = {},
     /** Un programme Woodpecker à jouer, à la place d'une série. */
     woodpeckerId: String? = null,
     model: PuzzleViewModel = viewModel(),
@@ -147,6 +152,8 @@ fun PuzzleScreen(
                     onNext = if (plan?.currentCycle?.isComplete == true) model::startNextCycle else model::next,
                     sourcePgn = ui.puzzle?.sourcePgn,
                     onViewSourceGame = onViewSourceGame,
+                    analyzeFen = ui.puzzle?.fen,
+                    onAnalyzePosition = onAnalyzePosition,
                     nextLabel = when {
                         plan == null -> stringResource(R.string.puzzle_next)
                         plan.currentCycle.isComplete ->
@@ -479,6 +486,8 @@ private fun ResultCard(
     onNext: () -> Unit,
     sourcePgn: String? = null,
     onViewSourceGame: (String) -> Unit = {},
+    analyzeFen: String? = null,
+    onAnalyzePosition: (String) -> Unit = {},
     nextLabel: String = stringResource(R.string.puzzle_next),
     /** Programme Woodpecker au cycle bouclé : son bilan, au-dessus du bouton. */
     cycleSummary: WoodpeckerPlan? = null,
@@ -532,6 +541,22 @@ private fun ResultCard(
                 .testTag("suivant"),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
         )
+        // Sous le verdict, quel qu'il soit : une solution révélée ne dit pas pourquoi. Le retour ramène ici.
+        if (!analyzeFen.isNullOrEmpty()) {
+            Text(
+                stringResource(R.string.puzzle_analyze_position),
+                fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.accent,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(CircleShape)
+                    .background(Palette.accent.copy(alpha = 0.12f))
+                    .border(1.dp, Palette.accent.copy(alpha = 0.45f), CircleShape)
+                    .clickable { onAnalyzePosition(analyzeFen) }
+                    .padding(vertical = 10.dp)
+                    .testTag("puzzleAnalyze"),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            )
+        }
         // Un puzzle MAISON vient d'une partie qu'on a jouée : la revoir dans
         // son contexte vaut mieux que la revoir seule, et c'est là que le
         // « pourquoi » se trouve.

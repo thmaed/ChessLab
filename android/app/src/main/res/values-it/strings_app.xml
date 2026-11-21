@@ -1042,6 +1042,7 @@
     <string name="entry_also_library_note">Nessun effetto su una posizione FEN — la libreria conserva partite.</string>
     <string name="analysis_summary_partial">Analisi in corso — il bilancio si completa man mano che le mosse vengono classificate.</string>
     <string name="puzzle_view_source">Vedi nella partita originale</string>
+    <string name="puzzle_analyze_position">Analizza questa posizione</string>
     <string name="woodpecker_title">Metodo Woodpecker</string>
     <string name="woodpecker_create">Crea il programma</string>
     <string name="woodpecker_resume">Riprendi</string>
