@@ -70,11 +70,11 @@ class DiscoveryTourTest {
         assertFalse(DiscoveryTourMemory.shouldOffer(InstrumentationRegistry.getInstrumentation().targetContext))
     }
 
-    /** Le court parcours des nouveautés (2.2) : cinq étapes, rejouables depuis l'Aide, et il se termine. */
+    /** Le court parcours des nouveautés (2.4) : cinq étapes, rejouables depuis l'Aide, et il se termine. */
     @Test fun theWhatsNewTourReplaysFromHelpAndEnds() {
         compose.onNodeWithTag("aide").performClick()
         compose.onNodeWithTag("revoir-nouveautes").performScrollTo().performClick()
-        awaitText("Un scanner plus fiable")
+        awaitText("Coups à la voix")
         repeat(4) {
             compose.onNodeWithTag("visite-suivant").performClick()
             compose.waitForIdle()
