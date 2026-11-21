@@ -100,13 +100,12 @@ extension AutosaveRecord {
 ///   y écrit, se synchronise tout seul ; l'éteindre doit donc rester un silence complet.
 /// - Le fichier local reste la source lue par l'app, et son format n'a pas changé : une version sans cette
 ///   synchronisation relit le même fichier.
-/// - **Une partie n'est jamais perdue en silence.** La suite de la même partie, venue d'un autre appareil,
-///   est reprise telle quelle. Une AUTRE partie, plus récente, devient la partie en cours, et celle d'ici
-///   est **mise de côté** sur cet appareil (une place : la plus récente des deux reste) — l'accueil la
-///   propose à côté (essai sur trois iPhone, 16/11/2026 : une partie lancée sur l'un remplaçait celle d'un
-///   autre). Seule exception : la partie que l'utilisateur a lui-même terminée ou remplacée sur un autre
-///   appareil — l'enveloppe le dit (``AutosaveEnvelope/endedGameID``), et l'avertissement de « Commencer »
-///   l'avait annoncé.
+/// - La suite de la même partie, venue d'un autre appareil, est reprise telle quelle. Une AUTRE partie, plus
+///   récente, devient la partie en cours et REMPLACE celle d'ici. Une version du 16/11/2026 la « mettait de
+///   côté » (la bande d'accueil échangeait alors les deux parties à chaque tap) ; l'utilisateur l'a retirée le
+///   21/11/2026 — « je comprends pas à quoi ça sert » — au prix de la partie d'ici, qui n'est plus gardée.
+///   Autre cas, inchangé : la partie que l'utilisateur a lui-même terminée ou remplacée sur un autre appareil
+///   — l'enveloppe le dit (``AutosaveEnvelope/endedGameID``), et l'avertissement de « Commencer » l'avait annoncé.
 struct SyncedAutosave<Record: AutosaveRecord> {
     let key: String
     let fileURL: () -> URL
@@ -117,8 +116,9 @@ struct SyncedAutosave<Record: AutosaveRecord> {
     /// Où retenir de quel AUTRE appareil vient la partie adoptée (voir ``origin()``), et la dernière partie
     /// terminée ici.
     var originDefaults: UserDefaults? = nil
-    /// La place de la partie mise de côté (locale, jamais publiée). `nil` : pas de mise de côté.
-    var asideURL: (() -> URL)? = nil
+    /// Le fichier de l'ANCIENNE « partie mise de côté » (retirée le 21/11/2026) : effacé à la lecture, pour qu'une
+    /// partie gardée par une version précédente ne reste pas à jamais sur l'appareil. `nil` : rien à effacer.
+    var legacyAsideURL: (() -> URL)? = nil
 
     private var originKey: String { key + ".origin" }
     private var endedKey: String { key + ".ended" }
@@ -178,8 +178,9 @@ struct SyncedAutosave<Record: AutosaveRecord> {
 
     /// La partie à proposer : la locale, ou une plus récente arrivée d'ailleurs (qui est alors adoptée,
     /// c'est-à-dire écrite dans le fichier local — la reprise la relit comme n'importe quelle autre). Si
-    /// celle qui arrive est une AUTRE partie, la locale est mise de côté (voir les garanties).
+    /// celle qui arrive est une AUTRE partie, elle remplace la locale (voir les garanties).
     func load() -> Record? {
+        if let legacyAsideURL { try? FileManager.default.removeItem(at: legacyAsideURL()) }
         let localData = try? Data(contentsOf: fileURL())
         let local = localData.flatMap { try? JSONDecoder().decode(Record.self, from: $0) }
         guard isEnabled() else { return local }
@@ -203,9 +204,6 @@ struct SyncedAutosave<Record: AutosaveRecord> {
             return nil
         case let .adoptRemote(data):
             guard let record = try? JSONDecoder().decode(Record.self, from: data) else { return local }
-            if let local, !local.isSameGame(as: record), remote?.ended(local) != true {
-                setAside(local)
-            }
             try? data.write(to: fileURL(), options: .atomic)
             let fromElsewhere = remote?.deviceID != nil && remote?.deviceID != identity?.id
             setOrigin(fromElsewhere ? remote?.originLabel : nil)
@@ -220,51 +218,6 @@ struct SyncedAutosave<Record: AutosaveRecord> {
               let data = try? Data(contentsOf: fileURL()),
               let record = try? JSONDecoder().decode(Record.self, from: data) else { return }
         publish(data, at: record.savedAt)
-    }
-
-    // MARK: Mise de côté
-
-    /// La partie mise de côté sur cet appareil, s'il y en a une — et si ce n'est pas, entre-temps, devenue la
-    /// partie en cours elle-même (reprise ailleurs puis revenue) : la place se libère alors d'elle-même.
-    func aside() -> Record? {
-        guard let asideURL, let data = try? Data(contentsOf: asideURL()),
-              let record = try? JSONDecoder().decode(Record.self, from: data) else { return nil }
-        if let current = localRecord(), current.isSameGame(as: record) {
-            try? FileManager.default.removeItem(at: asideURL())
-            return nil
-        }
-        return record
-    }
-
-    /// Reprendre la partie mise de côté : elle redevient la partie en cours (ici et, synchro allumée, sur
-    /// les autres appareils — où celle qu'elle remplace est à son tour mise de côté), et la partie en cours
-    /// prend sa place de côté. Un échange : rien ne se perd. Rend la partie reprise.
-    func resumeAside(now: Date = Date()) -> Record? {
-        guard let asideURL, var resumed = aside() else { return nil }
-        if let current = localRecord(), let data = try? JSONEncoder().encode(current) {
-            try? data.write(to: asideURL(), options: .atomic)
-        } else {
-            try? FileManager.default.removeItem(at: asideURL())
-        }
-        // Touchée maintenant : sans quoi la partie remplacée, plus récente, la chasserait au prochain
-        // rapprochement.
-        resumed.savedAt = now
-        save(resumed)
-        return resumed
-    }
-
-    /// « Oublier » la partie mise de côté.
-    func discardAside() {
-        guard let asideURL else { return }
-        try? FileManager.default.removeItem(at: asideURL())
-    }
-
-    private func setAside(_ record: Record) {
-        guard let asideURL else { return }
-        // Une seule place : la plus récente des deux reste.
-        if let existing = aside(), existing.savedAt > record.savedAt { return }
-        guard let data = try? JSONEncoder().encode(record) else { return }
-        try? data.write(to: asideURL(), options: .atomic)
     }
 
     // MARK: Détail
@@ -316,7 +269,7 @@ extension SyncedAutosave where Record == PlayGameAutosave {
             isEnabled: { CloudSyncSettingsStore.isEnabled },
             identity: .current,
             originDefaults: .standard,
-            asideURL: { AutosaveStore.documentURL("autosave_play_aside.json") })
+            legacyAsideURL: { AutosaveStore.documentURL("autosave_play_aside.json") })
     }
 }
 
@@ -330,7 +283,7 @@ extension SyncedAutosave where Record == TwoPlayerGameAutosave {
             isEnabled: { CloudSyncSettingsStore.isEnabled },
             identity: .current,
             originDefaults: .standard,
-            asideURL: { AutosaveStore.documentURL("autosave_twoplayer_aside.json") })
+            legacyAsideURL: { AutosaveStore.documentURL("autosave_twoplayer_aside.json") })
     }
 }
 

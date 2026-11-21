@@ -28,8 +28,6 @@ struct HomeView: View {
     /// L'appareil où a été joué le dernier coup de la partie proposée, si ce n'est pas celui-ci
     /// (« Dernier coup joué sur votre iPad »).
     @State private var resumableOrigin: String?
-    /// La partie mise de côté quand une AUTRE est arrivée d'un autre appareil (voir ``SyncedAutosave``).
-    @State private var asideGame: ResumableGame?
     /// Synchro éteinte ici, allumée sur un autre appareil : la proposition (voir ``CloudDeviceRegistry``).
     @State private var syncInvitation: CloudDeviceRecord?
     @State private var showsSyncRestartSheet = false
@@ -811,37 +809,6 @@ struct HomeView: View {
                     .accessibilityIdentifier("resumeGame")
                 }
             }
-            // La partie mise de côté, juste dessous : même rang, même persistance.
-            if let asideGame {
-                Section {
-                    Button {
-                        path = NavigationPath()
-                        resumeAsideGame(asideGame)
-                    } label: {
-                        Label {
-                            VStack(alignment: .leading, spacing: 1) {
-                                Text("Partie mise de côté")
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(Theme.textPrimary)
-                                Text("\(asideGame.moveCount) coup(s) joué(s)")
-                                    .font(.caption)
-                                    .foregroundStyle(Theme.textSecondary)
-                            }
-                        } icon: {
-                            Image(systemName: "pause.circle")
-                                .foregroundStyle(Theme.accent)
-                        }
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("resumeAsideGame")
-                    .contextMenu {
-                        Button("Oublier", systemImage: "xmark", role: .destructive) { discardAsideGame(asideGame) }
-                    }
-                    .swipeActions {
-                        Button("Oublier", role: .destructive) { discardAsideGame(asideGame) }
-                    }
-                }
-            }
             Section("Modes") {
                 sidebarLabel(.vsEngine, "Contre l'ordinateur", "cpu", Theme.accent, discoverySpot: .playTile)
                 sidebarLabel(.twoPlayer, "Deux joueurs", "person.2.fill", Theme.info)
@@ -952,7 +919,6 @@ struct HomeView: View {
                 // (persistante) — voir `sidebar` — pour ne pas doublonner ici.
                 dailySessionCard
                 newPuzzlesPill
-                repertoireExitPill
                 modesSection(minTile: ModeGridMetrics.minTileRegular, shortSubtitles: true, lowRow: wideLow)
                 homeProgressCard
                 if !recentGames.isEmpty { recentGamesSection }
@@ -1533,35 +1499,6 @@ struct HomeView: View {
         case nil: nil
         }
         resumableOrigin = origin.map { DeviceModelName.display($0) }
-
-        // APRÈS les `load` ci-dessus : c'est en rapprochant qu'une partie se met de côté.
-        let asides = [SyncedAutosave.play.aside().map(ResumableGame.vsEngine),
-                      SyncedAutosave.twoPlayer.aside().map(ResumableGame.twoPlayer)].compactMap { $0 }
-        asideGame = asides.max { $0.savedAt < $1.savedAt }
-    }
-
-    /// Reprendre la partie mise de côté : elle devient la partie en cours, la partie en cours prend sa place.
-    private func resumeAsideGame(_ aside: ResumableGame) {
-        switch aside {
-        case .vsEngine:
-            if let resumed = SyncedAutosave.play.resumeAside() { path.append(Route.resumedGame(resumed)) }
-        case .twoPlayer:
-            if let resumed = SyncedAutosave.twoPlayer.resumeAside() { path.append(Route.resumedTwoPlayerGame(resumed)) }
-        }
-        refreshResumableGame()
-    }
-
-    private func discardAsideGame(_ aside: ResumableGame) {
-        switch aside {
-        case .vsEngine: SyncedAutosave.play.discardAside()
-        case .twoPlayer: SyncedAutosave.twoPlayer.discardAside()
-        }
-        refreshResumableGame()
-    }
-
-    private func asideCard(_ aside: ResumableGame) -> some View {
-        AsideGameCard(mode: aside.mode, moveCount: aside.moveCount,
-                      onResume: { resumeAsideGame(aside) }, onDiscard: { discardAsideGame(aside) })
     }
 
     private func refreshSyncInvitation() {
@@ -1633,11 +1570,9 @@ struct HomeView: View {
                 if persistenceHealth.showsBanner { persistenceBanner }
                 if seedingState.isSeeding { seedingBanner }
                 if let resumableGame { resumeBanner(resumableGame) }
-                if let asideGame { asideCard(asideGame) }
                 syncHomeCard
                 dailySessionCard
                 newPuzzlesPill
-                repertoireExitPill
                 modesSection(minTile: ModeGridMetrics.minTileIPhone)
                 if !recentGames.isEmpty { recentGamesSection }
             }
@@ -2062,46 +1997,14 @@ struct HomeView: View {
 
     /// C7 / A5 (2.0) : la « Séance du jour » en tête de l'accueil.
     private var dailySessionCard: some View {
-        DailySessionCard { path.append(Route.dailySession) }
-            .discoveryAnchor(.dailySession)
-    }
-
-    /// A3 (2.0) : « Vous avez quitté votre répertoire — 1 position à revoir ».
-    /// La position est déjà dans les révisions ; un tap ouvre les ouvertures.
-    @ViewBuilder
-    private var repertoireExitPill: some View {
-        let count = AnalysisFollowUpService.shared.repertoireExitCount
-        if count > 0 {
-            Button {
-                AnalysisFollowUpService.shared.acknowledgeRepertoireExits()
-                open(.openings)
-            } label: {
-                HStack(spacing: 12) {
-                    Image(systemName: "arrow.uturn.backward.circle.fill")
-                        .font(.title3)
-                        .foregroundStyle(Theme.warning)
-                    Group {
-                        if count == 1 {
-                            Text("1 position de votre répertoire à revoir")
-                        } else {
-                            Text("\(count) positions de votre répertoire à revoir")
-                        }
-                    }
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(Theme.textPrimary)
-                        .multilineTextAlignment(.leading)
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(Theme.textTertiary)
-                }
-                .padding(14)
-                .background(Theme.warning.opacity(0.16), in: Theme.cardShape)
-                .overlay(Theme.cardShape.strokeBorder(Theme.warning.opacity(0.35), lineWidth: 1))
-            }
-            .buttonStyle(.pressable)
-            .accessibilityIdentifier("repertoireExitPill")
+        // « 1 position de votre répertoire à revoir » n'est plus une carte de plus : une ligne DANS la séance (21/11/2026,
+        // l'accueil empilait quatre cartes). La position est déjà dans les révisions de la séance ; l'ouvrir
+        // acquitte l'invitation, comme le faisait un tap sur l'ancienne pastille.
+        DailySessionCard(repertoireExits: AnalysisFollowUpService.shared.repertoireExitCount) {
+            AnalysisFollowUpService.shared.acknowledgeRepertoireExits()
+            path.append(Route.dailySession)
         }
+        .discoveryAnchor(.dailySession)
     }
 
     private func resumeBanner(_ resumable: ResumableGame) -> some View {

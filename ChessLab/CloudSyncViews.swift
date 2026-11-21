@@ -423,66 +423,6 @@ struct RemoteAdvanceBanner: View {
     }
 }
 
-// MARK: - Mise de côté
-
-/// « Partie mise de côté » : une AUTRE partie est arrivée d'un autre appareil, celle d'ici a été gardée au
-/// lieu d'être effacée (voir ``SyncedAutosave``). La reprendre l'échange avec la partie en cours.
-struct AsideGameCard: View {
-    let mode: LocalizedStringKey
-    let moveCount: Int
-    let onResume: () -> Void
-    let onDiscard: () -> Void
-    @State private var confirmsDiscard = false
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 10) {
-            Button(action: onResume) {
-                HStack(spacing: 14) {
-                    IconBadge(systemImage: "pause.circle", tint: Theme.accent, size: 34)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Partie mise de côté")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(Theme.textPrimary)
-                        HStack(spacing: 4) {
-                            Text(mode)
-                            Text(verbatim: "·")
-                            Text("\(moveCount) coup(s) joué(s)")
-                        }
-                        .font(.caption)
-                        .foregroundStyle(Theme.textSecondary)
-                        Text("Gardée ici quand une autre partie est arrivée d'un autre appareil. Touchez pour la reprendre.")
-                            .font(.caption2)
-                            .foregroundStyle(Theme.textTertiary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    Spacer(minLength: 0)
-                }
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.pressable)
-            .accessibilityIdentifier("resumeAsideGame")
-
-            Button { confirmsDiscard = true } label: {
-                Image(systemName: "xmark")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(Theme.textTertiary)
-                    .frame(width: 30, height: 30)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(Text("Oublier la partie mise de côté"))
-            .accessibilityIdentifier("discardAsideGame")
-        }
-        .cardStyle()
-        .confirmationDialog("Oublier la partie mise de côté ?", isPresented: $confirmsDiscard, titleVisibility: .visible) {
-            Button("Oublier", role: .destructive, action: onDiscard)
-            Button("Annuler", role: .cancel) {}
-        } message: {
-            Text("Elle ne pourra plus être reprise.")
-        }
-    }
-}
-
 struct CloudRestartReminderCard: View {
     let onTap: () -> Void
 

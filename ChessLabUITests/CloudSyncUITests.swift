@@ -234,24 +234,18 @@ final class CloudSyncUITests: XCTestCase {
         XCTAssertFalse(app.otherElements["remoteAdvanceBanner"].exists)
     }
 
-    /// L'« iPad » commence une AUTRE partie : elle devient la partie en cours, et la nôtre est mise de côté
-    /// au lieu d'être perdue. La reprendre l'échange avec l'autre.
-    func testOtherGameFromElsewhere_setsOursAside_andResumingSwaps() throws {
+    /// L'« iPad » commence une AUTRE partie : elle devient la partie en cours et REMPLACE la nôtre. Plus de « partie
+    /// mise de côté » (retirée le 21/11/2026 : la bande échangeait les deux parties à chaque tap).
+    func testOtherGameFromElsewhere_replacesOurs_noSetAsideStrip() throws {
         let app = launch(["-fakeRemoteOtherGame"])
         enableSyncAndGoHome(app)
         startGameAndPlayE4(app)
         app.navigationBars.buttons.firstMatch.tap()
 
-        let aside = app.buttons["resumeAsideGame"]
-        XCTAssertTrue(aside.waitForExistence(timeout: 15), "notre partie doit être mise de côté, pas perdue")
-        XCTAssertTrue(app.staticTexts["Dernier coup joué sur votre iPad Pro 13″ (M4)"].exists)
-        snapshot(app, "accueil-mise-de-cote")
-        aside.tap()
-        // C'est bien la nôtre : ses deux demi-coups.
-        waitForMoveCount("2", in: app)
-        app.navigationBars.buttons.firstMatch.tap()
-        // Et celle de l'iPad a pris sa place de côté.
-        XCTAssertTrue(app.buttons["resumeAsideGame"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Dernier coup joué sur votre iPad Pro 13″ (M4)"].waitForExistence(timeout: 15),
+                      "la partie de l'iPad est la partie en cours")
+        XCTAssertFalse(app.buttons["resumeAsideGame"].exists, "plus de partie mise de côté à l'accueil")
+        snapshot(app, "accueil-autre-partie")
     }
 
     /// « Vos appareils » : on peut nommer cet appareil, le nom remplace le modèle dans la liste.

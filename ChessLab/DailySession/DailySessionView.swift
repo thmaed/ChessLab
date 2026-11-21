@@ -201,6 +201,8 @@ struct DailySessionView: View {
 struct DailySessionCard: View {
     @Environment(\.modelContext) private var modelContext
     @State private var plan: DailySessionPlan?
+    /// Les positions du répertoire quittées en partie, à revoir (A3, 2.0) : une ligne dans la carte.
+    var repertoireExits = 0
     var onOpen: () -> Void
 
     var body: some View {
@@ -219,6 +221,21 @@ struct DailySessionCard: View {
                         .multilineTextAlignment(.leading)
                         .lineLimit(2)
                         .accessibilityIdentifier("dailySessionSummary")
+                    if repertoireExits > 0 {
+                        Label {
+                            if repertoireExits == 1 {
+                                Text("1 position de votre répertoire à revoir")
+                            } else {
+                                Text("\(repertoireExits) positions de votre répertoire à revoir")
+                            }
+                        } icon: {
+                            Image(systemName: "arrow.uturn.backward.circle.fill")
+                        }
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Theme.warning)
+                        .multilineTextAlignment(.leading)
+                        .accessibilityIdentifier("repertoireExitLine")
+                    }
                 }
                 Spacer()
                 if let streak = plan?.streak, streak > 0 {

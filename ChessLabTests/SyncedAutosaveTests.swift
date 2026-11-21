@@ -27,7 +27,7 @@ struct SyncedAutosaveTests {
     /// Un « appareil » : son fichier, son interrupteur, le nuage commun.
     private final class Device {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("autosave-\(UUID().uuidString).json")
-        let asideURL = FileManager.default.temporaryDirectory.appendingPathComponent("aside-\(UUID().uuidString).json")
+        let legacyAsideURL = FileManager.default.temporaryDirectory.appendingPathComponent("aside-\(UUID().uuidString).json")
         var enabled = true
         let defaults: UserDefaults
         private let suite = UUID().uuidString
@@ -41,13 +41,13 @@ struct SyncedAutosaveTests {
                 SyncedAutosave(key: "test.autosave", fileURL: { holder!.url },
                                store: store, isEnabled: { holder!.enabled },
                                identity: identity, originDefaults: defaults,
-                               asideURL: { holder!.asideURL })
+                               legacyAsideURL: { holder!.legacyAsideURL })
             }
             holder = self
         }
         deinit {
             try? FileManager.default.removeItem(at: url)
-            try? FileManager.default.removeItem(at: asideURL)
+            try? FileManager.default.removeItem(at: legacyAsideURL)
             defaults.removePersistentDomain(forName: suite)
         }
         var hasFile: Bool { FileManager.default.fileExists(atPath: url.path) }
@@ -179,9 +179,9 @@ struct SyncedAutosaveTests {
         iphone.autosave().save(newer)
         #expect(ipad.autosave().load() == newer)
         #expect(iphone.autosave().load() == newer)
-        // …et celle de l'iPad n'est pas perdue : mise de côté, sur l'iPad seulement.
-        #expect(ipad.autosave().aside() == older)
-        #expect(iphone.autosave().aside() == nil)
+        // …et celle de l'iPad est REMPLACÉE : plus de « mise de côté » (retirée le 21/11/2026, l'échange à chaque
+        // tap de la bande d'accueil déroutait l'utilisateur).
+        #expect(ipad.autosave().load() == newer, "elle ne revient pas au rapprochement suivant")
     }
 
     // MARK: Position de passage (contre l'ordinateur, 17/11/2026)
@@ -220,9 +220,9 @@ struct SyncedAutosaveTests {
         #expect(store.values.isEmpty)
     }
 
-    // MARK: Mise de côté (essai sur trois iPhone, 16/11/2026)
+    // MARK: Plus de mise de côté (retirée le 21/11/2026)
 
-    @Test func theSameGameAfterATakeback_isAdopted_notSetAside() {
+    @Test func theSameGameAfterATakeback_isAdopted() {
         let store = FakeStore()
         let ipad = Device(store: store), iphone = Device(store: store)
         let id = UUID()
@@ -232,7 +232,6 @@ struct SyncedAutosaveTests {
         let otherLine = game(["e2e4", "e7e5", "f1c4"], at(20), id: id)
         iphone.autosave().save(otherLine)
         #expect(ipad.autosave().load() == otherLine)
-        #expect(ipad.autosave().aside() == nil)
     }
 
     @Test func aDifferentGameEndedElsewhere_leavesOursAlone() {
@@ -248,9 +247,8 @@ struct SyncedAutosaveTests {
         #expect(ipad.hasFile)
     }
 
-    /// « Remplacer par une nouvelle partie » sur un appareil : la partie remplacée ne ressurgit pas, mise de
-    /// côté, sur l'autre — l'avertissement avait dit « sur tous vos appareils ».
-    @Test func anExplicitReplacement_isNotSetAside() {
+    /// « Remplacer par une nouvelle partie » sur un appareil : la partie remplacée ne ressurgit pas sur l'autre.
+    @Test func anExplicitReplacement_replacesTheOtherDevicesGame() {
         let store = FakeStore()
         let ipad = Device(store: store), iphone = Device(store: store)
         ipad.autosave().save(game(["e2e4"], at(120), id: UUID()))
@@ -259,54 +257,26 @@ struct SyncedAutosaveTests {
         let fresh = game(["c2c4"], at(10), id: UUID())
         iphone.autosave().save(fresh)
         #expect(ipad.autosave().load() == fresh)
-        #expect(ipad.autosave().aside() == nil)
     }
 
-    @Test func resumingTheSetAsideGame_swaps_andTheOtherDeviceKeepsItsOwnAside() throws {
-        let store = FakeStore()
-        let ipad = Device(store: store), iphone = Device(store: store)
-        let a = game(["e2e4"], at(120), id: UUID()), b = game(["d2d4"], at(60), id: UUID())
-        ipad.autosave().save(a)
-        _ = iphone.autosave().load()                  // l'iPhone suit A…
-        iphone.autosave().save(b)                     // …puis commence B
-        _ = iphone.autosave().load()
-        #expect(ipad.autosave().load() == b)
-        #expect(ipad.autosave().aside() == a)
-
-        // L'iPad reprend A : échange — A en cours, B de côté.
-        let resumed = try #require(ipad.autosave().resumeAside())
-        #expect(resumed.gameID == a.gameID)
-        #expect(ipad.autosave().aside()?.gameID == b.gameID)
-        // L'iPhone reçoit A, plus récente : B y est mise de côté à son tour. Rien ne se perd.
-        #expect(iphone.autosave().load()?.gameID == a.gameID)
-        #expect(iphone.autosave().aside()?.gameID == b.gameID)
-    }
-
-    @Test func oneAsidePlace_theMoreRecentStays() {
-        let store = FakeStore()
-        let ipad = Device(store: store), iphone = Device(store: store)
-        let first = game(["e2e4"], at(300), id: UUID())
-        ipad.autosave().save(first)
-        iphone.autosave().save(game(["d2d4"], at(200), id: UUID()))
-        _ = ipad.autosave().load()                    // first → de côté
-        let second = game(["d2d4", "g8f6"], at(150), id: UUID())
-        ipad.enabled = false
-        ipad.autosave().save(second)                  // une autre partie, ici, hors synchro
-        ipad.enabled = true
-        iphone.autosave().save(game(["g1f3"], at(100), id: UUID()))
-        _ = ipad.autosave().load()                    // second → de côté, à la place de first (plus ancienne)
-        #expect(ipad.autosave().aside() == second)
-    }
-
-    @Test func discardAside_forgetsIt() {
+    /// Une AUTRE partie, plus récente, venue d'un autre appareil REMPLACE la nôtre — sans copie gardée ailleurs.
+    @Test func anotherNewerGameReplacesOurs_andNothingIsKept() throws {
         let store = FakeStore()
         let ipad = Device(store: store), iphone = Device(store: store)
         ipad.autosave().save(game(["e2e4"], at(120), id: UUID()))
-        iphone.autosave().save(game(["d2d4"], at(60), id: UUID()))
+        let theirs = game(["d2d4"], at(30), id: UUID())
+        iphone.autosave().save(theirs)
+        #expect(ipad.autosave().load() == theirs)
+        #expect(!FileManager.default.fileExists(atPath: ipad.legacyAsideURL.path), "aucune partie gardée de côté")
+    }
+
+    /// Une partie « mise de côté » par une VERSION PRÉCÉDENTE ne reste pas sur l'appareil : sa place est vidée.
+    @Test func aLegacyAsideFileIsErasedOnLoad() throws {
+        let store = FakeStore()
+        let ipad = Device(store: store)
+        try Data("{}".utf8).write(to: ipad.legacyAsideURL)
         _ = ipad.autosave().load()
-        #expect(ipad.autosave().aside() != nil)
-        ipad.autosave().discardAside()
-        #expect(ipad.autosave().aside() == nil)
+        #expect(!FileManager.default.fileExists(atPath: ipad.legacyAsideURL.path))
     }
 
     @Test func savesFromBeforeTheIdentifier_areMatchedByTheirMoves() {
