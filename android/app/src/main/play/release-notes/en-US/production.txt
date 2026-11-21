@@ -1,7 +1,6 @@
-ChessLab 2.3
-• Five languages: French, English, Spanish, German and Italian, everywhere in the app, courses included.
-• “Automatic” move notation: it follows the language; any other choice is remembered.
-• Home in two tiers: four large tiles, the other modes under “More”.
-• A clearer “½ Draw” button in the game bar.
-• Analyse: a single “Import a file” (one game, a position or a games database).
-• Settings: board themes and piece sets as thumbnails.
+ChessLab 2.4
+• Voice moves: say “knight f3” or “castles kingside” — recognised on the phone, without the network.
+• Blindfold: five levels, from a partly hidden board to an invisible one; the app repeats the moves aloud.
+• Visualization: a module in five steps to see the board in your head.
+• Puzzles: “Against the clock”, and “Analyze this position” under each puzzle.
+• A redesigned New game screen: the opponent up front, the assists as pills.

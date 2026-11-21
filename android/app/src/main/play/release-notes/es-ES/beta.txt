@@ -1,7 +1,6 @@
-ChessLab 2.3
-• Cinco idiomas: francés, inglés, español, alemán e italiano, en toda la app, cursos incluidos.
-• Notación de las jugadas «Automática»: sigue el idioma; cualquier otra elección se recuerda.
-• Inicio en dos niveles: cuatro tarjetas grandes y los demás modos en «Más».
-• Botón «½ Tablas» más claro en la barra de juego.
-• Analizar: un único «Importar un archivo» (una partida, una posición o una base de partidas).
-• Ajustes: temas del tablero y juegos de piezas en miniaturas.
+ChessLab 2.4
+• Jugadas por voz: di «caballo f3» o «enroque corto»; se reconoce en el teléfono, sin red.
+• A ciegas: cinco niveles, del tablero en parte oculto al tablero invisible; la app repite las jugadas.
+• Visualización: un módulo en cinco peldaños para ver el tablero en la cabeza.
+• Puzles: «Contrarreloj» y «Analizar esta posición» bajo cada puzle.
+• Nueva partida renovada: el rival en primer plano y las ayudas en pastillas.

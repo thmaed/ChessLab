@@ -1,7 +1,6 @@
-ChessLab 2.3
-• Cinque lingue: francese, inglese, spagnolo, tedesco e italiano, in tutta l'app, corsi compresi.
-• Notazione delle mosse «Automatica»: segue la lingua; un'altra scelta resta memorizzata.
-• Home su due livelli: quattro riquadri grandi, le altre modalità sotto «Altro».
-• Pulsante «½ Patta» più chiaro nella barra di gioco.
-• Analizza: un solo «Importa un file» (partita, posizione o database di partite).
-• Impostazioni: temi della scacchiera e set di pezzi in miniatura.
+ChessLab 2.4
+• Mosse a voce: di' «cavallo f3» o «arrocco corto»; viene riconosciuta sul telefono, senza rete.
+• Alla cieca: cinque livelli, dalla scacchiera in parte nascosta a quella invisibile; l'app ripete le mosse.
+• Visualizzazione: un modulo in cinque gradini per vedere la scacchiera nella testa.
+• Puzzle: «Contro il tempo» e «Analizza questa posizione» sotto ogni puzzle.
+• Nuova partita rinnovata: l'avversario in primo piano e gli aiuti in pillole.

@@ -1,7 +1,6 @@
-ChessLab 2.3
-• Fünf Sprachen: Französisch, Englisch, Spanisch, Deutsch und Italienisch, überall in der App, Kurse inklusive.
-• Zugnotation „Automatisch“: folgt der Sprache; eine andere Wahl bleibt gespeichert.
-• Startseite in zwei Ebenen: vier große Kacheln, übrige Modi unter „Mehr“.
-• Deutlicherer Knopf „½ Remis“ in der Spielleiste.
-• Analysieren: ein einziges „Datei importieren“ (Partie, Stellung oder Partiendatenbank).
-• Einstellungen: Brettdesigns und Figurensätze als Vorschaubilder.
+ChessLab 2.4
+• Züge per Sprache: Sag „Springer f3“ oder „kurze Rochade“ – erkannt auf dem Telefon, ohne Netzwerk.
+• Blind: fünf Stufen, vom teilweise verdeckten bis zum unsichtbaren Brett; die App wiederholt die Züge.
+• Visualisierung: ein Modul in fünf Stufen, um das Brett im Kopf zu sehen.
+• Puzzles: „Gegen die Uhr“ und „Diese Stellung analysieren“ unter jedem Puzzle.
+• Überarbeitete Neue Partie: der Gegner im Vordergrund, die Hilfen als kleine Kapseln.

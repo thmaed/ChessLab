@@ -1226,6 +1226,12 @@
     <string name="discovery_wn_4_body">El «?» reúne el detalle de las novedades, y puedes repetir esta visita cuando quieras.</string>
     <string name="discovery_replay_news_title">Repasar las novedades</string>
     <string name="discovery_replay_news_sub">Un breve recorrido por las novedades, allí donde viven.</string>
+    <string name="help_news24_title">Novedades 2.4</string>
+    <string name="help_news24_body">• Jugadas por voz: di «caballo f3» o «enroque corto»; se reconoce en el teléfono, sin red.
+• A ciegas: cinco niveles, del tablero en parte oculto al tablero invisible; la app repite las jugadas.
+• Visualización: un módulo en cinco peldaños para ver el tablero en la cabeza.
+• Puzles: «Contrarreloj» y «Analizar esta posición» bajo cada puzle.
+• Nueva partida renovada: el rival en primer plano y las ayudas en pastillas.</string>
     <string name="help_news23_title">Novedades 2.3</string>
     <string name="help_news23_body">• Idiomas: la app también habla español, alemán e italiano: interfaz, ayuda, cursos de aperturas y de finales.\n• Notación de las jugadas: «Automático» sigue el idioma de la app; cualquier otra elección se recuerda.\n• Inicio: cuatro tarjetas grandes; los demás modos, en «Más».\n• Analizar: un único «Importar un archivo», que reconoce una partida, una posición o una base de partidas.\n• Ajustes: temas y juegos de piezas en miniaturas.</string>
     <string name="help_news_title">Novedades de la 2.2</string>

@@ -1194,6 +1194,12 @@
     <string name="discovery_wn_4_body">Das „?“ bündelt die Einzelheiten der Neuheiten, und du kannst diese Tour jederzeit wiederholen.</string>
     <string name="discovery_replay_news_title">Neuheiten ansehen</string>
     <string name="discovery_replay_news_sub">Ein kurzer Rundgang durch die Neuheiten, dort, wo sie zu finden sind.</string>
+    <string name="help_news24_title">Neu in 2.4</string>
+    <string name="help_news24_body">• Züge per Sprache: Sag „Springer f3“ oder „kurze Rochade“ – erkannt auf dem Telefon, ohne Netzwerk.
+• Blind: fünf Stufen, vom teilweise verdeckten bis zum unsichtbaren Brett; die App wiederholt die Züge.
+• Visualisierung: ein Modul in fünf Stufen, um das Brett im Kopf zu sehen.
+• Puzzles: „Gegen die Uhr“ und „Diese Stellung analysieren“ unter jedem Puzzle.
+• Überarbeitete Neue Partie: der Gegner im Vordergrund, die Hilfen als kleine Kapseln.</string>
     <string name="help_news23_title">Neu in 2.3</string>
     <string name="help_news23_body">• Sprachen: Die App spricht jetzt auch Spanisch, Deutsch und Italienisch – Oberfläche, Hilfe, Eröffnungs- und Endspielkurse.\n• Zugnotation: „Automatisch“ folgt der Sprache der App; eine andere Wahl bleibt gespeichert.\n• Start: vier große Kacheln, die übrigen Modi unter „Mehr“.\n• Analysieren: ein einziges „Datei importieren“, das eine Partie, eine Stellung oder eine Partiendatenbank erkennt.\n• Einstellungen: Brettdesigns und Figurensätze als Vorschaubilder.</string>
     <string name="help_news_title">Neu in 2.2</string>

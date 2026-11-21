@@ -1267,6 +1267,12 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="discovery_wn_4_body">The “?” gathers the details of what\'s new, and you can replay this tour whenever you like.</string>
     <string name="discovery_replay_news_title">Replay what\'s new</string>
     <string name="discovery_replay_news_sub">A short tour of what\'s new, where it lives.</string>
+    <string name="help_news24_title">What\'s new in 2.4</string>
+    <string name="help_news24_body">• Voice moves: say “knight f3” or “castles kingside” — recognised on the phone, without the network.
+• Blindfold: five levels, from a partly hidden board to an invisible one; the app repeats the moves aloud.
+• Visualization: a module in five steps to see the board in your head.
+• Puzzles: “Against the clock”, and “Analyze this position” under each puzzle.
+• A redesigned New game screen: the opponent up front, the assists as pills.</string>
     <string name="help_news23_title">What\'s new in 2.3</string>
     <string name="help_news23_body">• Languages: the app now also speaks Spanish, German and Italian — interface, help, opening and endgame courses.\n• Move notation: “Automatic” follows the app\'s language; any other choice is remembered.\n• Home: four large tiles, the other modes under “More”.\n• Analyse: a single “Import a file”, which recognises one game, a position or a games database.\n• Settings: board themes and piece sets shown as thumbnails.</string>
     <string name="help_news_title">What\'s new in 2.2</string>

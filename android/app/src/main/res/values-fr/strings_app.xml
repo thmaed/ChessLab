@@ -1264,6 +1264,12 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="discovery_wn_4_body">Le « ? » rassemble le détail des nouveautés, et vous pouvez rejouer cette visite quand vous voulez.</string>
     <string name="discovery_replay_news_title">Revoir les nouveautés</string>
     <string name="discovery_replay_news_sub">Un court parcours des nouveautés, là où elles vivent.</string>
+    <string name="help_news24_title">Nouveautés 2.4</string>
+    <string name="help_news24_body">• Coups à la voix : dites « cavalier f3 » ou « petit roque » — reconnu sur le téléphone, sans réseau.
+• À l\'aveugle : cinq niveaux, du plateau partiellement caché au plateau invisible.
+• Visualisation : un module en cinq marches pour voir l\'échiquier dans sa tête.
+• Puzzles : « Contre la montre », et « Analyser cette position » sous chaque puzzle.
+• Nouvelle partie refaite : l\'adversaire en vedette, les aides en pastilles.</string>
     <string name="help_news23_title">Nouveautés 2.3</string>
     <string name="help_news23_body">• Langues : l\'app parle aussi espagnol, allemand et italien — interface, aide, cours d\'ouvertures et de finales.\n• Notation des coups : « Automatique » suit la langue de l\'app ; un autre choix reste mémorisé.\n• Accueil : quatre grandes tuiles, les autres modes sous « Plus ».\n• Analyser : un seul « Importer un fichier », qui reconnaît une partie, une position ou une base de parties.\n• Réglages : thèmes et jeux de pièces en vignettes.</string>
     <string name="help_news_title">Nouveautés de la 2.2</string>

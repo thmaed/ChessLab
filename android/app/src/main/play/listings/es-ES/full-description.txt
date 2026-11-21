@@ -1,12 +1,11 @@
 ChessLab es un compañero de ajedrez completo: jugar, analizar, entrenar y experimentar, con el motor Stockfish integrado y sin salir nunca de la aplicación. Nada se envía a ningún servidor: ni cuenta, ni publicidad.
 
-NOVEDADES DE LA 2.0
-• Sesión diaria: cada día, lo que hay que repasar (posiciones de apertura pendientes, puzles fallados, un final), con tu racha de días y medallas.
-• Análisis: tus errores se convierten en puzles y en Progreso se dibuja un perfil de debilidades.
-• El Coach: bajo un error, la proporción de jugadores de tu nivel que juegan esa jugada.
-• Una puntuación personal de puzles y «A mi nivel» para puzles a tu medida.
-• Aperturas: tarjetas ilustradas, filtros de Bando y Nivel, y las 19 «clásicas».
-• Límite de tiempo opcional: un interruptor, y la app recuerda tu última elección.
+NOVEDADES DE LA 2.4
+• Jugadas por voz: di «caballo f3» o «enroque corto»; se reconoce en el teléfono, sin red.
+• A ciegas: cinco niveles, del tablero en parte oculto al tablero invisible; la app repite las jugadas.
+• Visualización: un módulo en cinco peldaños para ver el tablero en la cabeza.
+• Puzles: «Contrarreloj» y «Analizar esta posición» bajo cada puzle.
+• Nueva partida renovada: el rival en primer plano y las ayudas en pastillas.
 
 ADVERSARIOS QUE JUEGAN COMO HUMANOS
 Nueve personajes interpretados por Maia-3, una red entrenada con millones de partidas humanas: no busca la mejor jugada, sino la que jugaría un humano de ese nivel, errores incluidos cuando el nivel es bajo. Cada uno tiene su estilo, su repertorio de aperturas, su temperamento y su retrato, y su nivel se ajusta en la escala humana. O enfréntate al propio Stockfish, del principiante al nivel máximo. Reloj opcional: bullet, blitz, rápida, clásica, con incremento.
@@ -39,7 +38,7 @@ LABORATORIO
 Enfrenta dos ajustes en una serie de partidas para comparar su fuerza.
 
 PRIVACIDAD
-Sin cuenta, sin servidor, sin publicidad, sin medición de audiencia. La aplicación ni siquiera tiene permiso para acceder a Internet: tus partidas y tus ajustes se quedan en tu teléfono. Para cambiar de dispositivo, basta un archivo que guardas y vuelves a abrir donde quieras.
+Sin cuenta, sin servidor, sin publicidad, sin medición de audiencia. La aplicación ni siquiera tiene permiso para acceder a Internet: tus partidas y tus ajustes se quedan en tu teléfono. Para cambiar de dispositivo, basta un archivo que guardas y vuelves a abrir donde quieras. Única excepción: el micrófono, que activas tú para las jugadas por voz; tu voz se reconoce en el teléfono, sin red, y nunca se graba.
 
 Francés, inglés, español, alemán e italiano, incluidos la interfaz y el contenido de los cursos. Vertical y horizontal.
 

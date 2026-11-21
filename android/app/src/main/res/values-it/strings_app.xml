@@ -1226,6 +1226,12 @@
     <string name="discovery_wn_4_body">Il «?» raccoglie il dettaglio delle novità, e puoi rivedere questo tour quando vuoi.</string>
     <string name="discovery_replay_news_title">Rivedi le novità</string>
     <string name="discovery_replay_news_sub">Un breve percorso tra le novità, dove vivono.</string>
+    <string name="help_news24_title">Novità della 2.4</string>
+    <string name="help_news24_body">• Mosse a voce: di\' «cavallo f3» o «arrocco corto»; viene riconosciuta sul telefono, senza rete.
+• Alla cieca: cinque livelli, dalla scacchiera in parte nascosta a quella invisibile; l\'app ripete le mosse.
+• Visualizzazione: un modulo in cinque gradini per vedere la scacchiera nella testa.
+• Puzzle: «Contro il tempo» e «Analizza questa posizione» sotto ogni puzzle.
+• Nuova partita rinnovata: l\'avversario in primo piano e gli aiuti in pillole.</string>
     <string name="help_news23_title">Novità della 2.3</string>
     <string name="help_news23_body">• Lingue: l\'app parla anche spagnolo, tedesco e italiano — interfaccia, aiuto, corsi di aperture e di finali.\n• Notazione delle mosse: «Automatico» segue la lingua dell\'app; un\'altra scelta resta memorizzata.\n• Home: quattro riquadri grandi, le altre modalità sotto «Altro».\n• Analizza: un solo «Importa un file», che riconosce una partita, una posizione o un database di partite.\n• Impostazioni: temi e set di pezzi in miniatura.</string>
     <string name="help_news_title">Novità della 2.2</string>

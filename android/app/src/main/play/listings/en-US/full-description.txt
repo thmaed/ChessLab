@@ -1,12 +1,11 @@
 ChessLab is a complete chess companion: play, analyse, train and experiment, with the Stockfish engine built in and without ever leaving the app. Nothing is sent to a server: no account, no ads, no data collected.
 
-NEW IN 2.0
-• Daily session: every day, what to review — opening positions due, missed puzzles, an endgame — with your streak of days and medals.
-• Analysis: your mistakes become puzzles and a weakness profile builds up in Progress.
-• The Coach: under a mistake, the share of players at your level who play that move.
-• A personal puzzle rating, and “At my level” for puzzles that fit you.
-• Openings: illustrated cards, Side and Level filters, and the 19 “classics”.
-• Time limit is optional: one switch, and the app remembers your last choice.
+NEW IN 2.4
+• Voice moves: say “knight f3” or “castles kingside” — recognised on the phone, without the network.
+• Blindfold: five levels, from a partly hidden board to an invisible one; the app repeats the moves aloud.
+• Visualization: a module in five steps to see the board in your head.
+• Puzzles: “Against the clock”, and “Analyze this position” under each puzzle.
+• A redesigned New game screen: the opponent up front, the assists as pills.
 
 OPPONENTS THAT PLAY LIKE PEOPLE
 Nine characters played by Maia-3, a network trained on millions of human games: it does not look for the best move, it plays the one a human of that level would play — blunders included at the lower levels. Each has a style, an opening repertoire, a temperament and a portrait, and a level set on the human scale. Or face Stockfish itself, from beginner to full strength. Clock is optional: bullet, blitz, rapid, classical, with increment.
@@ -39,7 +38,7 @@ LABORATORY
 Set two configurations against each other over a series of games to compare their strength.
 
 PRIVACY
-No account, no server, no advertising, no analytics. The app does not even hold permission to reach the internet: your games and settings stay on your phone. To move to another device, a single file you write and reopen wherever you like.
+No account, no server, no advertising, no analytics. The app does not even hold permission to reach the internet: your games and settings stay on your phone. To move to another device, a single file you write and reopen wherever you like. The one exception is the microphone, which you switch on yourself for voice moves: your voice is recognised on the phone, without the network, and never recorded.
 
 English, French, Spanish, German and Italian, interface and course content alike. Portrait and landscape.
 

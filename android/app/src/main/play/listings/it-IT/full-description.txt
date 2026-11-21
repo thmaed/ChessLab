@@ -1,12 +1,11 @@
 ChessLab è un compagno di scacchi completo: giocare, analizzare, allenarsi e sperimentare, con il motore Stockfish integrato. Nulla viene inviato a un server: niente account, niente pubblicità.
 
-NOVITÀ DELLA 2.0
-• Sessione del giorno: ogni giorno, ciò che c'è da ripassare (posizioni d'apertura da ripassare, puzzle sbagliati, un finale), con la tua serie di giorni e le medaglie.
-• Analisi: i tuoi errori diventano puzzle e in Progressi si disegna un profilo delle debolezze.
-• Il Coach: sotto un errore, la quota di giocatori del tuo livello che giocano quella mossa.
-• Un punteggio personale dei puzzle e «Al mio livello» per puzzle su misura.
-• Aperture: schede illustrate, filtri per Lato e Livello e le 19 «classiche».
-• Limite di tempo facoltativo: un interruttore, e l'app ricorda la tua ultima scelta.
+NOVITÀ DELLA 2.4
+• Mosse a voce: di' «cavallo f3» o «arrocco corto»; viene riconosciuta sul telefono, senza rete.
+• Alla cieca: cinque livelli, dalla scacchiera in parte nascosta a quella invisibile; l'app ripete le mosse.
+• Visualizzazione: un modulo in cinque gradini per vedere la scacchiera nella testa.
+• Puzzle: «Contro il tempo» e «Analizza questa posizione» sotto ogni puzzle.
+• Nuova partita rinnovata: l'avversario in primo piano e gli aiuti in pillole.
 
 AVVERSARI CHE GIOCANO COME UMANI
 Nove personaggi interpretati da Maia-3, una rete addestrata su milioni di partite umane: non cerca la mossa migliore, ma quella che giocherebbe un umano di quel livello, errori compresi quando il livello è basso. Ognuno ha il suo stile, il suo repertorio di aperture, il suo temperamento e il suo ritratto, e il suo livello si regola sulla scala umana. Oppure affronta Stockfish, dal principiante al massimo. Orologio facoltativo: bullet, blitz, rapid, classico, con incremento.
@@ -39,7 +38,7 @@ LABORATORIO
 Fai affrontare due impostazioni in una serie di partite per confrontarne la forza.
 
 PRIVACY
-Nessun account, nessun server, nessuna pubblicità, nessuna misurazione del pubblico. L'app non ha nemmeno il permesso di accedere a Internet: le tue partite e le tue impostazioni restano sul tuo telefono. Per cambiare dispositivo basta un file da salvare e riaprire dove vuoi.
+Nessun account, nessun server, nessuna pubblicità, nessuna misurazione del pubblico. L'app non ha nemmeno il permesso di accedere a Internet: le tue partite e le tue impostazioni restano sul tuo telefono. Per cambiare dispositivo basta un file da salvare e riaprire dove vuoi. Unica eccezione: il microfono, che attivi tu per le mosse a voce; la tua voce viene riconosciuta sul telefono, senza rete, e non viene mai registrata.
 
 Francese, inglese, spagnolo, tedesco e italiano, interfaccia e contenuto dei corsi compresi. Verticale e orizzontale.
 

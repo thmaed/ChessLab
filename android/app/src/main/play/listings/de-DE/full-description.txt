@@ -1,12 +1,11 @@
 ChessLab ist ein kompletter Schachbegleiter: spielen, analysieren, trainieren, experimentieren – mit der eingebauten Engine Stockfish. Nichts geht an einen Server: kein Konto, keine Werbung.
 
-NEU IN 2.0
-• Tagestraining: Jeden Tag das, was zu wiederholen ist – fällige Eröffnungsstellungen, verfehlte Puzzles, ein Endspiel – mit deiner Tagesserie und Medaillen.
-• Analyse: Deine Fehler werden zu Puzzles, und im Fortschritt zeichnet sich ein Schwächenprofil ab.
-• Der Coach: Unter einem Fehler zeigt er, wie viele Spieler deiner Stufe diesen Zug spielen.
-• Eine persönliche Puzzle-Wertung und „Auf meiner Stufe“ für Puzzles, die zu dir passen.
-• Eröffnungen: illustrierte Karten, Filter für Seite und Stufe und die 19 „Klassiker“.
-• Optionales Zeitlimit: ein Schalter, und die App merkt sich deine letzte Wahl.
+NEU IN 2.4
+• Züge per Sprache: Sag „Springer f3“ oder „kurze Rochade“ – erkannt auf dem Telefon, ohne Netzwerk.
+• Blind: fünf Stufen, vom teilweise verdeckten bis zum unsichtbaren Brett; die App wiederholt die Züge.
+• Visualisierung: ein Modul in fünf Stufen, um das Brett im Kopf zu sehen.
+• Puzzles: „Gegen die Uhr“ und „Diese Stellung analysieren“ unter jedem Puzzle.
+• Überarbeitete Neue Partie: der Gegner im Vordergrund, die Hilfen als kleine Kapseln.
 
 GEGNER, DIE WIE MENSCHEN SPIELEN
 Neun Charaktere, gespielt von Maia-3, einem Netz, das auf Millionen menschlicher Partien trainiert wurde: Es sucht nicht den besten Zug, sondern den, den ein Mensch dieser Stärke spielen würde – bei niedriger Stufe samt Patzern. Jeder hat seinen Stil, sein Eröffnungsrepertoire, sein Temperament und sein Porträt, und seine Stärke wird auf der menschlichen Skala eingestellt. Oder tritt gegen Stockfish selbst an, vom Anfänger bis zur Höchststufe. Optionale Schachuhr: Bullet, Blitz, Rapid, klassisch, mit Inkrement.
@@ -39,7 +38,7 @@ LABOR
 Lass zwei Einstellungen in einer Partienserie gegeneinander antreten, um ihre Stärke zu vergleichen.
 
 DATENSCHUTZ
-Kein Konto, kein Server, keine Werbung, keine Reichweitenmessung. Die App hat nicht einmal die Berechtigung, auf das Internet zuzugreifen: Deine Partien und Einstellungen bleiben auf deinem Telefon. Für den Gerätewechsel genügt eine Datei, die du speicherst und öffnest, wo du willst.
+Kein Konto, kein Server, keine Werbung, keine Reichweitenmessung. Die App hat nicht einmal die Berechtigung, auf das Internet zuzugreifen: Deine Partien und Einstellungen bleiben auf deinem Telefon. Für den Gerätewechsel genügt eine Datei, die du speicherst und öffnest, wo du willst. Einzige Ausnahme: das Mikrofon, das du selbst für Züge per Sprache einschaltest; deine Stimme wird auf dem Telefon erkannt, ohne Netzwerk, und nie aufgenommen.
 
 Französisch, Englisch, Spanisch, Deutsch und Italienisch, Oberfläche und Kursinhalte inbegriffen. Hoch- und Querformat.
 
